@@ -5,6 +5,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
@@ -15,6 +18,23 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
+        toolbar.setTitle("新闻列表");
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.main_menu_settings:
+//                        TODO: implement intent to setting activity here
+                        break;
+                    case R.id.main_menu_search:
+                        break;
+                }
+                return true;
+            }
+        });
+
+        setSupportActionBar(toolbar);
 
         Fragment newFragment = NewsListFragment.newInstance(-1, "", false);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -27,6 +47,12 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
     public void onFragmentInteraction(String newsID) {
         Intent intent = new Intent(MainActivity.this, NewsViewActivity.class);
         intent.putExtra("id", newsID);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
     }
 }
