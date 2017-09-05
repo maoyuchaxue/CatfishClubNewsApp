@@ -4,7 +4,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
  * Created by YU_Jason on 2017/9/5.
  */
 
-public enum NewsCategory {
+public enum NewsCategoryTag {
     SCITECH,
     EDUCATION,
     MILITARY,
@@ -33,7 +33,7 @@ public enum NewsCategory {
             "娱乐"
     };
 
-    public static final NewsCategory[] CATEGORIES = {
+    public static final NewsCategoryTag[] CATEGORIES = {
             SCITECH,
             EDUCATION,
             MILITARY,
@@ -48,7 +48,7 @@ public enum NewsCategory {
             ENTERTAINMENT
     };
 
-    public static NewsCategory getCategoryByTitle(String title){
+    public static NewsCategoryTag getCategoryByTitle(String title){
         for(int i = 0; i < TITLES.length; i ++)
             if(TITLES[i].equals(title))
                 return CATEGORIES[i];

@@ -8,7 +8,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 public class LocalStorageNewsCache implements NewsCache {
     @Override
-    public NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategory category) throws NewsSourceException {
+    public NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
         return new NewsMetaInfo[0];
     }
 

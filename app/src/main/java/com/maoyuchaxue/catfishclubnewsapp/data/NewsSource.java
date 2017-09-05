@@ -8,7 +8,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
  */
 
 public interface NewsSource {
-    NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategory category) throws NewsSourceException;
+    NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException;
     NewsContent getNewsContent(String id) throws NewsSourceException;
     int getPageSize();
 
