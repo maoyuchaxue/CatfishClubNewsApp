@@ -4,13 +4,18 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
  * Created by YU_Jason on 2017/9/5.
  */
 
-public class CachedWebNewsList implements NewsList {
+public class CachedSourceNewsList implements NewsList {
 
 
     private class CachedWebNewsCursor implements NewsCursor{
 
         @Override
-        public News getNews() {
+        public NewsMetaInfo getNewsMetaInfo() {
+            return null;
+        }
+
+        @Override
+        public NewsContent getNewsContent() {
             return null;
         }
 
@@ -44,4 +49,6 @@ public class CachedWebNewsList implements NewsList {
     public void close() {
 
     }
+
+
 }

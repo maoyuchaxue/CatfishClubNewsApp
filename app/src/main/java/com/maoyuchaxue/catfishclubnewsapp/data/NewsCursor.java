@@ -7,7 +7,9 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
  */
 
 public interface NewsCursor {
-    News getNews();
+
+    NewsMetaInfo getNewsMetaInfo();
+    NewsContent getNewsContent();
     boolean moveToNext();
     boolean moveToPrevious();
     boolean existing();
