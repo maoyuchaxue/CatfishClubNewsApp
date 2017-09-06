@@ -74,6 +74,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/news_info_list">
         </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

@@ -2,9 +2,16 @@ package com.maoyuchaxue.catfishclubnewsapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +21,20 @@ import android.widget.TextView;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.MainActivity;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
+import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoLoader;
+import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsList;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfoListSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.SourceNewsList;
+import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsMetaInfoListSource;
 
 import org.w3c.dom.Text;
+
+import java.util.List;
 
 
 /**
@@ -26,19 +45,25 @@ import org.w3c.dom.Text;
  * Use the {@link NewsListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewsListFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+public class NewsListFragment extends Fragment
+        implements NewsMetainfoRecyclerViewAdapter.OnRecyclerViewItemClickListener,
+        LoaderManager.LoaderCallbacks<List<NewsCursor> >{
+
     private static final String ARG_CATEGORY = "category";
     private static final String ARG_KEYWORD = "keyword";
     private static final String ARG_IS_LOCAL = "is_local";
 
-    // TODO: Rename and change types of parameters
-    private int category;
+    private static final int NEWS_CURSOR_LOADER_ID = 1;
+
+    private String category;
     private String keyword;
     private boolean isLocal;
 
     private OnFragmentInteractionListener mListener;
+    private NewsMetainfoRecyclerViewAdapter mAdapter;
+    private Loader<List<NewsCursor>> mLoader;
+    private NewsList newsList;
+    private NewsCursor mCursor;
 
     public NewsListFragment() {
         // Required empty public constructor
@@ -53,10 +78,11 @@ public class NewsListFragment extends Fragment {
      * @return A new instance of fragment NewsListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewsListFragment newInstance(int category, String keyword, boolean isLocal) {
+    public static NewsListFragment newInstance(String category, String keyword, boolean isLocal) {
         NewsListFragment fragment = new NewsListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_CATEGORY, category);
+
+        args.putString(ARG_CATEGORY, category);
         args.putString(ARG_KEYWORD, keyword);
         args.putBoolean(ARG_IS_LOCAL, isLocal);
         fragment.setArguments(args);
@@ -67,7 +93,7 @@ public class NewsListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            category = getArguments().getInt(ARG_CATEGORY);
+            category = getArguments().getString(ARG_CATEGORY);
             keyword = getArguments().getString(ARG_KEYWORD);
             isLocal = getArguments().getBoolean(ARG_IS_LOCAL);
         }
@@ -76,31 +102,43 @@ public class NewsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         LinearLayout curView = (LinearLayout) inflater.inflate(R.layout.fragment_news_list, container, false);
-        View subView = inflater.inflate(R.layout.news_into_unit_layout, curView, false);
 
-        TextView title = (TextView) subView.findViewById(R.id.news_unit_title);
-        title.setText("假装有标题");
-        TextView intro = (TextView) subView.findViewById(R.id.news_unit_intro);
-        intro.setText("假装有新闻简介假装有新闻简介假装有新闻简介假装有新闻简介假装有新闻简介假装有新闻简介");
-        TextView id = (TextView) subView.findViewById(R.id.news_unit_id);
-        id.setText("testid");
-        curView.addView(subView);
+        RecyclerView recyclerView = (RecyclerView) curView.findViewById(R.id.news_info_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
 
-        subView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    TextView tview = (TextView) view.findViewById(R.id.news_unit_id);
-                    mListener.onFragmentInteraction(tview.getText().toString());
-                }
-            }
-        });
+        mAdapter= new NewsMetainfoRecyclerViewAdapter();
+        mAdapter.setOnRecyclerViewItemClickListener(this);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setHasFixedSize(true);
+
+
+        NewsContentSource newsContentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+
+        NewsCategoryTag tag = NewsCategoryTag.getCategoryByTitle(category);
+        if (tag != null || !keyword.isEmpty()) {
+            NewsMetaInfoListSource metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
+            newsList = new SourceNewsList(metaInfoListSource, newsContentSource, keyword, tag);
+        } else {
+            NewsMetaInfoListSource metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
+            newsList = new SourceNewsList(metaInfoListSource, newsContentSource);
+        }
+
+        mCursor = null;
+
+        Bundle args = new Bundle();
+        mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
+        mLoader.forceLoad();
         return curView;
     }
 
-//    // TODO: Rename method, update argument and hook method into UI event
+    public void onItemClick(View view, NewsCursor cursor) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(cursor);
+        }
+    }
+
 //    public void onButtonPressed(Uri uri) {
 //        if (mListener != null) {
 //            mListener.onFragmentInteraction(uri);
@@ -135,6 +173,26 @@ public class NewsListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(String newsID);
+        void onFragmentInteraction(NewsCursor cursor);
     }
+
+    @Override
+    public Loader<List<NewsCursor> > onCreateLoader(int id, Bundle args) {
+        Log.i("catclub", "create loader");
+        return new NewsMetainfoLoader(this.getContext(), 10, mCursor, newsList);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<NewsCursor>> loader, List<NewsCursor> data) {
+        NewsMetainfoLoader metainfoLoader = (NewsMetainfoLoader) loader;
+        mCursor = metainfoLoader.getCurrentCursor();
+        Log.i("catclub", "finished");
+        for (int i = 0; i < data.size(); i++) {
+            mAdapter.addItem(data.get(i));
+            Log.i("catclub", String.valueOf(i));
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<NewsCursor>> loader) {}
 }

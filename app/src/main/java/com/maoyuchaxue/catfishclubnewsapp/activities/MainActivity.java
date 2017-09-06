@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +18,17 @@ import android.widget.Button;
 import com.flyco.tablayout.SlidingTabLayout;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.CategoryViewPagerAdapter;
+import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NewsListFragment.OnFragmentInteractionListener {
+
+
+public class MainActivity extends AppCompatActivity
+        implements NewsListFragment.OnFragmentInteractionListener {
 
     private void initActionBar() {
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
@@ -34,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
                 switch (item.getItemId()) {
                     case R.id.main_menu_settings:
                         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+
                         startActivityForResult(intent, 1);
                         break;
                     case R.id.main_menu_search:
@@ -51,16 +59,16 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
         ViewPager viewPager = (ViewPager) findViewById(R.id.main_menu_viewpager);
 
         ArrayList<Fragment> fragments = new ArrayList<Fragment>();
-        fragments.add(NewsListFragment.newInstance(-1, "", false));
-        fragments.add(NewsListFragment.newInstance(1, "", false));
-        fragments.add(NewsListFragment.newInstance(2, "", false));
-        fragments.add(NewsListFragment.newInstance(3, "", false));
-        fragments.add(NewsListFragment.newInstance(4, "", false));
-        fragments.add(NewsListFragment.newInstance(5, "", false));
-        fragments.add(NewsListFragment.newInstance(6, "", false));
-        fragments.add(NewsListFragment.newInstance(7, "", false));
-        fragments.add(NewsListFragment.newInstance(8, "", false));
-        fragments.add(NewsListFragment.newInstance(9, "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
+        fragments.add(NewsListFragment.newInstance("", "", false));
 
         ArrayList<String> titles = new ArrayList<String>();
         titles.add("ZH");
@@ -109,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
     }
 
     @Override
-    public void onFragmentInteraction(String newsID) {
+    public void onFragmentInteraction(NewsCursor cursor) {
         Intent intent = new Intent(MainActivity.this, NewsViewActivity.class);
-        intent.putExtra("id", newsID);
+        intent.putExtra("id", cursor.getNewsMetaInfo().getId());
         startActivityForResult(intent, 0);
     }
 
