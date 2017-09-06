@@ -1,14 +1,23 @@
 <resources>
     <string name="app_name">News App</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="main_page_title">新闻列表</string>
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
+    <string name="pref_header_general">应用设置</string>
+
+    <string name="pref_enable_dark_style">夜间模式</string>
+
+    <string name="pref_offline">离线模式</string>
+    <string name="pref_offline_description">停止网络连接，只查看离线页面</string>
+
+    <string name="pref_text_only">省流量模式</string>
+    <string name="pref_text_only_description">只看文字，节省流量</string>
 
     <string name="pref_title_social_recommendations">Enable social recommendations</string>
     <string name="pref_description_social_recommendations">Recommendations for people to contact
