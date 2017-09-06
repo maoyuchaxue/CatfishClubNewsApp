@@ -128,7 +128,12 @@ public class NewsListFragment extends Fragment
         mCursor = null;
 
         Bundle args = new Bundle();
-        mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
+        Loader<List<NewsCursor> > loader = getLoaderManager().getLoader(NEWS_CURSOR_LOADER_ID);
+        if (loader != null && loader.isReset()) {
+            getLoaderManager().destroyLoader(NEWS_CURSOR_LOADER_ID);
+        } else {
+            mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
+        }
         mLoader.forceLoad();
         return curView;
     }
