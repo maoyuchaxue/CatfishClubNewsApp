@@ -15,12 +15,16 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.pm.ActivityInfoCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.app.Activity;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
@@ -49,7 +53,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 //                TODO: implement listeners for preference change
             String stringValue = value.toString();
-
+            //System.out.println("out:  "+preference);
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
@@ -63,6 +67,34 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 : null);
 
             } else {
+
+                if(String.valueOf(preference).equals("夜间模式"))
+                {
+                    System.out.println("yes");
+
+                    Intent intent = new Intent();
+                    intent.putExtra("username", "day-night");
+                    intent.putExtra("to", "night");
+                    MainActivity activity = new MainActivity();
+                    activity.setResult(1,intent);
+                    //建议删掉吧
+                    //SettingsActivity.super.setResult(1,intent);
+                    //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    //activity.recreate();
+                    //GeneralPreferenceFragment.
+                    //getActivity().setResult(1,intent);
+
+                    //setResult(1,intent);
+                    //startActivity(intent);
+                    //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    //recreate();
+                }
+                else
+                {
+                    //TODO: other preferences
+
+                }
+
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
 //                preference.setSummary(stringValue);
@@ -161,6 +193,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
+
             bindPreferenceSummaryToValue(findPreference("dark_style"));
             bindPreferenceSummaryToValue(findPreference("offline_mode"));
             bindPreferenceSummaryToValue(findPreference("text_only_mode"));
