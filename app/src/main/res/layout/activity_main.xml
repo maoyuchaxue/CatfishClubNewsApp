@@ -17,21 +17,47 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/main_menu_tablayout"
-        android:layout_below="@+id/main_menu_toolbar"
+    <RelativeLayout
+        android:id="@+id/main_menu_tab_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabSelectedTextColor="@color/colorPrimary"
-        app:tabIndicatorColor="@color/colorPrimary"
-        app:tabTextColor="@android:color/background_dark"
-        app:tabBackground="@android:color/white">
+        android:orientation="horizontal"
+        android:layout_below="@+id/main_menu_toolbar"
+        android:layout_height="48dp"
+        android:background="@android:color/white">
 
-    </android.support.design.widget.TabLayout>
+        <com.flyco.tablayout.SlidingTabLayout
+            android:layout_toLeftOf="@+id/main_menu_category_button"
+            android:id="@+id/main_menu_tablayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:tl_underline_color="@color/colorPrimary"
+            app:tl_indicator_color="@color/colorPrimary"
+            app:tl_textSelectColor="@color/colorPrimary"
+            app:tl_textUnselectColor="@android:color/black"
+            app:tl_textBold="SELECT"
+            app:tl_textsize="16sp"
+            app:tl_divider_color="@android:color/darker_gray"
+            >
+        </com.flyco.tablayout.SlidingTabLayout>
+
+        <!--<android.support.design.widget.TabLayout-->
+        <!--</android.support.design.widget.TabLayout>-->
+
+        <Button
+            android:layout_alignParentRight="true"
+            android:id="@+id/main_menu_category_button"
+            android:background="@drawable/ic_add_black_24dp"
+            android:layout_margin="6dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp">
+        </Button>
+
+    </RelativeLayout>
+
 
     <android.support.v4.view.ViewPager
         android:id="@+id/main_menu_viewpager"
-        android:layout_below="@+id/main_menu_tablayout"
+        android:layout_below="@+id/main_menu_tab_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </android.support.v4.view.ViewPager>
