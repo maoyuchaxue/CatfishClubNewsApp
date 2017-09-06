@@ -11,7 +11,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
+import com.flyco.tablayout.SlidingTabLayout;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.CategoryViewPagerAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
@@ -21,10 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NewsListFragment.OnFragmentInteractionListener {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    private void initActionBar() {
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
         toolbar.setTitle("新闻列表");
 
@@ -44,20 +43,33 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
                 return true;
             }
         });
+    }
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.main_menu_tablayout);
+    private void initTabLayout() {
+        SlidingTabLayout tabLayout = (SlidingTabLayout) findViewById(R.id.main_menu_tablayout);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.main_menu_viewpager);
-
 
         ArrayList<Fragment> fragments = new ArrayList<Fragment>();
         fragments.add(NewsListFragment.newInstance(-1, "", false));
         fragments.add(NewsListFragment.newInstance(1, "", false));
         fragments.add(NewsListFragment.newInstance(2, "", false));
         fragments.add(NewsListFragment.newInstance(3, "", false));
+        fragments.add(NewsListFragment.newInstance(4, "", false));
+        fragments.add(NewsListFragment.newInstance(5, "", false));
+        fragments.add(NewsListFragment.newInstance(6, "", false));
+        fragments.add(NewsListFragment.newInstance(7, "", false));
+        fragments.add(NewsListFragment.newInstance(8, "", false));
+        fragments.add(NewsListFragment.newInstance(9, "", false));
 
         ArrayList<String> titles = new ArrayList<String>();
         titles.add("ZH");
+        titles.add("C1");
+        titles.add("C2");
+        titles.add("C3");
+        titles.add("C1");
+        titles.add("C2");
+        titles.add("C3");
         titles.add("C1");
         titles.add("C2");
         titles.add("C3");
@@ -66,13 +78,34 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
                 fragments, titles);
         viewPager.setAdapter(viewPagerAdapter);
 
-        tabLayout.setupWithViewPager(viewPager);
+        String[] titleStrs = new String[10];
+        Object[] objs = titles.toArray();
+        for (int i = 0; i < objs.length; i++) {
+            titleStrs[i] = (String) objs[i];
+        }
 
-//        Fragment newFragment = NewsListFragment.newInstance(-1, "", false);
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//
-//        transaction.replace(R.id.news_info_list, newFragment);
-//        transaction.commit();
+        tabLayout.setViewPager(viewPager, titleStrs);
+    }
+
+    private void initCategoryButton() {
+        Button categoryButton = (Button) findViewById(R.id.main_menu_category_button);
+        categoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, CategoryEditActivity.class);
+                startActivityForResult(intent, 2);
+            }
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        initActionBar();
+        initTabLayout();
+        initCategoryButton();
     }
 
     @Override
