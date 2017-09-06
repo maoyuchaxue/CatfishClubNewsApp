@@ -7,4 +7,6 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsSource;
  */
 
 public interface NewsCache extends NewsSource {
+    NewsMetaInfo[] getNewsMetaInfoListFromCache(int pageNo, String keyword, NewsCategoryTag categoryTag);
+    void flush();
 }

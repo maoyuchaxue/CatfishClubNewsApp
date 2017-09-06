@@ -26,4 +26,14 @@ public class LocalStorageNewsCache implements NewsCache {
     public void close() throws NewsSourceException {
 
     }
+
+    @Override
+    public NewsMetaInfo[] getNewsMetaInfoListFromCache(int pageNo, String keyword, NewsCategoryTag categoryTag) {
+        return new NewsMetaInfo[0];
+    }
+
+    @Override
+    public void flush() {
+
+    }
 }
