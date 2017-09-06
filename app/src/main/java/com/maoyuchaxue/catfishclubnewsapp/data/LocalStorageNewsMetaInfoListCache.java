@@ -1,5 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
+import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
+
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 /**
@@ -8,14 +10,30 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 public class LocalStorageNewsMetaInfoListCache implements NewsMetaInfoListCache {
     @Override
-    public NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
-        return new NewsMetaInfo[0];
+    public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
+        return new Pair<>(new NewsMetaInfo[0], 0);
+    }
+
+    @Override
+    public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException {
+
+        return new Pair<>(new NewsMetaInfo[0], 0);
     }
 
 
     @Override
     public int getPageSize() {
         return 0;
+    }
+
+    @Override
+    public int getCapacity() {
+        return 0;
+    }
+
+    @Override
+    public void refresh() {
+
     }
 
     @Override

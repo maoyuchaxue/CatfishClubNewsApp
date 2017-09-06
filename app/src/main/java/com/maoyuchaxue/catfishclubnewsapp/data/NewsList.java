@@ -10,6 +10,8 @@ public interface NewsList {
      * @return The NewsCursor of the requested news item.
      * */
     NewsCursor getCursor(int index);
+    NewsCursor getHeadCursor();
+    int getLength();
 
     void close();
 }

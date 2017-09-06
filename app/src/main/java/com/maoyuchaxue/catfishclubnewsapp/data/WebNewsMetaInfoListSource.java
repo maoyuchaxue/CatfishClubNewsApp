@@ -1,5 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
+import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
+
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 import com.google.gson.JsonArray;
@@ -26,8 +28,10 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
     private static final int PAGE_SIZE = 20;
     private static final SimpleDateFormat DATE_FORMAT =
             new SimpleDateFormat("yyyyMMddHHmmss"); // for parsing the date time
-    private String apiUrl;
     private static final JsonParser JSON_PARSER = new JsonParser();
+
+    private String apiUrl;
+    private int capacity;
 
     /**
      * @param apiUrl The URL for the fetching the service API.
@@ -35,6 +39,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
      * */
     public WebNewsMetaInfoListSource(String apiUrl){
         this.apiUrl = apiUrl;
+        refresh();
     }
 
     private String buildQueryString(int pageNo, String keyword, NewsCategoryTag category){
@@ -79,11 +84,12 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         else {
             String[] pics = picStr.split(";");
             ArrayList<URL> picsUrl = new ArrayList<URL>();
-            for (int i = 0; i < pics.length; i++) {
+            for (String pu : pics) {
                 try {
-                    picsUrl.add(new URL(pics[i]));
+                    picsUrl.add(new URL(pu));
                 } catch(MalformedURLException e){
-                    e.printStackTrace();
+                    System.err.println("(A malformed URL found!)");
+                    //e.printStackTrace();
                     // do nothing
                 }
             }
@@ -92,7 +98,12 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
         // parse the url of the video
         String video = json.get("news_Video").getAsString();
-        metaInfo.setVideo(video.equals("") ? null : new URL(video));
+        //System.err.println(video);
+        try {
+            metaInfo.setVideo(video.equals("") ? null : new URL(video));
+        } catch(MalformedURLException e){
+            metaInfo.setVideo(null);
+        }
 
         metaInfo.setIntro(json.get("news_Intro").getAsString());
 
@@ -114,9 +125,10 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
 
     @Override
-    public NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword,
-                                              NewsCategoryTag category) throws NewsSourceException {
+    public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword,
+                                                                     NewsCategoryTag category) throws NewsSourceException {
         NewsMetaInfo[] list = null;
+        int st = 0;
         try {
             URL url = new URL(buildQueryString(pageNo, keyword, category));
 
@@ -127,8 +139,12 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
 //            JsonObject haha = new JsonObject();
 
+//            System.err.println(pageNo);
             JsonObject json = JSON_PARSER.parse(readContentFromConnection(con)).getAsJsonObject();
             list = createMetaInfoListFromJSON(json);
+
+            // compute the index of the starting record
+            st = json.get("totalRecords").getAsInt() - (pageNo - 1) * PAGE_SIZE - 1;
 
             con.disconnect();
         } catch(IOException e){
@@ -141,13 +157,29 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
             //TODO: deal with ParseException
         }
 
-        return list;
+        return new Pair<>(list, st);
+    }
+
+    @Override
+    public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException {
+        // TODO: do nothing about it
+        return new Pair<>(new NewsMetaInfo[0], 0);
     }
 
 
     @Override
     public int getPageSize() {
         return PAGE_SIZE;
+    }
+
+    @Override
+    public int getCapacity() {
+        return capacity;
+    }
+
+    @Override
+    public void refresh(){
+        // TODO: update the capacity
     }
 
     @Override
@@ -160,7 +192,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         WebNewsMetaInfoListSource newsSource = new WebNewsMetaInfoListSource(
                 "http://166.111.68.66:2042/news/action/query/latest",
                 "http://166.111.68.66:2042/news/action/query/detail");
-        for(NewsMetaInfo metaInfo : newsSource.getNewsMetaInfoList(1, null, null))
+        for(NewsMetaInfo metaInfo : newsSource.getNewsMetaInfoListByPageNo(1, null, null))
             System.out.println(metaInfo.getTitle());
 
     }

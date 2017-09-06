@@ -24,6 +24,10 @@ public class WebNewsContentSource implements NewsContentSource {
     private static final JsonParser JSON_PARSER = new JsonParser();
     private String apiUrl;
 
+    public WebNewsContentSource(String apiUrl){
+        this.apiUrl = apiUrl;
+    }
+
     private String buildDetailString(String id){
         return apiUrl + "?newsId=" + id;
     }
@@ -80,6 +84,7 @@ public class WebNewsContentSource implements NewsContentSource {
         }
         return content;
     }
+
 
     @Override
     public void close(){

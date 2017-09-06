@@ -15,8 +15,15 @@ public interface NewsCursor {
 
     NewsMetaInfo getNewsMetaInfo();
     NewsContent getNewsContent();
-    boolean moveToNext();
-    boolean moveToPrevious();
-    boolean existing();
+//    boolean moveToNext();
+//    boolean moveToPrevious();
+    //boolean existing();
+
+    NewsCursor next();
+    NewsCursor previous();
+
     int getIndex();
+    int getIndexInList();
+
+    void close();
 }
