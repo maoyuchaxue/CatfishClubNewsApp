@@ -16,6 +16,9 @@ import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link NewsViewFragment#newInstance} factory method to
@@ -25,6 +28,7 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NEWS_ID = "news_id";
     private static final String ARG_TITLE = "title";
+    private static final List<String> replaceStrings = Arrays.asList("。 ","？ ", "！ ", "… ", "\\. ", "\\? ", "\\! ", "” ", "— ", "\" ");
     private View homeView;
     private String newsID;
     private String title;
@@ -118,7 +122,21 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         Log.i("catclub", "content loading finished");
 
         TextView contentTextView = (TextView) homeView.findViewById(R.id.news_view_content);
-        contentTextView.setText(data.getContentStr());
+        String content = data.getContentStr();
+
+        for (String s : replaceStrings) {
+            String target = s.replace(" ", "\n");
+            content = content.replaceAll(s, target);
+        }
+
+        String[] lines = content.split("\n");
+
+        String finalContent = "";
+        for (String s : lines) {
+            finalContent += "        " + s.replace("　", "  ").trim() + "\n";
+        }
+
+        contentTextView.setText(finalContent);
     }
 
     @Override

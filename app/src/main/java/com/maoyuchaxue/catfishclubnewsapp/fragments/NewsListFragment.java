@@ -183,7 +183,6 @@ public class NewsListFragment extends Fragment
 
     @Override
     public Loader<List<NewsCursor> > onCreateLoader(int id, Bundle args) {
-        Log.i("catclub", "create loader");
         return new NewsMetainfoLoader(this.getContext(), 10, mCursor, newsList);
     }
 
@@ -191,10 +190,8 @@ public class NewsListFragment extends Fragment
     public void onLoadFinished(Loader<List<NewsCursor>> loader, List<NewsCursor> data) {
         NewsMetainfoLoader metainfoLoader = (NewsMetainfoLoader) loader;
         mCursor = metainfoLoader.getCurrentCursor();
-        Log.i("catclub", "finished");
         for (int i = 0; i < data.size(); i++) {
             mAdapter.addItem(data.get(i));
-            Log.i("catclub", String.valueOf(i));
         }
     }
 
