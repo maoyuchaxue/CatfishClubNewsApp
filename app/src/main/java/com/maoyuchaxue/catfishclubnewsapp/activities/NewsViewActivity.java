@@ -22,8 +22,9 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
         Intent intent = getIntent();
         String newsID = intent.getExtras().getString("id");
+        String title = intent.getExtras().getString("title");
 
-        Fragment newFragment = NewsViewFragment.newInstance(newsID);
+        Fragment newFragment = NewsViewFragment.newInstance(newsID, title);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         transaction.replace(R.id.news_view, newFragment);

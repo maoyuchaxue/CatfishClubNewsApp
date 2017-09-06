@@ -13,7 +13,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import java.util.ArrayList;
 
 /**
- * Created by gongming on 17/9/6.
+ * Created by catfish on 17/9/6.
  */
 
 

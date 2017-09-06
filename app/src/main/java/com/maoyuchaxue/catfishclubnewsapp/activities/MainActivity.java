@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity
     public void onFragmentInteraction(NewsCursor cursor) {
         Intent intent = new Intent(MainActivity.this, NewsViewActivity.class);
         intent.putExtra("id", cursor.getNewsMetaInfo().getId());
+        intent.putExtra("title", cursor.getNewsMetaInfo().getTitle());
         startActivityForResult(intent, 0);
     }
 
