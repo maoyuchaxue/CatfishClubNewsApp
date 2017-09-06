@@ -20,21 +20,24 @@ public class MainActivity extends AppCompatActivity implements NewsListFragment.
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
         toolbar.setTitle("新闻列表");
+
+        setSupportActionBar(toolbar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.main_menu_settings:
-//                        TODO: implement intent to setting activity here
+                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivityForResult(intent, 1);
                         break;
                     case R.id.main_menu_search:
                         break;
                 }
+
                 return true;
             }
         });
 
-        setSupportActionBar(toolbar);
 
         Fragment newFragment = NewsListFragment.newInstance(-1, "", false);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
