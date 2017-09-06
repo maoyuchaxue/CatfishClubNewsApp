@@ -6,16 +6,12 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
  * Created by YU_Jason on 2017/9/5.
  */
 
-public class LocalStorageNewsCache implements NewsCache {
+public class LocalStorageNewsMetaInfoListCache implements NewsMetaInfoListCache {
     @Override
     public NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
         return new NewsMetaInfo[0];
     }
 
-    @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
-        return null;
-    }
 
     @Override
     public int getPageSize() {

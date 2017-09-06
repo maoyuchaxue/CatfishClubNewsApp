@@ -22,25 +22,23 @@ import java.util.ArrayList;
  * Created by YU_Jason on 2017/9/5.
  */
 
-public class WebNewsSource implements NewsSource {
+public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
     private static final int PAGE_SIZE = 20;
     private static final SimpleDateFormat DATE_FORMAT =
             new SimpleDateFormat("yyyyMMddHHmmss"); // for parsing the date time
-    private String queryUrl, detailUrl;
+    private String apiUrl;
     private static final JsonParser JSON_PARSER = new JsonParser();
 
     /**
-     * @param queryUrl The URL for the query service API.
-     * @param detailUrl The URL for the detail service API.
+     * @param apiUrl The URL for the fetching the service API.
      *
      * */
-    public WebNewsSource(String queryUrl, String detailUrl){
-        this.queryUrl = queryUrl;
-        this.detailUrl = detailUrl;
+    public WebNewsMetaInfoListSource(String apiUrl){
+        this.apiUrl = apiUrl;
     }
 
     private String buildQueryString(int pageNo, String keyword, NewsCategoryTag category){
-        StringBuilder queryStr = new StringBuilder(queryUrl);
+        StringBuilder queryStr = new StringBuilder(apiUrl);
         queryStr.append("?pageSize=" + PAGE_SIZE);
         queryStr.append("&pageNo=" + pageNo);
         if(keyword != null)
@@ -50,10 +48,6 @@ public class WebNewsSource implements NewsSource {
 
 //        System.out.println(queryStr);
         return queryStr.toString();
-    }
-
-    private String buildDetailString(String id){
-        return detailUrl + "?newsId=" + id;
     }
 
     private String readContentFromConnection(URLConnection con) throws IOException{
@@ -118,18 +112,6 @@ public class WebNewsSource implements NewsSource {
         return list;
     }
 
-    private NewsContent createContentFromJSON(JsonObject json) throws JsonParseException, ParseException{
-        NewsContent content = new NewsContent();
-
-        content.setContentStr(json.get("news_Content").getAsString());
-        content.setCrawlSource(json.get("crawl_Source").getAsString());
-        content.setCrawTime(DATE_FORMAT.parse(json.get("crawl_Time").getAsString()));
-        content.setCategory(json.get("news_Category").getAsString());
-        content.setJournalist(json.get("news_Journal").getAsString());
-
-        return content;
-    }
-
 
     @Override
     public NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword,
@@ -162,33 +144,6 @@ public class WebNewsSource implements NewsSource {
         return list;
     }
 
-    /**
-     *
-     *
-     * */
-    @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
-        NewsContent content = null;
-        try{
-            URL url = new URL(buildDetailString(id));
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.connect();
-
-            JsonObject json = JSON_PARSER.parse(readContentFromConnection(con)).getAsJsonObject();
-            //JsonObject json = new JsonObject(readContentFromConnection(con));
-            content = createContentFromJSON(json);
-
-            con.disconnect();
-        } catch(IOException e){
-            //TODO: deal with the exception
-        } catch(JsonParseException e){
-            //TODO: deal with JsonParseExceptiong #2
-        } catch(ParseException e){
-            //TODO: deal with ParseException #2
-        }
-        return content;
-    }
 
     @Override
     public int getPageSize() {
@@ -199,14 +154,15 @@ public class WebNewsSource implements NewsSource {
     public void close() throws NewsSourceException {
         // simply do nothing
     }
-
+/*
     // for testing
     public static void main(String args[]) throws Exception{
-        WebNewsSource newsSource = new WebNewsSource(
+        WebNewsMetaInfoListSource newsSource = new WebNewsMetaInfoListSource(
                 "http://166.111.68.66:2042/news/action/query/latest",
                 "http://166.111.68.66:2042/news/action/query/detail");
         for(NewsMetaInfo metaInfo : newsSource.getNewsMetaInfoList(1, null, null))
             System.out.println(metaInfo.getTitle());
 
     }
+    */
 }

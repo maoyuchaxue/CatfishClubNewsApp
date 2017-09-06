@@ -7,7 +7,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
  * Created by YU_Jason on 2017/9/5.
  */
 
-public interface NewsSource {
+public interface NewsMetaInfoListSource {
     /**
      * Queries in the source a list of news based on the specified conditions.<br>
      *     The lists are paged according to the page size returned by <code>getPageSize()</code>.
@@ -18,7 +18,6 @@ public interface NewsSource {
      *                no restriction in news titles shall be assumed.
      * */
     NewsMetaInfo[] getNewsMetaInfoList(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException;
-    NewsContent getNewsContent(String id) throws NewsSourceException;
     int getPageSize();
 
     void close() throws NewsSourceException;
