@@ -1,7 +1,11 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
-import android.content.Context;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.constraint.solver.Cache;
 
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 /**
@@ -10,10 +14,11 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 public class DatabaseNewsContentCache implements NewsContentCache {
     private NewsContentSource frontSource;
+    private CacheDBOpenHelper openHelper;
 
 
-    //TODO: the signature needs updating to incorporate the parameters for the database
-    public DatabaseNewsContentCache(Context context, NewsContentSource frontSource){
+    public DatabaseNewsContentCache(CacheDBOpenHelper openHelper, NewsContentSource frontSource){
+        this.openHelper = openHelper;
         this.frontSource = frontSource;
     }
 
@@ -32,9 +37,35 @@ public class DatabaseNewsContentCache implements NewsContentCache {
 
     @Override
     public NewsContent getNewsContentFromCache(String id) throws NewsSourceException {
-        //TODO: getNewsContentFromCache
-        return null;
+        SQLiteDatabase db = openHelper.getReadableDatabase();
+        Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME, new String[]{CacheDBOpenHelper.FIELD_CONTENT_STR,
+                CacheDBOpenHelper.FIELD_JOURNALIST, CacheDBOpenHelper.FIELD_CATEGORY,
+                CacheDBOpenHelper.FIELD_CRAWL_SRC}, CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id}, null, null, null, null);
+        db.close();
+        NewsContent newsContent = null;
+        if(cursor.moveToFirst()){ // found the record
+            String contentStr = cursor.getString(0);
+            String journalist = cursor.getString(1);
+            String category = cursor.getString(2);
+            String crawSrc = cursor.getString(3);
+            cursor.close();
+
+
+            try{
+                newsContent = new NewsContent();
+                newsContent.setJournalist(journalist);
+                newsContent.setContentStr(contentStr);
+                newsContent.setCategory(category);
+                newsContent.setCrawlSource(crawSrc);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        cursor.close();
+        return newsContent;
     }
+
 
     @Override
     public NewsContent cacheNewsContent(String id) throws NewsSourceException {
@@ -49,7 +80,37 @@ public class DatabaseNewsContentCache implements NewsContentCache {
 
     }
 
-    private void writeNewsContentToDatabase(String id, NewsContent content){
-        //TODO: writeNewsContentToDatabase
+    private void writeNewsContentToDatabase(String id, NewsContent newsContent) throws NewsSourceException{
+
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        db.beginTransaction();
+//        Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME, new String[]{},
+//                CacheDBOpenHelper.FIELD_ID + "=?", new String[]{id},
+//                null, null, null, null);
+//        if(cursor.moveToFirst()){
+//            db.execSQL();
+//        }
+        ContentValues change = new ContentValues();
+        change.put(CacheDBOpenHelper.FIELD_CATEGORY, newsContent.getCategory());
+        change.put(CacheDBOpenHelper.FIELD_CRAWL_SRC, newsContent.getCrawlSource());
+        change.put(CacheDBOpenHelper.FIELD_JOURNALIST, newsContent.getJournalist());
+        change.put(CacheDBOpenHelper.FIELD_CONTENT_STR, newsContent.getContentStr());
+
+        int affectedNo = db.update(CacheDBOpenHelper.NEWS_TABLE_NAME,
+                change,
+                CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id});
+
+        if(affectedNo == 0){ // not existing so far
+            // insert a new row
+            change.put(CacheDBOpenHelper.FIELD_ID, id);
+            db.insert(CacheDBOpenHelper.NEWS_TABLE_NAME,
+                    null,
+                    change);
+        }
+
+        db.endTransaction();
+        db.close();
+
     }
 }
