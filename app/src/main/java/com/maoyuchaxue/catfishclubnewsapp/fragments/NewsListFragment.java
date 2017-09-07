@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.MainActivity;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
+import com.maoyuchaxue.catfishclubnewsapp.controller.NewsListRecyclerViewListener;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoLoader;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
@@ -48,7 +50,8 @@ import java.util.List;
  */
 public class NewsListFragment extends Fragment
         implements NewsMetainfoRecyclerViewAdapter.OnRecyclerViewItemClickListener,
-        LoaderManager.LoaderCallbacks<List<NewsCursor> >{
+        LoaderManager.LoaderCallbacks<List<NewsCursor> >,
+        NewsListRecyclerViewListener.OnLoadMoreListener {
 
     private static final String ARG_CATEGORY = "category";
     private static final String ARG_KEYWORD = "keyword";
@@ -62,9 +65,15 @@ public class NewsListFragment extends Fragment
 
     private OnFragmentInteractionListener mListener;
     private NewsMetainfoRecyclerViewAdapter mAdapter;
+    private NewsContentSource mNewsContentSource;
+    private NewsMetaInfoListSource mMetaInfoListSource;
+    private NewsListRecyclerViewListener mNewsListRecyclerViewListener;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private Loader<List<NewsCursor>> mLoader;
     private NewsList newsList;
+    private NewsCategoryTag tag;
     private NewsCursor mCursor;
+
 
     public NewsListFragment() {
         // Required empty public constructor
@@ -114,21 +123,51 @@ public class NewsListFragment extends Fragment
         recyclerView.setAdapter(mAdapter);
         recyclerView.setHasFixedSize(true);
 
+        mNewsListRecyclerViewListener = new NewsListRecyclerViewListener(this);
+        recyclerView.addOnScrollListener(mNewsListRecyclerViewListener);
 
-        NewsContentSource newsContentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+        mNewsContentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
 
-        NewsCategoryTag tag = NewsCategoryTag.getCategoryByTitleEN(category);
-        NewsMetaInfoListSource metaInfoListSource;
+        tag = NewsCategoryTag.getCategoryByTitleEN(category);
         if (keyword != null) {
-            metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
+            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
         } else {
-            metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
+            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
         }
-
-        newsList = new SourceNewsList(metaInfoListSource, newsContentSource, keyword, tag);
 
         mCursor = null;
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) curView.findViewById(R.id.news_info_swipe_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mSwipeRefreshLayout.setRefreshing(true);
+                reloadFromBeginning();
+            }
+        });
+
+        return curView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        reloadFromBeginning();
+    }
+
+    public void onItemClick(View view, NewsCursor cursor) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(cursor);
+        }
+    }
+
+    private void resetNewsList() {
+        newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag);
+    }
+
+    private void reloadFromBeginning() {
+        mCursor = null;
+        resetNewsList();
         Bundle args = new Bundle();
         Loader<List<NewsCursor> > loader = getLoaderManager().getLoader(NEWS_CURSOR_LOADER_ID);
         if (loader != null && loader.isReset()) {
@@ -136,19 +175,11 @@ public class NewsListFragment extends Fragment
         } else {
             mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
         }
-        return curView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         mLoader.forceLoad();
     }
 
-    public void onItemClick(View view, NewsCursor cursor) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(cursor);
-        }
+    private void loadNextData() {
+        mLoader.forceLoad();
     }
 
 //    public void onButtonPressed(Uri uri) {
@@ -200,8 +231,14 @@ public class NewsListFragment extends Fragment
         for (int i = 0; i < data.size(); i++) {
             mAdapter.addItem(data.get(i));
         }
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onLoaderReset(Loader<List<NewsCursor>> loader) {}
+
+    @Override
+    public void onLoadMore() {
+        loadNextData();
+    }
 }

@@ -35,13 +35,10 @@ public class NewsMetainfoLoader extends AsyncTaskLoader<List<NewsCursor>> {
     @Override
     public List<NewsCursor> loadInBackground() {
         List<NewsCursor> cursors = new ArrayList<NewsCursor>();
-        Log.i("catclub", "loading here");
         if (curCursor == null) {
             curCursor = newsList.getHeadCursor();
-            Log.i("catclub", "get head cursor");
         }
         for (int i = 0; i < loadBatch; i++) {
-            Log.i("catclub", "loaded" + String.valueOf(i));
             cursors.add(curCursor);
             curCursor = curCursor.next();
         }
