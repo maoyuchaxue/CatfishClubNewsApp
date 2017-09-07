@@ -11,6 +11,7 @@ import android.support.constraint.solver.Cache;
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "cache";
+    private static final int DB_VERSION = 2;
 
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
@@ -42,8 +43,17 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_CRAWL_SRC + " text, " +
             FIELD_CATEGORY + " text);";
 
+
+    public static final String RESOURCES_TABLE_NAME = "resources_cache";
+    public static final String FIELD_RESOURCE_URL = "url";
+    public static final String FIELD_RESOURCE_BLOB = "rblob";
+    private static final String RESOURCES_TABLE_CREATE = "create table if not exists " +
+            RESOURCES_TABLE_NAME + " (" +
+            FIELD_RESOURCE_URL + " text primary key, " +
+            FIELD_RESOURCE_BLOB + " blob);";
+
     private CacheDBOpenHelper(Context context){
-        super(context, DB_NAME, null, 1);
+        super(context, DB_NAME, null, DB_VERSION);
     }
     private static CacheDBOpenHelper instance;
 
@@ -56,14 +66,17 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(NEWS_TABLE_CREATE);
+        db.execSQL(RESOURCES_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //brute-force upgrade
         //remove old tables and create new ones
-        db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
-        db.execSQL(NEWS_TABLE_CREATE);
+//        db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
+//        db.execSQL(NEWS_TABLE_CREATE);
+        if(oldVersion == 1 && newVersion == 2)
+            db.execSQL(RESOURCES_TABLE_CREATE);
     }
 
     @Override
