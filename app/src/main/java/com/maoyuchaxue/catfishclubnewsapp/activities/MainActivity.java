@@ -2,14 +2,19 @@ package com.maoyuchaxue.catfishclubnewsapp.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +28,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,11 +45,13 @@ public class MainActivity extends AppCompatActivity
     private SlidingTabLayout mTabLayout;
     private ViewPager mViewPager;
     private CategoryViewPagerAdapter mViewPagerAdapter;
+    private SearchView mSearchView;
+    private String globalKeyword = null;
 
     private void initActionBar() {
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
         toolbar.setTitle("新闻列表");
-
+        toolbar.setOverflowIcon(ContextCompat.getDrawable(this, R.drawable.ic_more_vert_white_24dp)) ;
         setSupportActionBar(toolbar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -51,10 +59,10 @@ public class MainActivity extends AppCompatActivity
                 switch (item.getItemId()) {
                     case R.id.main_menu_settings:
                         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-
                         startActivityForResult(intent, SETTINGS_ACTIVITY);
                         break;
                     case R.id.main_menu_search:
+
                         break;
                 }
 
@@ -83,13 +91,15 @@ public class MainActivity extends AppCompatActivity
         ArrayList<Fragment> fragments = new ArrayList<Fragment>();
         ArrayList<String> titles = new ArrayList<String>();
 
-        fragments.add(NewsListFragment.newInstance("", null, false));
+        if (globalKeyword != null)
+            Log.i("catclub", globalKeyword);
+        fragments.add(NewsListFragment.newInstance("", globalKeyword, false));
         titles.add("综合");
 
         for (int i = 0; i < NewsCategoryTag.TITLES.length; i++) {
             boolean appears = sharedPreferences.getBoolean(NewsCategoryTag.TITLES_EN[i], true);
             if (appears) {
-                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], null, false));
+                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, false));
                 titles.add(NewsCategoryTag.TITLES[i]);
             }
         }
@@ -124,6 +134,7 @@ public class MainActivity extends AppCompatActivity
         initActionBar();
         initTabLayout();
         initCategoryButton();
+//        Log.i("catclub", "finished loading");
     }
 
     @Override
@@ -137,6 +148,35 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.main_menu_search);
+
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                setKeywordForFragments(null);
+                return true;
+            }
+        });
+
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                setKeywordForFragments(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//                TODO: add history recommendation
+                return true;
+            }
+        });
         return true;
     }
 
@@ -152,6 +192,17 @@ public class MainActivity extends AppCompatActivity
                 break;
             default:
                 break;
+        }
+    }
+
+    public void setKeywordForFragments(String keyword) {
+        if (keyword != null && !keyword.isEmpty()) {
+            try {
+                globalKeyword = URLEncoder.encode(keyword, "utf-8");
+            } catch (Exception e) {
+
+            }
+            refreshTabLayout();
         }
     }
 }
