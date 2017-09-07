@@ -51,10 +51,10 @@ public class NewsMetainfoRecyclerViewAdapter
         NewsMetaInfo info = cursor.getNewsMetaInfo();
         TextView titleView = (TextView) view.findViewById(R.id.news_unit_title);
         TextView introView = (TextView) view.findViewById(R.id.news_unit_intro);
-        TextView idView = (TextView) view.findViewById(R.id.news_unit_id);
+        TextView sourceView = (TextView) view.findViewById(R.id.news_unit_source);
         titleView.setText(info.getTitle());
         introView.setText(info.getIntro());
-        idView.setText(info.getId());
+        sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
 
         viewHolder.itemView.setTag(cursors.get(position));
     }

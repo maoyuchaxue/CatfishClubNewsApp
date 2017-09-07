@@ -68,15 +68,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             } else {
 
-                if(String.valueOf(preference).equals("夜间模式"))
+                if (String.valueOf(preference).equals("夜间模式"))
                 {
-                    System.out.println("yes");
-
-                    Intent intent = new Intent();
-                    intent.putExtra("username", "day-night");
-                    intent.putExtra("to", "night");
-                    MainActivity activity = new MainActivity();
-                    activity.setResult(1,intent);
+//                    System.out.println("yes");
+//
+//                    Intent intent = new Intent();
+//                    intent.putExtra("username", "day-night");
+//                    intent.putExtra("to", "night");
+//                    MainActivity activity = new MainActivity();
+//                    activity.setResult(1,intent);
                     //建议删掉吧
                     //SettingsActivity.super.setResult(1,intent);
                     //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
