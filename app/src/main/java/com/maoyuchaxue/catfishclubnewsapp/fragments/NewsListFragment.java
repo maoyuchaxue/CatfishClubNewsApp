@@ -71,12 +71,14 @@ public class NewsListFragment extends Fragment
     private NewsContentSource mNewsContentSource;
     private NewsMetaInfoListSource mMetaInfoListSource;
     private NewsListRecyclerViewListener mNewsListRecyclerViewListener;
+    private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Loader<List<NewsCursor>> mLoader;
     private NewsList newsList;
     private NewsCategoryTag tag;
     private NewsCursor mCursor;
 
+    private View mView = null;
 
     public NewsListFragment() {
         // Required empty public constructor
@@ -113,21 +115,32 @@ public class NewsListFragment extends Fragment
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mView != null) {
+            ((ViewGroup) mView.getParent()).removeView(mView);
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (mView != null) {
+            return mView;
+        }
 
         LinearLayout curView = (LinearLayout) inflater.inflate(R.layout.fragment_news_list, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) curView.findViewById(R.id.news_info_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
+        mRecyclerView = (RecyclerView) curView.findViewById(R.id.news_info_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
 
         mAdapter= new NewsMetainfoRecyclerViewAdapter();
         mAdapter.setOnRecyclerViewItemClickListener(this);
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
 
         mNewsListRecyclerViewListener = new NewsListRecyclerViewListener(this);
-        recyclerView.addOnScrollListener(mNewsListRecyclerViewListener);
+        mRecyclerView.addOnScrollListener(mNewsListRecyclerViewListener);
 
         mNewsContentSource = new DatabaseNewsContentCache(new CacheDBOpenHelper(getContext()),
                 new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"));
@@ -153,13 +166,17 @@ public class NewsListFragment extends Fragment
             }
         });
 
+        mView = curView;
         return curView;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        reloadFromBeginning();
+    public void onStart() {
+        super.onStart();
+        if (mAdapter.getItemCount() == 0) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            reloadFromBeginning();
+        }
     }
 
     public void onItemClick(View view, NewsCursor cursor) {

@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity
 
         mViewPagerAdapter = new CategoryViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
-        mViewPager.setOffscreenPageLimit(20);
+        mViewPager.setOffscreenPageLimit(0);
         mTabLayout.setViewPager(mViewPager);
 
         refreshTabLayout();
@@ -196,13 +196,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setKeywordForFragments(String keyword) {
-        if (keyword != null && !keyword.isEmpty()) {
+        if (keyword == null) {
+            globalKeyword = null;
+        } else if (!keyword.isEmpty()) {
             try {
                 globalKeyword = URLEncoder.encode(keyword, "utf-8");
-            } catch (Exception e) {
-
-            }
-            refreshTabLayout();
+            } catch (Exception e) {}
+        } else {
+            return;
         }
+        refreshTabLayout();
     }
 }
