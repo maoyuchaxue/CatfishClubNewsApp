@@ -1,5 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
+import android.util.Log;
+
 import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -107,7 +109,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
         metaInfo.setIntro(json.get("news_Intro").getAsString());
 
-        metaInfo.setTime(DATE_FORMAT.parse(json.get("news_Time").getAsString()));
+//        metaInfo.setTime(DATE_FORMAT.parse(json.get("news_Time").getAsString()));
 
         return metaInfo;
     }
@@ -142,7 +144,6 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 //            System.err.println(pageNo);
             JsonObject json = JSON_PARSER.parse(readContentFromConnection(con)).getAsJsonObject();
             list = createMetaInfoListFromJSON(json);
-
             // compute the index of the starting record
             st = json.get("totalRecords").getAsInt() - (pageNo - 1) * PAGE_SIZE - 1;
 
