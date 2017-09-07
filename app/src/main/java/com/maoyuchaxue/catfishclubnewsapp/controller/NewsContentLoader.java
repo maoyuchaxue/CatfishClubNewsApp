@@ -5,6 +5,7 @@ import android.support.v4.content.AsyncTaskLoader;
 
 import com.maoyuchaxue.catfishclubnewsapp.ApplicationState;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 import java.util.List;
@@ -15,17 +16,19 @@ import java.util.List;
 
 public class NewsContentLoader extends AsyncTaskLoader<NewsContent> {
     private String newsID;
+    private NewsContentSource contentSource;
 
-    public NewsContentLoader(Context context, String newsID) {
+    public NewsContentLoader(Context context, String newsID, NewsContentSource contentSource) {
         super(context);
         this.newsID = newsID;
+        this.contentSource = contentSource;
     }
 
     @Override
     public NewsContent loadInBackground() {
         NewsContent content = null;
         try {
-            content = ApplicationState.contentSource.getNewsContent(newsID);
+            content = contentSource.getNewsContent(newsID);
         } catch (NewsSourceException e) {
         }
         return content;

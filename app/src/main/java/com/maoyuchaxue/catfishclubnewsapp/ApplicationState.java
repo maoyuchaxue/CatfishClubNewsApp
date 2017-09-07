@@ -1,5 +1,6 @@
 package com.maoyuchaxue.catfishclubnewsapp;
 
+import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 
@@ -14,6 +15,7 @@ public class ApplicationState {
      * It will possibly not be incorporated as a final solution.
      *
      * */
-    public static NewsContentSource contentSource =
-            new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+//    public static NewsContentSource contentSource =
+//            new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+    public static NewsContentSource contentSource;
 }

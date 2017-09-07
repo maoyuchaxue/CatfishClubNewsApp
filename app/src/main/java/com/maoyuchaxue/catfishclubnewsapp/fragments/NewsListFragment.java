@@ -26,6 +26,8 @@ import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsListRecyclerViewListener;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoLoader;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
+import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
+import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsMetaInfoListCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
@@ -34,6 +36,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfoListSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.SourceNewsList;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsMetaInfoListSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 
 import org.w3c.dom.Text;
 
@@ -126,13 +129,17 @@ public class NewsListFragment extends Fragment
         mNewsListRecyclerViewListener = new NewsListRecyclerViewListener(this);
         recyclerView.addOnScrollListener(mNewsListRecyclerViewListener);
 
-        mNewsContentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+        mNewsContentSource = new DatabaseNewsContentCache(new CacheDBOpenHelper(getContext()),
+                new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"));
 
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         if (keyword != null) {
-            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
+            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(new CacheDBOpenHelper(getContext()),
+                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search"));
         } else {
-            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
+            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(new CacheDBOpenHelper(getContext()),
+                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest"));
+//            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
         }
 
         mCursor = null;

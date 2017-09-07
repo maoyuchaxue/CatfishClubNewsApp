@@ -39,16 +39,16 @@ public class NewsContent {
         this.category = category;
     }
 
-    public Date getCrawTime() {
-        return crawTime;
-    }
+//    public Date getCrawTime() {
+//        return crawTime;
+//    }
 
-    public void setCrawTime(Date crawTime) {
-        this.crawTime = crawTime;
-    }
+//    public void setCrawTime(Date crawTime) {
+//        this.crawTime = crawTime;
+//    }
 
     private String contentStr, journalist, crawlSource, category;
-    private Date crawTime;
+//    private Date crawTime;
 
     // empty constructor
 
