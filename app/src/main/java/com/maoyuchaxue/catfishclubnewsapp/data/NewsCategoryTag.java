@@ -33,6 +33,22 @@ public enum NewsCategoryTag {
             "娱乐"
     };
 
+    public static final String[] TITLES_EN = {
+            "SCITECH",
+            "EDUCATION",
+            "MILITARY",
+            "DOMESTIC",
+            "SOCIETY",
+            "CULTURE",
+            "AUTOMOBILE",
+            "INTERNATIONAL",
+            "SPORTS",
+            "ECONOMY",
+            "HEALTH",
+            "ENTERTAINMENT"
+    };
+
+
     public static final NewsCategoryTag[] CATEGORIES = {
             SCITECH,
             EDUCATION,
@@ -51,6 +67,13 @@ public enum NewsCategoryTag {
     public static NewsCategoryTag getCategoryByTitle(String title){
         for(int i = 0; i < TITLES.length; i ++)
             if(TITLES[i].equals(title))
+                return CATEGORIES[i];
+        return null;
+    }
+
+    public static NewsCategoryTag getCategoryByTitleEN(String titleEN) {
+        for(int i = 0; i < TITLES_EN.length; i ++)
+            if(TITLES_EN[i].equals(titleEN))
                 return CATEGORIES[i];
         return null;
     }
