@@ -85,7 +85,7 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
         db.setTransactionSuccessful();
         db.endTransaction();
 
-        db.close();
+//        db.close();
     }
 
     @Override

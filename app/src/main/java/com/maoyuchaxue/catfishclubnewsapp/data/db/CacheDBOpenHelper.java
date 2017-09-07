@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.constraint.solver.Cache;
 
 /**
  * Created by YU_Jason on 2017/9/7.
@@ -41,8 +42,15 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_CRAWL_SRC + " text, " +
             FIELD_CATEGORY + " text);";
 
-    public CacheDBOpenHelper(Context context){
+    private CacheDBOpenHelper(Context context){
         super(context, DB_NAME, null, 1);
+    }
+    private static CacheDBOpenHelper instance;
+
+    public static synchronized CacheDBOpenHelper getInstance(Context context){
+        if(instance == null)
+            instance = new CacheDBOpenHelper(context);
+        return instance;
     }
 
     @Override
