@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -116,14 +117,15 @@ public class NewsListFragment extends Fragment
 
         NewsContentSource newsContentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
 
-        NewsCategoryTag tag = NewsCategoryTag.getCategoryByTitle(category);
-        if (tag != null || !keyword.isEmpty()) {
-            NewsMetaInfoListSource metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
-            newsList = new SourceNewsList(metaInfoListSource, newsContentSource, keyword, tag);
+        NewsCategoryTag tag = NewsCategoryTag.getCategoryByTitleEN(category);
+        NewsMetaInfoListSource metaInfoListSource;
+        if (keyword != null) {
+            metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
         } else {
-            NewsMetaInfoListSource metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
-            newsList = new SourceNewsList(metaInfoListSource, newsContentSource);
+            metaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
         }
+
+        newsList = new SourceNewsList(metaInfoListSource, newsContentSource, keyword, tag);
 
         mCursor = null;
 
@@ -134,8 +136,13 @@ public class NewsListFragment extends Fragment
         } else {
             mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
         }
-        mLoader.forceLoad();
         return curView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mLoader.forceLoad();
     }
 
     public void onItemClick(View view, NewsCursor cursor) {
