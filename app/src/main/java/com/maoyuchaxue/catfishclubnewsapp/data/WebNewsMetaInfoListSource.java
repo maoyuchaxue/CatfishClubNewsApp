@@ -107,7 +107,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
         metaInfo.setIntro(json.get("news_Intro").getAsString());
 
-        metaInfo.setTime(DATE_FORMAT.parse(json.get("news_Time").getAsString()));
+//        metaInfo.setTime(DATE_FORMAT.parse(json.get("news_Time").getAsString()));
 
         return metaInfo;
     }

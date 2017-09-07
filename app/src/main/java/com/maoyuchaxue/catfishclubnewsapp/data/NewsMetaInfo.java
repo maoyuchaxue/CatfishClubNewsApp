@@ -12,7 +12,7 @@ public class NewsMetaInfo {
     private String id;
     private String srcSite;
     private String title;
-    private Date time;
+//    private Date time;
     private URL url;
     private String author, lang;
 
@@ -35,14 +35,14 @@ public class NewsMetaInfo {
      *
      * */
     public NewsMetaInfo(NewsCategoryTag categoryTag, String id, String srcSite,
-                        String title, Date time, URL url,
+                        String title, URL url,
                         String author, String lang, URL[] pictures,
                         URL video, String intro) {
         this.categoryTag = categoryTag;
         this.id = id;
         this.srcSite = srcSite;
         this.title = title;
-        this.time = time;
+//        this.time = time;
         this.url = url;
         this.author = author;
         this.lang = lang;
@@ -67,9 +67,9 @@ public class NewsMetaInfo {
         return title;
     }
 
-    public Date getTime() {
-        return time;
-    }
+//    public Date getTime() {
+//        return time;
+//    }
 
     public URL getUrl() {
         return url;
@@ -107,9 +107,9 @@ public class NewsMetaInfo {
         this.title = title;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
-    }
+//    public void setTime(Date time) {
+//        this.time = time;
+//    }
 
     public void setUrl(URL url) {
         this.url = url;
