@@ -129,15 +129,18 @@ public class NewsListFragment extends Fragment
         mNewsListRecyclerViewListener = new NewsListRecyclerViewListener(this);
         recyclerView.addOnScrollListener(mNewsListRecyclerViewListener);
 
-        mNewsContentSource = new DatabaseNewsContentCache(new CacheDBOpenHelper(getContext()),
+        mNewsContentSource = new DatabaseNewsContentCache(CacheDBOpenHelper.
+                getInstance(getContext().getApplicationContext()),
                 new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"));
 
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         if (keyword != null) {
-            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(new CacheDBOpenHelper(getContext()),
+            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
+                getInstance(getContext().getApplicationContext()),
                     new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search"));
         } else {
-            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(new CacheDBOpenHelper(getContext()),
+            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
+                getInstance(getContext().getApplicationContext()),
                     new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest"));
 //            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
         }

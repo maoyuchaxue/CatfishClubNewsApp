@@ -71,8 +71,8 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
 //        contentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
         contentSource = new DatabaseNewsContentCache(
-                new CacheDBOpenHelper(getContext()),
-                new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
+                CacheDBOpenHelper.getInstance(getContext().getApplicationContext())
+               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
         );
         if (getArguments() != null) {
             newsID = getArguments().getString(ARG_NEWS_ID);

@@ -63,7 +63,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
             }
         }
         cursor.close();
-        db.close();
+//        db.close();
         return newsContent;
     }
 
@@ -113,7 +113,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
         }
         db.setTransactionSuccessful();
         db.endTransaction();
-        db.close();
+//        db.close();
 
     }
 }
