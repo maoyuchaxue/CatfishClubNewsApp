@@ -67,13 +67,13 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
             pictureStr.append(";" + url.toString());
         change.put(CacheDBOpenHelper.FIELD_PICTURES, pictureStr.toString());
 
-        change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo().toString());
+        change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo() == null ? "" : metaInfo.getVideo().toString());
         change.put(CacheDBOpenHelper.FIELD_LANG, metaInfo.getLang());
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
 
 
         db.beginTransaction();
-        int affectedNo = db.update(CacheDBOpenHelper.DB_NAME,
+        int affectedNo = db.update(CacheDBOpenHelper.NEWS_TABLE_NAME,
                 change,
                 CacheDBOpenHelper.FIELD_ID + "=?",
                 new String[]{metaInfo.getId()}
@@ -82,6 +82,7 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
             change.put(CacheDBOpenHelper.FIELD_ID, metaInfo.getId());
             db.insert(CacheDBOpenHelper.NEWS_TABLE_NAME, null, change);
         }
+        db.setTransactionSuccessful();
         db.endTransaction();
 
         db.close();

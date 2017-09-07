@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.constraint.solver.Cache;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -42,9 +43,8 @@ public class DatabaseNewsContentCache implements NewsContentCache {
                 CacheDBOpenHelper.FIELD_JOURNALIST, CacheDBOpenHelper.FIELD_CATEGORY,
                 CacheDBOpenHelper.FIELD_CRAWL_SRC}, CacheDBOpenHelper.FIELD_ID + "=?",
                 new String[]{id}, null, null, null, null);
-        db.close();
         NewsContent newsContent = null;
-        if(cursor.moveToFirst()){ // found the record
+        if(cursor.moveToFirst() && cursor.getString(0) != null){ // found the record
             String contentStr = cursor.getString(0);
             String journalist = cursor.getString(1);
             String category = cursor.getString(2);
@@ -63,6 +63,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
             }
         }
         cursor.close();
+        db.close();
         return newsContent;
     }
 
@@ -90,6 +91,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
 //        if(cursor.moveToFirst()){
 //            db.execSQL();
 //        }
+//        Log.i("FISH", newsContent.getContentStr());
         ContentValues change = new ContentValues();
         change.put(CacheDBOpenHelper.FIELD_CATEGORY, newsContent.getCategory());
         change.put(CacheDBOpenHelper.FIELD_CRAWL_SRC, newsContent.getCrawlSource());
@@ -104,11 +106,12 @@ public class DatabaseNewsContentCache implements NewsContentCache {
         if(affectedNo == 0){ // not existing so far
             // insert a new row
             change.put(CacheDBOpenHelper.FIELD_ID, id);
-            db.insert(CacheDBOpenHelper.NEWS_TABLE_NAME,
+            Log.i("FISH", Long.toString(db.insert(CacheDBOpenHelper.NEWS_TABLE_NAME,
                     null,
-                    change);
-        }
+                    change)));
 
+        }
+        db.setTransactionSuccessful();
         db.endTransaction();
         db.close();
 

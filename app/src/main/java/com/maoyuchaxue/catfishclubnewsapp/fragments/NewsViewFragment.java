@@ -14,7 +14,11 @@ import android.widget.TextView;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
+import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +36,7 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
     private View homeView;
     private String newsID;
     private String title;
+    private NewsContentSource contentSource;
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
@@ -40,6 +45,7 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     public NewsViewFragment() {
         // Required empty public constructor
+
     }
 
     /**
@@ -61,7 +67,13 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+//        contentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+        contentSource = new DatabaseNewsContentCache(
+                new CacheDBOpenHelper(getContext()),
+                new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
+        );
         if (getArguments() != null) {
             newsID = getArguments().getString(ARG_NEWS_ID);
             title = getArguments().getString(ARG_TITLE);
@@ -74,6 +86,7 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         // Inflate the layout for this fragment
         homeView = inflater.inflate(R.layout.fragment_news_view, container, false);
 
+
         Bundle args = new Bundle();
         mLoader = getLoaderManager().initLoader(NEWS_CONTENT_LOADER_ID, args, this);
         mLoader.forceLoad();
@@ -83,6 +96,8 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         idTextView.setText(newsID);
         titleTextView.setText(title);
+
+
         return homeView;
     }
 
@@ -114,7 +129,7 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public Loader<NewsContent> onCreateLoader(int id, Bundle args) {
         Log.i("catclub", "loading content");
-        return new NewsContentLoader(this.getContext(), newsID);
+        return new NewsContentLoader(this.getContext(), newsID, contentSource);
     }
 
     @Override

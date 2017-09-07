@@ -9,7 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
-    public static final String DB_NAME = "cache";
+    private static final String DB_NAME = "cache";
+
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
     public static final String FIELD_INTRO = "intro";
