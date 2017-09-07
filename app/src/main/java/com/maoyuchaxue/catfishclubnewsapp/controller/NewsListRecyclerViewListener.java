@@ -24,9 +24,7 @@ public class NewsListRecyclerViewListener extends RecyclerView.OnScrollListener 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
-            Log.i("catclub",String.format("yes?"));
             mLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-
             mItemCount = mLayoutManager.getItemCount();
             mLastCompletely = mLayoutManager.findLastCompletelyVisibleItemPosition();
         } else {
