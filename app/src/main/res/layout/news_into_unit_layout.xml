@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/draw_line"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/news_unit_title"
+        android:layout_marginLeft="12dip"
+        android:layout_marginRight="12dip"
+        android:layout_marginTop="10dp"
+        android:textSize="19sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/news_unit_intro"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/news_unit_source"
+        android:layout_marginLeft="12dip"
+        android:layout_marginBottom="10dp"
+        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+</LinearLayout>
+
+    <!--android:visibility="gone"-->
+
+<!--<stroke-->
+<!--android:width="0.03dp"-->
+<!--android:color="@color/colorLine" />-->
+
+<!--<padding-->
+<!--android:bottom="1dp"-->
+<!--android:left="1dp"-->
+<!--android:right="1dp"-->
+<!--android:top="1dp" />-->

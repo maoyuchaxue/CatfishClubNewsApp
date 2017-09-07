@@ -1,0 +1,22 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="dark_style"
+        android:title="@string/pref_enable_dark_style"/>
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="offline_mode"
+        android:title="@string/pref_offline"
+        android:summary="@string/pref_offline_description"/>
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="text_only_mode"
+        android:title="@string/pref_text_only"
+        android:summary="@string/pref_text_only_description"/>
+
+</PreferenceScreen>
