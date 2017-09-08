@@ -11,7 +11,7 @@ import android.support.constraint.solver.Cache;
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "cache";
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
 
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
@@ -54,6 +54,21 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_RESOURCE_URL + " text primary key, " +
             FIELD_RESOURCE_BLOB + " blob);";
 
+    public static final String BOOKMARK_TABLE_NAME = "bookmark_cache";
+    private static final String BOOKMARK_TABLE_CREATE = "create table if not exists " +
+            BOOKMARK_TABLE_NAME + " (" +
+            FIELD_ID + " text primary key, " +
+            FIELD_INTRO + " text, " +
+            FIELD_CATEGORY_TAG + " integer, " +
+            FIELD_AUTHOR + " text, " +
+            FIELD_TITLE + " text, " +
+            FIELD_URL + " text, " +
+            FIELD_LANG + " text, " +
+            FIELD_SRC + " text, " +
+            FIELD_PICTURES + " text, " +
+            FIELD_VIDEO + " text);";
+
+
     private CacheDBOpenHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -69,6 +84,7 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(NEWS_TABLE_CREATE);
         db.execSQL(RESOURCES_TABLE_CREATE);
+        db.execSQL(BOOKMARK_TABLE_CREATE);
     }
 
     @Override
@@ -77,13 +93,16 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
         //remove old tables and create new ones
 //        db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
 //        db.execSQL(NEWS_TABLE_CREATE);
-        if(newVersion == 3){
+        if(newVersion >= 4)
+            db.execSQL(BOOKMARK_TABLE_CREATE);
+
+        if(newVersion >= 3){
             db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
             db.execSQL(NEWS_TABLE_CREATE);
 //            db.execSQL("alter table " + NEWS_TABLE_NAME +
 //            "add column " + FIELD_TITLE + " text;");
         }
-        if(oldVersion == 1 && newVersion == 2)
+        if(oldVersion == 1)
             db.execSQL(RESOURCES_TABLE_CREATE);
     }
 
