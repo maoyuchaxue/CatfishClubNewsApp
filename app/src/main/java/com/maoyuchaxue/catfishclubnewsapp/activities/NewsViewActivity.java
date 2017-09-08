@@ -3,16 +3,21 @@ package com.maoyuchaxue.catfishclubnewsapp.activities;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
+import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
 
 import com.iflytek.cloud.InitListener;
@@ -28,6 +33,10 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
     private SpeechSynthesizer mTts;
     private NewsViewFragment newsViewFragment;
+
+    private BookmarkManager bookmarkManager;
+    private Toolbar toolbar;
+    private boolean isInBookmark;
 
     private void initSynthesizer() {
         SpeechUtility.createUtility(NewsViewActivity.this, SpeechConstant.APPID +"=59b0c3fb");
@@ -55,14 +64,15 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
         transaction.replace(R.id.news_view, newsViewFragment);
         transaction.commit();
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.news_view_menu_toolbar);
+        bookmarkManager = BookmarkManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext()));
+        isInBookmark = bookmarkManager.isBookmarked(metaInfo.getId());
+
+        toolbar = (Toolbar)findViewById(R.id.news_view_menu_toolbar);
         toolbar.setTitle("新闻详细");
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
 
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(this);
-
-
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -109,8 +119,20 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
                         } else {
                             newsViewFragment.startSpeaking();
                         }
+                        break;
 
-//                        TODO: implement voice here
+                    case R.id.news_view_menu_bookmark:
+                        Log.i("bookmark", String.valueOf(isInBookmark));
+                        if (isInBookmark) {
+                            newsViewFragment.removeCurrentNewsFromBookmark(bookmarkManager);
+//                            TODO: should set isInBookmark = false, when DB implemented
+                        } else {
+                            newsViewFragment.addCurrentNewsToBookmark(bookmarkManager);
+                            isInBookmark = true;
+
+                        }
+
+                        resetMenuItemAppearance();
                         break;
                 }
                 return true;
@@ -128,16 +150,25 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
         }
     };
 
+    private void resetMenuItemAppearance() {
+        if (isInBookmark) {
+            toolbar.getMenu().getItem(2).setIcon(ContextCompat.
+                    getDrawable(getApplicationContext(), R.drawable.ic_bookmark_white_24dp));
+        } else {
+            toolbar.getMenu().getItem(2).setIcon(ContextCompat.
+                    getDrawable(getApplicationContext(), R.drawable.ic_bookmark_border_white_24dp));
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.news_view_menu, menu);
+        resetMenuItemAppearance();
         return true;
     }
 
     @Override
     public void onClick(View view) {
-
         NewsViewActivity.this.finish();
     }
 

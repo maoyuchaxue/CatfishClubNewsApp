@@ -156,8 +156,15 @@ public class HistoryManager {
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
         StringBuilder pictureStr = new StringBuilder();
-        for(URL url : metaInfo.getPictures())
-            pictureStr.append(";" + url.toString());
+        boolean first = true;
+        for(URL url : metaInfo.getPictures()) {
+            if (first) {
+                first = false;
+                pictureStr.append(url.toString());
+            } else {
+                pictureStr.append(";" + url.toString());
+            }
+        };
         change.put(CacheDBOpenHelper.FIELD_PICTURES, pictureStr.toString());
 
         change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo() == null ? "" : metaInfo.getVideo().toString());

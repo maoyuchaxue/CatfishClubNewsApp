@@ -24,6 +24,7 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
+import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
@@ -32,6 +33,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -189,6 +191,13 @@ public class NewsViewFragment extends Fragment
     @Override
     public void onLoaderReset(Loader<NewsContent> loader) {}
 
+    public void addCurrentNewsToBookmark(BookmarkManager bookmarkManager) {
+        bookmarkManager.bookmark(metaInfo);
+    }
+
+    public void removeCurrentNewsFromBookmark(BookmarkManager bookmarkManager) {
+//        TODO: remove!
+    }
 
     public void startSpeaking() {
         if (speakContent == null) {
