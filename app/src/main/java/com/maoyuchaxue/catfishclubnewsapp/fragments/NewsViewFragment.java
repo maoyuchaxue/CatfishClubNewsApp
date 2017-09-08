@@ -7,15 +7,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
@@ -28,12 +35,15 @@ import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.sharesdk.onekeyshare.OnekeyShare;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link NewsViewFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCallbacks<NewsContent> {
+public class NewsViewFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<NewsContent> {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NEWS_ID = "news_id";
     private static final String ARG_TITLE = "title";
@@ -43,6 +53,8 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
     private String title;
     private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
+    private SpeechSynthesizer speechSynthesizer;
+    private String speakContent = null;
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
@@ -71,17 +83,18 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         return fragment;
     }
 
-    public static NewsViewFragment newInstance(NewsMetaInfo metaInfo){
+    public static NewsViewFragment newInstance(SpeechSynthesizer speechSynthesizer, NewsMetaInfo metaInfo){
         NewsViewFragment instance = newInstance(metaInfo.getId(), metaInfo.getTitle());
 
         instance.metaInfo = metaInfo;
-
+        instance.speechSynthesizer = speechSynthesizer;
         return instance;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 //        contentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
 //        contentSource = new DatabaseNewsContentCache(
 //                CacheDBOpenHelper.getInstance(getContext().getApplicationContext())
@@ -129,18 +142,11 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
     }
 
 
@@ -173,6 +179,8 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         contentTextView.setText(finalContent);
 
+        speakContent = metaInfo.getTitle() + " " + finalContent;
+
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
             add(metaInfo, data);
@@ -180,5 +188,56 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<NewsContent> loader) {}
+
+
+    public void startSpeaking() {
+        if (speakContent == null) {
+            return;
+        }
+
+        speechSynthesizer.startSpeaking(speakContent, new SynthesizerListener() {
+            @Override
+            public void onSpeakBegin() {
+
+            }
+
+            @Override
+            public void onBufferProgress(int i, int i1, int i2, String s) {
+
+            }
+
+            @Override
+            public void onSpeakPaused() {
+
+            }
+
+            @Override
+            public void onSpeakResumed() {
+
+            }
+
+            @Override
+            public void onSpeakProgress(int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onCompleted(SpeechError speechError) {
+
+            }
+
+            @Override
+            public void onEvent(int i, int i1, int i2, Bundle bundle) {
+
+            }
+        });
+    }
+
+
+    public void stopSpeaking() {
+        if (speechSynthesizer.isSpeaking()) {
+            speechSynthesizer.stopSpeaking();
+        }
+    }
 
 }
