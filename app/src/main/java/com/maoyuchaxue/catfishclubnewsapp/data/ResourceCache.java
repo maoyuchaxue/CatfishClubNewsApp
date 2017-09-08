@@ -15,7 +15,7 @@ public abstract class ResourceCache extends ResourceSource{
         if(res != null)
             return res;
 
-        getFrontSource().getAsBlob(url);
+        res = getFrontSource().getAsBlob(url);
 
         cache(url, res);
 

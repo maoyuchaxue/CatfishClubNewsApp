@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseResourceCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
@@ -215,7 +216,9 @@ public class NewsMetainfoRecyclerViewAdapter
         @Override
         public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
             imageView = (ImageView) view.findViewById(R.id.news_unit_pics_image);
-            return new ResourceLoader(context, summaryPicURL, new WebResourceSource());
+            return new ResourceLoader(context, summaryPicURL,
+                    new DatabaseResourceCache(CacheDBOpenHelper.getInstance(context.getApplicationContext()),
+                            new WebResourceSource()));
         }
 
         @Override
