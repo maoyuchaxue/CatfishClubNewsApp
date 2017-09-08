@@ -5,22 +5,45 @@
     android:orientation="vertical"
     tools:context="com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
+
     <TextView
         android:id="@+id/news_view_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         />
 
     <TextView
         android:id="@+id/news_view_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:textSize="19sp"
+        android:text="测试测试测试测试测试测试测试测试测试测试"
+        android:layout_marginBottom="15dp"/>
+
+    <TextView
+        android:id="@+id/news_view_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="15sp"
+        android:layout_marginBottom="10dp"/>
+
 
     <TextView
         android:id="@+id/news_view_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:lineSpacingExtra="3dp"
+        android:text="测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试"
         />
+
+    </LinearLayout>
 
 </LinearLayout>

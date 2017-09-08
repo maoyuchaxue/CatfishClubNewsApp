@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,11 +95,12 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
 
         TextView idTextView = (TextView) homeView.findViewById(R.id.news_view_id);
         TextView titleTextView = (TextView) homeView.findViewById(R.id.news_view_title);
+//        TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
 
         idTextView.setText(newsID);
         titleTextView.setText(title);
-
-
+//        authorTextView.setText(Html.fromHtml("<a href=\"https://www.baidu.com\">作者网</a>")) ;
+//        authorTextView.setMovementMethod(LinkMovementMethod.getInstance());
         return homeView;
     }
 
@@ -137,6 +140,8 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         Log.i("catclub", "content loading finished");
 
         TextView contentTextView = (TextView) homeView.findViewById(R.id.news_view_content);
+        TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
+        authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();
 
         for (String s : replaceStrings) {
