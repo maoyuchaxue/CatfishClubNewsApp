@@ -1,6 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.fragments;
 
 import android.content.Context;
+import android.support.constraint.solver.Cache;
 import android.support.v4.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,8 +18,10 @@ import android.widget.TextView;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
+import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 
@@ -38,6 +41,7 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
     private View homeView;
     private String newsID;
     private String title;
+    private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
     Loader<NewsContent> mLoader;
 
@@ -67,14 +71,25 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         return fragment;
     }
 
+    public static NewsViewFragment newInstance(NewsMetaInfo metaInfo){
+        NewsViewFragment instance = newInstance(metaInfo.getId(), metaInfo.getTitle());
+
+        instance.metaInfo = metaInfo;
+
+        return instance;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 //        contentSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
-        contentSource = new DatabaseNewsContentCache(
-                CacheDBOpenHelper.getInstance(getContext().getApplicationContext())
-               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
+//        contentSource = new DatabaseNewsContentCache(
+//                CacheDBOpenHelper.getInstance(getContext().getApplicationContext())
+//               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
+//        );
+        contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
+                getInstance(getContext().getApplicationContext())).getNewsContentSource(
+               new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
         );
         if (getArguments() != null) {
             newsID = getArguments().getString(ARG_NEWS_ID);
@@ -157,6 +172,10 @@ public class NewsViewFragment extends Fragment implements LoaderManager.LoaderCa
         }
 
         contentTextView.setText(finalContent);
+
+        // add to history
+        HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
+            add(metaInfo, data);
     }
 
     @Override

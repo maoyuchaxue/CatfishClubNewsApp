@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
 
 public class NewsViewActivity extends AppCompatActivity implements View.OnClickListener {
@@ -21,10 +22,14 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_news_view);
 
         Intent intent = getIntent();
-        String newsID = intent.getExtras().getString("id");
-        String title = intent.getExtras().getString("title");
+        NewsMetaInfo metaInfo = (NewsMetaInfo)intent.getSerializableExtra("meta_info");
+//        String newsID = intent.getExtras().getString("id");
+//        String title = intent.getExtras().getString("title");
+//        String newsID = metaInfo.getId();
+//        String title = metaInfo.getTitle();
 
-        Fragment newFragment = NewsViewFragment.newInstance(newsID, title);
+//        Fragment newFragment = NewsViewFragment.newInstance(newsID, title);
+        Fragment newFragment = NewsViewFragment.newInstance(metaInfo);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         transaction.replace(R.id.news_view, newFragment);

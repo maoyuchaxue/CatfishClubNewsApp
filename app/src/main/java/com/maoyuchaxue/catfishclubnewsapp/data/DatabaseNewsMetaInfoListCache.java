@@ -58,7 +58,7 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
         ContentValues change = new ContentValues();
         change.put(CacheDBOpenHelper.FIELD_INTRO, metaInfo.getIntro());
         change.put(CacheDBOpenHelper.FIELD_AUTHOR, metaInfo.getAuthor());
-        change.put(CacheDBOpenHelper.FIELD_PICTURES, metaInfo.getTitle());
+        change.put(CacheDBOpenHelper.FIELD_TITLE, metaInfo.getTitle());
         change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
