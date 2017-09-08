@@ -14,12 +14,21 @@ import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
 
+import com.iflytek.cloud.InitListener;
+import com.iflytek.cloud.SpeechUtility;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SynthesizerListener;
+import com.iflytek.cloud.SpeechError;
+
 public class NewsViewActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_view);
+
+        SpeechUtility.createUtility(NewsViewActivity.this, SpeechConstant.APPID +"=59b0c3fb");
 
         Intent intent = getIntent();
         NewsMetaInfo metaInfo = (NewsMetaInfo)intent.getSerializableExtra("meta_info");
@@ -50,6 +59,22 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 //                        TODO: implement intent to share URL here
                         break;
                     case R.id.news_view_menu_voice:
+                        //开始语音
+                        //1.创建SpeechSynthesizer对象, 第二个参数：本地合成时传InitListener
+
+                        SpeechSynthesizer mTts= SpeechSynthesizer.createSynthesizer(NewsViewActivity.this, ini);
+//2.合成参数设置，详见《科大讯飞MSC API手册(Android)》SpeechSynthesizer 类
+                        mTts.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");//设置发音人
+                        mTts.setParameter(SpeechConstant.SPEED, "50");//设置语速
+                        mTts.setParameter(SpeechConstant.VOLUME, "80");//设置音量，范围0~100
+                        mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD); //设置云端
+//设置合成音频保存位置（可自定义保存位置），保存在“./sdcard/iflytek.pcm”
+//保存在SD卡需要在AndroidManifest.xml添加写SD卡权限
+//如果不需要保存合成音频，注释该行代码
+                        //mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, "./sdcard/iflytek.pcm");
+//3.开始合成
+                        String speaking = "大家好，我很皮诶。我买了一台iPhone 7。曾经，曾子My name is Van, I am an artist, a performance artist。";
+                        mTts.startSpeaking(speaking, mSynListener);
 //                        TODO: implement voice here
                         break;
                 }
@@ -59,6 +84,50 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
 
     }
+
+    private InitListener ini = new InitListener() {
+        @Override
+        public void onInit(int i) {
+
+        }
+    };
+
+    private SynthesizerListener mSynListener = new SynthesizerListener() {
+        @Override
+        public void onSpeakBegin() {
+
+        }
+
+        @Override
+        public void onBufferProgress(int i, int i1, int i2, String s) {
+
+        }
+
+        @Override
+        public void onSpeakPaused() {
+
+        }
+
+        @Override
+        public void onSpeakResumed() {
+
+        }
+
+        @Override
+        public void onSpeakProgress(int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onCompleted(SpeechError speechError) {
+
+        }
+
+        @Override
+        public void onEvent(int i, int i1, int i2, Bundle bundle) {
+
+        }
+    };
 
 
     @Override
