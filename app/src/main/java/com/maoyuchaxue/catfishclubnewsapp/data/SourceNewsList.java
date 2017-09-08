@@ -56,6 +56,11 @@ public class SourceNewsList implements NewsList {
         }
 
         @Override
+        public void dismiss() {
+            //TODO: dismiss in SourceNewsList
+        }
+
+        @Override
         protected void finalize() throws Throwable {
             super.finalize();
             close();

@@ -184,6 +184,12 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
     }
 
     @Override
+    public boolean remove(String id) {
+        //TODO: remove in MetaInfoListSource
+        return false;
+    }
+
+    @Override
     public void close() throws NewsSourceException {
         // simply do nothing
     }

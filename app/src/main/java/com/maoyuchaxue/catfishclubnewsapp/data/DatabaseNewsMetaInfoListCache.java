@@ -113,6 +113,12 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
     }
 
     @Override
+    public boolean remove(String id) {
+        //TODO: I don't know whether it is necessary to implement this. I will check whether this class is useful or not.
+        return false;
+    }
+
+    @Override
     public void close() throws NewsSourceException {
         frontSrc.close();
     }

@@ -59,6 +59,12 @@ public class BookmarkManager {
         }
 
         @Override
+        public boolean remove(String id) {
+            //TODO: remove in BookmarkMetaInfoListSource
+            return false;
+        }
+
+        @Override
         public void close() throws NewsSourceException {
 
         }
@@ -90,7 +96,7 @@ public class BookmarkManager {
         return bookmarked;
     }
 
-    public void bookmark(NewsMetaInfo metaInfo){
+    public boolean bookmark(NewsMetaInfo metaInfo){
         SQLiteDatabase db = openHelper.getWritableDatabase();
 
         ContentValues change = new ContentValues();
@@ -110,6 +116,9 @@ public class BookmarkManager {
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
 
         change.put(CacheDBOpenHelper.FIELD_ID, metaInfo.getId());
-        db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
+
+        long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
+
+        return res != -1;
     }
 }

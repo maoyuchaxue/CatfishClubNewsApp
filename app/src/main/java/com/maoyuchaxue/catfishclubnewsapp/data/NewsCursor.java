@@ -25,5 +25,7 @@ public interface NewsCursor {
     int getIndex();
     int getIndexInList();
 
+    void dismiss();
+
     void close();
 }

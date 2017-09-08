@@ -23,6 +23,7 @@ public interface NewsMetaInfoListSource {
     int getPageSize();
     int getCapacity();
     void refresh();
+    boolean remove(String id);
 
     void close() throws NewsSourceException;
 }
