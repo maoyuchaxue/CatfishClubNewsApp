@@ -75,84 +75,23 @@ public class HistoryManager {
         }
     }
 
-    private class HistoryMetaInfoListSource implements NewsMetaInfoListSource{
+    private class HistoryMetaInfoListSource extends DatabaseNewsMetaInfoListSource{
         private static final int PAGE_SIZE = 20;
 
         @Override
-        public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo,
-                                                                         String keyword,
-                                                                         NewsCategoryTag category)
-                throws NewsSourceException {
-            SQLiteDatabase db = openHelper.getReadableDatabase();
+        protected String getTableName(){
+            return CacheDBOpenHelper.NEWS_TABLE_NAME;
+        }
 
-            String selection;
-            String[] selectionArgs;
-            // TODO: support no searching now
-            selection = null;
-            selectionArgs = null;
-
-            String order = null;
-            String limit = (PAGE_SIZE * pageNo - pageNo) + "," + PAGE_SIZE;
-
-            Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME,
-                    new String[]{CacheDBOpenHelper.FIELD_ID,
-                            CacheDBOpenHelper.FIELD_SRC,
-                            CacheDBOpenHelper.FIELD_INTRO,
-                            CacheDBOpenHelper.FIELD_PICTURES,
-                            CacheDBOpenHelper.FIELD_CATEGORY_TAG,
-                            CacheDBOpenHelper.FIELD_URL,
-                            CacheDBOpenHelper.FIELD_TITLE,
-                            CacheDBOpenHelper.FIELD_VIDEO,
-                            CacheDBOpenHelper.FIELD_LANG,
-                            CacheDBOpenHelper.FIELD_AUTHOR
-                    },
-                    selection,
-                    selectionArgs,
-                    null,
-                    null,
-                    order,
-                    limit
-                    );
-            ArrayList<NewsMetaInfo> metaInfos = new ArrayList<NewsMetaInfo>();
-            if(cursor.moveToFirst()) {
-                do {
-                    NewsMetaInfo metaInfo = new NewsMetaInfo(cursor.getString(0));
-                    metaInfo.setSrcSite(cursor.getString(1));
-                    metaInfo.setIntro(cursor.getString(2));
-
-                    String[] pictures = cursor.getString(3).split(";");
-                    URL[] urls = new URL[pictures.length];
-                    for(int i = 0; i < pictures.length; i ++)
-                        try {
-                            urls[i] = new URL(pictures[i]);
-                        } catch(MalformedURLException e){
-                            e.printStackTrace();
-                        }
-                    metaInfo.setPictures(urls);
-
-                    metaInfo.setCategoryTag(NewsCategoryTag.CATEGORIES[cursor.getInt(4)]);
-                    try {
-                        metaInfo.setUrl(new URL(cursor.getString(5)));
-                        metaInfo.setVideo(new URL(cursor.getString(7)));
-                    } catch(MalformedURLException e){
-                        e.printStackTrace();
-                    }
-
-                    metaInfo.setTitle(cursor.getString(6));
-                    metaInfo.setLang(cursor.getString(8));
-                    metaInfo.setAuthor(cursor.getString(9));
-
-
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-
-            return new Pair<>(metaInfos.toArray(new NewsMetaInfo[0]),
-                    -(PAGE_SIZE * pageNo - pageNo + 1));
+        @Override
+        protected CacheDBOpenHelper getOpenHelper() {
+            return openHelper;
         }
 
         @Override
         public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException {
+            //TODO
+
             return null;
         }
 
@@ -177,7 +116,7 @@ public class HistoryManager {
         }
     }
 
-    public static HistoryManager getInstance(CacheDBOpenHelper openHelper){
+    public synchronized static HistoryManager getInstance(CacheDBOpenHelper openHelper){
         if(instance == null)
             instance = new HistoryManager(openHelper);
         return instance;
@@ -232,8 +171,18 @@ public class HistoryManager {
     }
 
     public boolean isInHistory(String id){
-        // TODO: wait to be done
-        return false;
+        SQLiteDatabase db = openHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME,
+                new String[]{CacheDBOpenHelper.FIELD_ID},
+                CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id},
+                null, null, null, null);
+
+        boolean inHistory = cursor.moveToFirst();
+        cursor.close();
+
+        return inHistory;
     }
 
 
