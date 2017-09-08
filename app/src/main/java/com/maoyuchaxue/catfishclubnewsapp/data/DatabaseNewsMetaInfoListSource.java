@@ -2,6 +2,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -30,7 +31,7 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
         selectionArgs = null;
 
         String order = null;
-        String limit = (getPageSize() * pageNo - pageNo) + "," + getPageSize();
+        String limit = (getPageSize() * pageNo - getPageSize()) + "," + getPageSize();
 
         Cursor cursor = db.query(false, getTableName(),
                 new String[]{CacheDBOpenHelper.FIELD_ID,
@@ -58,15 +59,21 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                 metaInfo.setSrcSite(cursor.getString(1));
                 metaInfo.setIntro(cursor.getString(2));
 
-                String[] pictures = cursor.getString(3).split(";");
-                URL[] urls = new URL[pictures.length];
-                for(int i = 0; i < pictures.length; i ++)
-                    try {
-                        urls[i] = new URL(pictures[i]);
-                    } catch(MalformedURLException e){
-                        e.printStackTrace();
-                    }
-                metaInfo.setPictures(urls);
+                Log.i("catclub", cursor.getString(3));
+                String s = cursor.getString(3).trim();
+                if (s.isEmpty())
+                    metaInfo.setPictures(new URL[0]);
+                else {
+                    String[] pictures = cursor.getString(3).split(";");
+                    URL[] urls = new URL[pictures.length];
+                    for (int i = 0; i < pictures.length; i++)
+                        try {
+                            urls[i] = new URL(pictures[i]);
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
+                    metaInfo.setPictures(urls);
+                }
 
                 metaInfo.setCategoryTag(NewsCategoryTag.CATEGORIES[cursor.getInt(4)]);
                 try {
@@ -80,12 +87,13 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                 metaInfo.setLang(cursor.getString(8));
                 metaInfo.setAuthor(cursor.getString(9));
 
-
+                metaInfos.add(metaInfo);
             } while (cursor.moveToNext());
         }
         cursor.close();
 
+        Log.i("metainfo", String.valueOf(metaInfos.size()));
         return new Pair<>(metaInfos.toArray(new NewsMetaInfo[0]),
-                -(getPageSize() * pageNo - pageNo + 1));
+                -(getPageSize() * pageNo - getPageSize() + 1));
     }
 }

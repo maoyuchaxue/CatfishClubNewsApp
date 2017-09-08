@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.constraint.solver.Cache;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -12,6 +13,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by YU_Jason on 2017/9/8.
@@ -158,8 +160,15 @@ public class HistoryManager {
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
         StringBuilder pictureStr = new StringBuilder();
-        for(URL url : metaInfo.getPictures())
-            pictureStr.append(";" + url.toString());
+        boolean first = true;
+        for(URL url : metaInfo.getPictures()) {
+            if (first) {
+                first = false;
+                pictureStr.append(url.toString());
+            } else {
+                pictureStr.append(";" + url.toString());
+            }
+        };
         change.put(CacheDBOpenHelper.FIELD_PICTURES, pictureStr.toString());
 
         change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo() == null ? "" : metaInfo.getVideo().toString());

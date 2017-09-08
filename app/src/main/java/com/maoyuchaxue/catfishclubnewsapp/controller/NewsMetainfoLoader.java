@@ -39,6 +39,7 @@ public class NewsMetainfoLoader extends AsyncTaskLoader<List<NewsCursor>> {
             curCursor = newsList.getHeadCursor();
         }
         for (int i = 0; i < loadBatch; i++) {
+            Log.i("bookmark", String.valueOf(i));
             if (curCursor == null) {
                 break;
             }

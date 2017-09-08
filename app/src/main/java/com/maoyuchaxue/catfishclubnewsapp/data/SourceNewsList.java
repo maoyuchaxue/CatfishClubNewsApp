@@ -17,6 +17,9 @@ import javax.xml.transform.Source;
  */
 
 public class SourceNewsList implements NewsList {
+    private static final int LOOKUP_LIM = 3;
+
+
     private class SourceNewsCursor implements NewsCursor{
         private NewsMetaInfo metaInfo;
         // the index in the real list (stable)
@@ -133,6 +136,7 @@ public class SourceNewsList implements NewsList {
     private NewsCategoryTag categoryTag;
     private Random random;
 
+
     // triple: (index, cursor);
 //    private HashMap<Integer, SourceNewsCursor> buffer = new HashMap<Integer, SourceNewsCursor>();
     private final int BUFFER_SIZE = 100;
@@ -244,8 +248,8 @@ public class SourceNewsList implements NewsList {
         // the expected new page
         int nPage = next ? (oPage + 1) : (oPage - 1);
         try{
-            Pair<NewsMetaInfo[], Integer> res;
-            while(true){
+            Pair<NewsMetaInfo[], Integer> res = null;
+            for(int t = 0; t < LOOKUP_LIM; t ++) {
                 res =
                         metaInfoSource.getNewsMetaInfoListByPageNo(nPage, keyword, categoryTag);
                 // compute the index range of the page
