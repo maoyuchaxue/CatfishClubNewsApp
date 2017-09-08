@@ -185,7 +185,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
     @Override
     public boolean remove(String id) {
-        //TODO: remove in MetaInfoListSource
+        // does nothing, for the contents on web cannot be removed
         return false;
     }
 

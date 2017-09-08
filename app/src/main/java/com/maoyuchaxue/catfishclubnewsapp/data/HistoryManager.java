@@ -112,8 +112,7 @@ public class HistoryManager {
 
         @Override
         public boolean remove(String id) {
-            //TODO: remove in HistoryMetaInfoListSource
-            return false;
+            return HistoryManager.this.remove(id);
         }
 
         @Override
@@ -143,7 +142,6 @@ public class HistoryManager {
     }
 
     public boolean add(NewsMetaInfo metaInfo, NewsContent newsContent){
-        //TODO: add news to history
         SQLiteDatabase db = openHelper.getWritableDatabase();
         //assume it is not yet in database
         //TODO: deal with exceptions
@@ -174,8 +172,13 @@ public class HistoryManager {
         return res != -1;
     }
 
-    public void remove(String id){
-        //TODO: remove a piece of news from history
+    public boolean remove(String id){
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        int affectedNo = db.delete(CacheDBOpenHelper.NEWS_TABLE_NAME,
+                CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id});
+
+        return affectedNo != 0;
     }
 
     public boolean isInHistory(String id){

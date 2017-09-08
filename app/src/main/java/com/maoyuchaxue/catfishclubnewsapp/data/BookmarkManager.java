@@ -58,10 +58,15 @@ public class BookmarkManager {
 
         }
 
+        /**
+         * Removes the record with a specified id.
+         * @param id The specified id.
+         * @return If the record is successfully removed, the return value would be <code>true</code>;
+         * otherwise it would be <code>false</code>.
+         * */
         @Override
         public boolean remove(String id) {
-            //TODO: remove in BookmarkMetaInfoListSource
-            return false;
+            return BookmarkManager.this.remove(id);
         }
 
         @Override
@@ -96,7 +101,16 @@ public class BookmarkManager {
         return bookmarked;
     }
 
-    public boolean bookmark(NewsMetaInfo metaInfo){
+    public boolean remove(String id){
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        int affectedNo = db.delete(CacheDBOpenHelper.BOOKMARK_TABLE_NAME,
+                CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id});
+
+        return affectedNo != 0;
+    }
+
+    public boolean add(NewsMetaInfo metaInfo){
         SQLiteDatabase db = openHelper.getWritableDatabase();
 
         ContentValues change = new ContentValues();
