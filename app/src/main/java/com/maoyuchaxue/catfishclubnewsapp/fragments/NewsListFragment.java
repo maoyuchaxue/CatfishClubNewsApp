@@ -218,32 +218,33 @@ public class NewsListFragment extends Fragment
     private void resetNewsList() {
         newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag);
         mNewsListRecyclerViewListener.setFinished(false);
+        mNewsListRecyclerViewListener.setFirstBatchLoaded(false);
         mAdapter.clear();
     }
 
     public void reloadFromBeginning() {
+        Log.i("load_process", "reload from beginning");
         mCursor = null;
         resetNewsList();
         Bundle args = new Bundle();
         Loader<List<NewsCursor> > loader = getLoaderManager().getLoader(NEWS_CURSOR_LOADER_ID);
-        Log.i("mloader", "loader can be get: " + String.valueOf(loader  == null));
+        Log.i("load_process", "loader can be get: " + String.valueOf(loader  == null));
         if (loader != null) {
             getLoaderManager().destroyLoader(NEWS_CURSOR_LOADER_ID);
         }
         mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
 
-        Log.i("mloader", String.valueOf(((NewsMetainfoLoader)mLoader).isFinished()));
+        Log.i("load_process", String.valueOf(((NewsMetainfoLoader)mLoader).isFinished()));
         mLoader.forceLoad();
     }
 
     private void loadNextData() {
+        Log.i("load_process", "load next data");
         if (((NewsMetainfoLoader) mLoader).isFinished()) {
             mNewsListRecyclerViewListener.setFinished(true);
         } else {
             mNewsListRecyclerViewListener.setFinished(false);
-            if (!mLoader.isStarted()) {
-                mLoader.forceLoad();
-            }
+            mLoader.forceLoad();
         }
     }
 
@@ -291,7 +292,9 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<List<NewsCursor>> loader, List<NewsCursor> data) {
+        Log.i("load_process", "load finished, data size: " + data.size());
         NewsMetainfoLoader metainfoLoader = (NewsMetainfoLoader) loader;
+        mNewsListRecyclerViewListener.setFirstBatchLoaded(true);
         mCursor = metainfoLoader.getCurrentCursor();
         for (int i = 0; i < data.size(); i++) {
             mAdapter.addItem(data.get(i));
@@ -304,6 +307,7 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onLoadMore() {
+        Log.i("load_process", "load more");
         loadNextData();
     }
 }
