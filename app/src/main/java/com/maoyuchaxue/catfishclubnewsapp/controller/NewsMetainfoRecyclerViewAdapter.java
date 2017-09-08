@@ -160,18 +160,16 @@ public class NewsMetainfoRecyclerViewAdapter
         @Override
         public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
             imageView = (ImageView) view.findViewById(R.id.news_unit_pics_image);
-            if (imageView == null) {
-                Log.e("catclub", "imageview is null!!!");
-            }
             return new ResourceLoader(context, summaryPicURL, new WebResourceSource());
         }
 
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
-            if (imageView == null) {
-                Log.e("catclub", "imageview is null!!!");
+            if (data == null || data.getByteCount() == 0 || data.getHeight() == 0) {
+                imageView.setImageResource(R.mipmap.ic_placeholder);
+            } else {
+                imageView.setImageBitmap(data);
             }
-            imageView.setImageBitmap(data);
         }
 
         @Override
