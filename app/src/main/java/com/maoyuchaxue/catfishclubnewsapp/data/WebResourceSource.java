@@ -2,6 +2,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
 
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,6 +35,7 @@ public class WebResourceSource extends ResourceSource {
         con.connect();
         con.disconnect();
 
+        Log.i("catclub", url.toString() + byteArray.size());
         return byteArray.toByteArray();
     }
 }

@@ -60,7 +60,9 @@ public class NewsListFragment extends Fragment
     private static final String ARG_KEYWORD = "keyword";
     private static final String ARG_IS_LOCAL = "is_local";
 
-    private static final int NEWS_CURSOR_LOADER_ID = 1;
+    public static final int NEWS_CURSOR_LOADER_ID = 1;
+    public static final int IMAGE_LOADER_ID = 2;
+
 
     private String category;
     private String keyword;
@@ -134,7 +136,7 @@ public class NewsListFragment extends Fragment
         mRecyclerView = (RecyclerView) curView.findViewById(R.id.news_info_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
 
-        mAdapter= new NewsMetainfoRecyclerViewAdapter();
+        mAdapter = new NewsMetainfoRecyclerViewAdapter(getContext(), getLoaderManager());
         mAdapter.setOnRecyclerViewItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
