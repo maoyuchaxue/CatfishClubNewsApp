@@ -12,6 +12,7 @@ public class NewsListRecyclerViewListener extends RecyclerView.OnScrollListener 
     private LinearLayoutManager mLayoutManager;
     private int mItemCount, mLastCompletely, mLastLoad;
     private OnLoadMoreListener onLoadMoreListener;
+    private boolean finished;
 
     public NewsListRecyclerViewListener(OnLoadMoreListener listener) {
         onLoadMoreListener = listener;
@@ -19,6 +20,10 @@ public class NewsListRecyclerViewListener extends RecyclerView.OnScrollListener 
 
     public interface OnLoadMoreListener {
         public void onLoadMore();
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     @Override
