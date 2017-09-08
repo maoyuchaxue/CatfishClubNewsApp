@@ -28,6 +28,7 @@ import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoLoader;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsMetaInfoListCache;
+import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
@@ -104,6 +105,7 @@ public class NewsListFragment extends Fragment
         return fragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,20 +144,21 @@ public class NewsListFragment extends Fragment
         mNewsListRecyclerViewListener = new NewsListRecyclerViewListener(this);
         mRecyclerView.addOnScrollListener(mNewsListRecyclerViewListener);
 
-        mNewsContentSource = new DatabaseNewsContentCache(CacheDBOpenHelper.
-                getInstance(getContext().getApplicationContext()),
+        mNewsContentSource = HistoryManager.getInstance(CacheDBOpenHelper.
+                getInstance(getContext().getApplicationContext())).getNewsContentSource(
                 new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"));
 
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         if (keyword != null) {
-            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
-                getInstance(getContext().getApplicationContext()),
-                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search"));
+//            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
+//                getInstance(getContext().getApplicationContext()),
+//                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search"));
+            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
         } else {
-            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
-                getInstance(getContext().getApplicationContext()),
-                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest"));
-//            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
+//            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
+//                getInstance(getContext().getApplicationContext()),
+//                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest"));
+            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
         }
 
         mCursor = null;
