@@ -1,13 +1,13 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
+import java.io.Serializable;
 import java.net.URL;
-import java.util.Date;
 
 /**
  * Created by YU_Jason on 2017/9/5.
  */
 
-public class NewsMetaInfo {
+public class NewsMetaInfo implements Serializable{
     private NewsCategoryTag categoryTag;
     private String id;
     private String srcSite;
@@ -24,6 +24,7 @@ public class NewsMetaInfo {
     private URL video;
     private String intro;
 
+    public NewsMetaInfo(){}
 
     public NewsMetaInfo(String id){
         this.id = id;
@@ -54,6 +55,7 @@ public class NewsMetaInfo {
     public NewsCategoryTag getCategoryTag() {
         return categoryTag;
     }
+
 
     public String getId() {
         return id;
@@ -95,6 +97,10 @@ public class NewsMetaInfo {
         return intro;
     }
 
+    public void setId(String id){
+        this.id = id;
+    }
+
     public void setCategoryTag(NewsCategoryTag categoryTag) {
         this.categoryTag = categoryTag;
     }
@@ -132,3 +138,4 @@ public class NewsMetaInfo {
     }
 
 }
+

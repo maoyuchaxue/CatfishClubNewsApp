@@ -1,12 +1,12 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
-import java.util.Date;
+import java.io.Serializable;
 
 /**
  * Created by YU_Jason on 2017/9/5.
  */
 
-public class NewsContent {
+public class NewsContent implements Serializable{
     public String getContentStr() {
         return contentStr;
     }
