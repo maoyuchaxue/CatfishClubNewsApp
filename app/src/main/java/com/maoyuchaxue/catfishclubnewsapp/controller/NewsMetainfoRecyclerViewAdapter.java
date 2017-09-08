@@ -25,6 +25,7 @@ import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -40,9 +41,12 @@ public class NewsMetainfoRecyclerViewAdapter
     private Context context;
     private LoaderManager loaderManager;
     private ArrayList<NewsCursor> cursors;
+    private HashMap<String, Integer> IDToPosition;
+
     public NewsMetainfoRecyclerViewAdapter(Context context, LoaderManager loaderManager) {
         this.context = context;
         this.loaderManager = loaderManager;
+        this.IDToPosition = new HashMap<String, Integer>();
         cursors = new ArrayList<NewsCursor>();
     }
 
@@ -115,7 +119,9 @@ public class NewsMetainfoRecyclerViewAdapter
             }
 
             picsViewHolder.setSummaryPicURL(info.getPictures()[0]);
+
             viewHolder.itemView.setTag(cursors.get(position));
+
             loaderManager.initLoader(NewsListFragment.IMAGE_LOADER_ID + position , null, picsViewHolder).forceLoad();
 
         } else if (viewHolder instanceof TextViewHolder) {
@@ -150,6 +156,28 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public void onClick(View v) {
+
+        int color = ContextCompat.getColor(context, R.color.colorHasReadText);
+        TextView titleView = (TextView) v.findViewById(R.id.news_unit_title);
+        TextView introView = null;
+        TextView sourceView = null;
+        if (titleView != null) {
+            introView = (TextView) v.findViewById(R.id.news_unit_intro);
+            sourceView = (TextView) v.findViewById(R.id.news_unit_source);
+        } else {
+            titleView = (TextView) v.findViewById(R.id.news_unit_pics_title);
+            if (titleView != null) {
+                introView = (TextView) v.findViewById(R.id.news_unit_pics_intro);
+                sourceView = (TextView) v.findViewById(R.id.news_unit_pics_source);
+            }
+        }
+
+        try {
+            titleView.setTextColor(color);
+            introView.setTextColor(color);
+            sourceView.setTextColor(color);
+        } catch (Exception e) {}
+
         if (onRecyclerViewItemClickListener != null) {
             onRecyclerViewItemClickListener.onItemClick(v, (NewsCursor) v.getTag());
         }
@@ -158,6 +186,13 @@ public class NewsMetainfoRecyclerViewAdapter
     public void addItem(NewsCursor data) {
         cursors.add(data);
         notifyItemInserted(cursors.size());
+        IDToPosition.put(data.getNewsMetaInfo().getId(), cursors.size());
+    }
+
+    public void clear() {
+        cursors = new ArrayList<NewsCursor>();
+        IDToPosition = new HashMap<String, Integer>();
+        notifyDataSetChanged();
     }
 
     private static class PicsViewHolder extends RecyclerView.ViewHolder

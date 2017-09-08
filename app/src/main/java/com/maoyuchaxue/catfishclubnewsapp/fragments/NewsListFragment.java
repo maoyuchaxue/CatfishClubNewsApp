@@ -195,6 +195,7 @@ public class NewsListFragment extends Fragment
 
     private void resetNewsList() {
         newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag);
+        mAdapter.clear();
     }
 
     private void reloadFromBeginning() {
@@ -202,11 +203,10 @@ public class NewsListFragment extends Fragment
         resetNewsList();
         Bundle args = new Bundle();
         Loader<List<NewsCursor> > loader = getLoaderManager().getLoader(NEWS_CURSOR_LOADER_ID);
-        if (loader != null && loader.isReset()) {
+        if (loader != null) {
             getLoaderManager().destroyLoader(NEWS_CURSOR_LOADER_ID);
-        } else {
-            mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
         }
+        mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
         mLoader.forceLoad();
     }
 
