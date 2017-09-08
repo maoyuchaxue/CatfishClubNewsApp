@@ -98,6 +98,11 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
     }
 
     @Override
+    public boolean isReversed() {
+        return false;
+    }
+
+    @Override
     public int getPageSize() {
         return frontSrc.getPageSize();
     }

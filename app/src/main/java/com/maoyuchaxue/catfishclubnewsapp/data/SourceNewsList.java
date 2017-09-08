@@ -18,6 +18,8 @@ import javax.xml.transform.Source;
 
 public class SourceNewsList implements NewsList {
     private static final int LOOKUP_LIM = 3;
+    private boolean sourceReversed;
+    private int nextD, previousD;
 
 
     private class SourceNewsCursor implements NewsCursor{
@@ -31,7 +33,7 @@ public class SourceNewsList implements NewsList {
             this.metaInfo = metaInfo;
             this.oPage = oPage;
 
-            closed = false;
+            closed = true;
         }
 
         @Override
@@ -57,14 +59,14 @@ public class SourceNewsList implements NewsList {
         public NewsCursor next() {
             if(closed)
                 throw new NewsCursorClosedException();
-            return getCursorAt(indexInList - 1, oPage, true);
+            return getCursorAt(indexInList + nextD, oPage, true);
         }
 
         @Override
         public NewsCursor previous() {
             if(closed)
                 throw new NewsCursorClosedException();
-            return getCursorAt(indexInList + 1, oPage, false);
+            return getCursorAt(indexInList + previousD, oPage, false);
         }
 
         @Override
@@ -107,18 +109,18 @@ public class SourceNewsList implements NewsList {
                 // the index needs updating
                 shiftHigherInArray(buffer, ind);
                 shiftHigherInArray(allocated, ind);
-           }
+            }
             closed = true;
         }
 
         @Override
         protected void finalize() throws Throwable {
             super.finalize();
-            close();
         }
 
         public void close() {
-            closed = true;
+            deallocate(this);
+//            closed = true;
         }
 
         public boolean isClosed(){
@@ -146,7 +148,7 @@ public class SourceNewsList implements NewsList {
 //    private int allocatedCursorCnt;
 
     private void addToBuffer(SourceNewsCursor cursor){
-        int ind = cursor.getIndexInList();
+        int ind = cursor.indexInList;
         SourceNewsCursor res = buffer.get(ind);
         if(res != null)
             return;
@@ -173,6 +175,9 @@ public class SourceNewsList implements NewsList {
         this.categoryTag = newsCategoryTag;
 
         random = new Random();
+        sourceReversed = metaInfoSource.isReversed();
+        previousD = sourceReversed ? 1 : -1;
+        nextD = sourceReversed ? -1 : 1;
     }
 
 
@@ -187,27 +192,32 @@ public class SourceNewsList implements NewsList {
     }
 
     private void addToAllocated(SourceNewsCursor cursor){
-        int ind = cursor.getIndexInList();
+        int ind = cursor.indexInList;
         allocated.put(ind, cursor);
     }
 
     private void allocate(SourceNewsCursor cursor){
-        int ind = cursor.getIndexInList();
+        int ind = cursor.indexInList;
         buffer.remove(ind);
         addToAllocated(cursor);
+
+        cursor.closed = false;
     }
 
     private void deallocate(SourceNewsCursor cursor){
-        int ind = cursor.getIndexInList();
+        int ind = cursor.indexInList;
         allocated.remove(ind);
         addToBuffer(cursor);
+
+        cursor.closed = true;
     }
 
     private void bufferCursor(SourceNewsCursor cursor){
-        int ind = cursor.getIndexInList();
-        SourceNewsCursor res = allocated.get(ind);
-        if(res == null)
-            addToBuffer(res);
+//        int ind = cursor.indexInList;
+//        SourceNewsCursor res = allocated.get(ind);
+//        if(res == null)
+        if(cursor.closed)
+            addToBuffer(cursor);
     }
 
 
@@ -221,8 +231,8 @@ public class SourceNewsList implements NewsList {
         try {
             Pair<NewsMetaInfo[], Integer> res =
                     metaInfoSource.getNewsMetaInfoListByPageNo(1, keyword, categoryTag);
-            for(int i = 0; i < res.first.length; i ++) {
-                SourceNewsCursor cursor = new SourceNewsCursor(res.second - i, res.first[i], 1);
+            for(int i = 0, cur = res.second; i < res.first.length; i ++, cur += nextD) {
+                SourceNewsCursor cursor = new SourceNewsCursor(cur, res.first[i], 1);
                 if(i == 0)
                     allocate(cursor);
                 else
@@ -253,23 +263,24 @@ public class SourceNewsList implements NewsList {
                 res =
                         metaInfoSource.getNewsMetaInfoListByPageNo(nPage, keyword, categoryTag);
                 // compute the index range of the page
-                int lo = res.second - res.first.length;
+                int lo = res.second + nextD * res.first.length;
                 int hi = res.second;
-                if(index > lo && index <= hi) // if it is on the page
+                if((index > lo && index <= hi) ||
+                        (index < lo && index >= hi)) // if it is on the page
                     break;
-                if(index <= lo){
-                    nPage += (lo - index + 1) / metaInfoSource.getPageSize();
-                    if((lo - index + 1) % metaInfoSource.getPageSize() != 0)
+                if((index - lo) * nextD >= 0){
+                    nPage += ((index - lo) * nextD + 1) / metaInfoSource.getPageSize();
+                    if(((index - lo) * nextD + 1) % metaInfoSource.getPageSize() != 0)
                         ++ nPage;
                 } else{
-                    nPage -= (index - hi) / metaInfoSource.getPageSize();
-                    if((index - hi) % metaInfoSource.getPageSize() != 0)
+                    nPage -= (index - hi) * previousD / metaInfoSource.getPageSize();
+                    if((index - hi) * previousD % metaInfoSource.getPageSize() != 0)
                         -- nPage;
                 }
             }
-            for(int i = 0; i < res.first.length; i ++) {
-                cursor = new SourceNewsCursor(res.second - i, res.first[i], nPage);
-                if(res.second - i == index)
+            for(int i = 0, cur = res.second; i < res.first.length; i ++, cur += nextD) {
+                cursor = new SourceNewsCursor(cur, res.first[i], nPage);
+                if(cur == index)
                     allocate(cursor);
                 else
                     bufferCursor(cursor);

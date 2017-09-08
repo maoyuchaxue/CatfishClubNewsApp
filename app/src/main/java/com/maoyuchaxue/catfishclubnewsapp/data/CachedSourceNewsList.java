@@ -56,6 +56,16 @@ public class CachedSourceNewsList implements NewsList {
         }
 
         @Override
+        public void dismiss() {
+
+        }
+
+        @Override
+        public boolean isClosed() {
+            return false;
+        }
+
+        @Override
         public void close() {
 
         }

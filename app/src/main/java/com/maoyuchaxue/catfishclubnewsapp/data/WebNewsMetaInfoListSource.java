@@ -167,6 +167,11 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         return new Pair<>(new NewsMetaInfo[0], 0);
     }
 
+    @Override
+    public boolean isReversed() {
+        return true;
+    }
+
 
     @Override
     public int getPageSize() {

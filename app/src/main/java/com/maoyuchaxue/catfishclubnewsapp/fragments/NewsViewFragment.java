@@ -192,7 +192,7 @@ public class NewsViewFragment extends Fragment
     public void onLoaderReset(Loader<NewsContent> loader) {}
 
     public void addCurrentNewsToBookmark(BookmarkManager bookmarkManager) {
-        bookmarkManager.bookmark(metaInfo);
+        bookmarkManager.add(metaInfo);
     }
 
     public void removeCurrentNewsFromBookmark(BookmarkManager bookmarkManager) {

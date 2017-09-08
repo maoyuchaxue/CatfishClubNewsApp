@@ -94,6 +94,6 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
 
         Log.i("metainfo", String.valueOf(metaInfos.size()));
         return new Pair<>(metaInfos.toArray(new NewsMetaInfo[0]),
-                -(getPageSize() * pageNo - getPageSize() + 1));
+                getPageSize() * pageNo - getPageSize() + 1);
     }
 }

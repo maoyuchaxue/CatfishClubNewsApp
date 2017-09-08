@@ -98,6 +98,11 @@ public class HistoryManager {
         }
 
         @Override
+        public boolean isReversed() {
+            return false;
+        }
+
+        @Override
         public int getPageSize() {
             return PAGE_SIZE;
         }
