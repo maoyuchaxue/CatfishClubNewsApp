@@ -54,6 +54,21 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_RESOURCE_URL + " text primary key, " +
             FIELD_RESOURCE_BLOB + " blob);";
 
+    public static final String BOOKMARK_TABLE_NAME = "bookmark_cache";
+    private static final String BOOKMARK_TABLE_CREATE = "create table if not exists " +
+            BOOKMARK_TABLE_NAME + " (" +
+            FIELD_ID + " text primary key, " +
+            FIELD_INTRO + " text, " +
+            FIELD_CATEGORY_TAG + " integer, " +
+            FIELD_AUTHOR + " text, " +
+            FIELD_TITLE + " text, " +
+            FIELD_URL + " text, " +
+            FIELD_LANG + " text, " +
+            FIELD_SRC + " text, " +
+            FIELD_PICTURES + " text, " +
+            FIELD_VIDEO + " text);";
+
+
     private CacheDBOpenHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
     }
