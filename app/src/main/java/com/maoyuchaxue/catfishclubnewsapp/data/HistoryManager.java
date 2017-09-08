@@ -12,6 +12,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by YU_Jason on 2017/9/8.

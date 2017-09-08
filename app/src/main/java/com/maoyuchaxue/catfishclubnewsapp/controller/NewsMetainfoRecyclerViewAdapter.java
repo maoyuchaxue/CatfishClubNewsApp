@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,9 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebResourceSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 
 import java.net.URL;
@@ -103,6 +106,14 @@ public class NewsMetainfoRecyclerViewAdapter
             introView.setText(info.getIntro());
             sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
 
+            String id = info.getId();
+            if (HistoryManager.getInstance(CacheDBOpenHelper.getInstance(context.getApplicationContext())).isInHistory(id)) {
+                int color = ContextCompat.getColor(context, R.color.colorHasReadText);
+                titleView.setTextColor(color);
+                introView.setTextColor(color);
+                sourceView.setTextColor(color);
+            }
+
             picsViewHolder.setSummaryPicURL(info.getPictures()[0]);
             viewHolder.itemView.setTag(cursors.get(position));
             loaderManager.initLoader(NewsListFragment.IMAGE_LOADER_ID + position , null, picsViewHolder).forceLoad();
@@ -112,12 +123,21 @@ public class NewsMetainfoRecyclerViewAdapter
             View view = textViewHolder.view;
             NewsCursor cursor = cursors.get(position);
             NewsMetaInfo info = cursor.getNewsMetaInfo();
+
             TextView titleView = (TextView) view.findViewById(R.id.news_unit_title);
             TextView introView = (TextView) view.findViewById(R.id.news_unit_intro);
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_source);
             titleView.setText(info.getTitle());
             introView.setText(info.getIntro());
             sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
+
+            String id = info.getId();
+            if (HistoryManager.getInstance(CacheDBOpenHelper.getInstance(context.getApplicationContext())).isInHistory(id)) {
+                int color = ContextCompat.getColor(context, R.color.colorHasReadText);
+                titleView.setTextColor(color);
+                introView.setTextColor(color);
+                sourceView.setTextColor(color);
+            }
 
             viewHolder.itemView.setTag(cursors.get(position));
         }
@@ -153,7 +173,7 @@ public class NewsMetainfoRecyclerViewAdapter
             this.view = view;
         }
 
-        public void setSummaryPicURL(URL summaryPicURL) {
+        void setSummaryPicURL(URL summaryPicURL) {
             this.summaryPicURL = summaryPicURL;
         }
 
