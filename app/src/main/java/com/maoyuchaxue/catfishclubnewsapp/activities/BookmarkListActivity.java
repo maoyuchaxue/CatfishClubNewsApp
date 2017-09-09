@@ -8,7 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 
 public class BookmarkListActivity extends AppCompatActivity
@@ -57,6 +59,8 @@ public class BookmarkListActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case NEWS_VIEW_ACTIVITY:
+                BookmarkManager.getInstance(CacheDBOpenHelper.
+                        getInstance(getApplicationContext())).modifyBookmarkAccordingToIntent(data);
                 resetFragment();
                 break;
             default:

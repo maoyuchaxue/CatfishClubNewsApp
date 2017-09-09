@@ -65,7 +65,6 @@ public class NewsViewFragment extends Fragment
 
     public NewsViewFragment() {
         // Required empty public constructor
-
     }
 
     /**
@@ -134,12 +133,6 @@ public class NewsViewFragment extends Fragment
         return homeView;
     }
 
-//    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -192,11 +185,11 @@ public class NewsViewFragment extends Fragment
     public void onLoaderReset(Loader<NewsContent> loader) {}
 
     public void addCurrentNewsToBookmark(BookmarkManager bookmarkManager) {
-        bookmarkManager.add(metaInfo);
+//        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
     public void removeCurrentNewsFromBookmark(BookmarkManager bookmarkManager) {
-//        TODO: remove!
+//        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
     public void startSpeaking() {
