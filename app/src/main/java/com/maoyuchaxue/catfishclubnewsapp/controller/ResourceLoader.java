@@ -28,8 +28,9 @@ public class ResourceLoader extends AsyncTaskLoader<Bitmap> {
     public Bitmap loadInBackground() {
         Bitmap resource = null;
         try {
-            Log.i("catclub", url.toString());
-            resource = resourceSource.getAsBitmap(url);
+            if (url != null) {
+                resource = resourceSource.getAsBitmap(url);
+            }
         } catch (IOException e) {
         }
         return resource;

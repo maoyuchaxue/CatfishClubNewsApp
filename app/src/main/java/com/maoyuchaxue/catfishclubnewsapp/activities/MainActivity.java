@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity
     public static final int NEWS_VIEW_ACTIVITY = 0;
     public static final int SETTINGS_ACTIVITY = 1;
     public static final int CATEGORY_EDIT_ACTIVITY = 2;
+    public static final int BOOKMARK_LIST_ACTIVITY = 3;
 
 
     private SlidingTabLayout mTabLayout;
@@ -56,13 +57,18 @@ public class MainActivity extends AppCompatActivity
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = null;
                 switch (item.getItemId()) {
                     case R.id.main_menu_settings:
-                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        intent = new Intent(MainActivity.this, SettingsActivity.class);
                         startActivityForResult(intent, SETTINGS_ACTIVITY);
                         break;
                     case R.id.main_menu_search:
 
+                        break;
+                    case R.id.main_menu_bookmarks:
+                        intent = new Intent(MainActivity.this, BookmarkListActivity.class);
+                        startActivityForResult(intent, BOOKMARK_LIST_ACTIVITY);
                         break;
                 }
 
@@ -93,13 +99,13 @@ public class MainActivity extends AppCompatActivity
 
         if (globalKeyword != null)
             Log.i("catclub", globalKeyword);
-        fragments.add(NewsListFragment.newInstance("", globalKeyword, false));
+        fragments.add(NewsListFragment.newInstance("", globalKeyword, NewsListFragment.WEB_FRAGMENT));
         titles.add("综合");
 
         for (int i = 0; i < NewsCategoryTag.TITLES.length; i++) {
             boolean appears = sharedPreferences.getBoolean(NewsCategoryTag.TITLES_EN[i], true);
             if (appears) {
-                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, false));
+                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, NewsListFragment.WEB_FRAGMENT));
                 titles.add(NewsCategoryTag.TITLES[i]);
             }
         }
@@ -134,15 +140,12 @@ public class MainActivity extends AppCompatActivity
         initActionBar();
         initTabLayout();
         initCategoryButton();
-//        Log.i("catclub", "finished loading");
     }
 
     @Override
     public void onFragmentInteraction(NewsCursor cursor) {
         Intent intent = new Intent(MainActivity.this, NewsViewActivity.class);
         intent.putExtra("meta_info", cursor.getNewsMetaInfo());
-//        intent.putExtra("id", cursor.getNewsMetaInfo().getId());
-//        intent.putExtra("title", cursor.getNewsMetaInfo().getTitle());
         startActivityForResult(intent, NEWS_VIEW_ACTIVITY);
     }
 
@@ -190,6 +193,8 @@ public class MainActivity extends AppCompatActivity
                 break;
             case CATEGORY_EDIT_ACTIVITY:
                 refreshTabLayout();
+                break;
+            case BOOKMARK_LIST_ACTIVITY:
                 break;
             default:
                 break;

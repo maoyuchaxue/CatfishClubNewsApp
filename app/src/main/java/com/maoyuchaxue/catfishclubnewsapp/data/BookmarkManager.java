@@ -44,6 +44,11 @@ public class BookmarkManager {
         }
 
         @Override
+        public boolean isReversed() {
+            return false;
+        }
+
+        @Override
         public int getPageSize() {
             return PAGE_SIZE;
         }
@@ -56,6 +61,17 @@ public class BookmarkManager {
         @Override
         public void refresh() {
 
+        }
+
+        /**
+         * Removes the record with a specified id.
+         * @param id The specified id.
+         * @return If the record is successfully removed, the return value would be <code>true</code>;
+         * otherwise it would be <code>false</code>.
+         * */
+        @Override
+        public boolean remove(String id) {
+            return BookmarkManager.this.remove(id);
         }
 
         @Override
@@ -90,7 +106,16 @@ public class BookmarkManager {
         return bookmarked;
     }
 
-    public void bookmark(NewsMetaInfo metaInfo){
+    public boolean remove(String id){
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        int affectedNo = db.delete(CacheDBOpenHelper.BOOKMARK_TABLE_NAME,
+                CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id});
+
+        return affectedNo != 0;
+    }
+
+    public boolean add(NewsMetaInfo metaInfo){
         SQLiteDatabase db = openHelper.getWritableDatabase();
 
         ContentValues change = new ContentValues();
@@ -101,8 +126,17 @@ public class BookmarkManager {
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
         StringBuilder pictureStr = new StringBuilder();
-        for(URL url : metaInfo.getPictures())
-            pictureStr.append(";" + url.toString());
+
+        boolean first = true;
+        for(URL url : metaInfo.getPictures()) {
+            if (first) {
+                first = false;
+                pictureStr.append(url.toString());
+            } else {
+                pictureStr.append(";" + url.toString());
+            }
+        }
+
         change.put(CacheDBOpenHelper.FIELD_PICTURES, pictureStr.toString());
 
         change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo() == null ? "" : metaInfo.getVideo().toString());
@@ -110,6 +144,9 @@ public class BookmarkManager {
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
 
         change.put(CacheDBOpenHelper.FIELD_ID, metaInfo.getId());
-        db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
+
+        long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
+
+        return res != -1;
     }
 }

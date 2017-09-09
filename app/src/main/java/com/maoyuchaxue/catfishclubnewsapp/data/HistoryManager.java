@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.constraint.solver.Cache;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -97,6 +98,11 @@ public class HistoryManager {
         }
 
         @Override
+        public boolean isReversed() {
+            return false;
+        }
+
+        @Override
         public int getPageSize() {
             return PAGE_SIZE;
         }
@@ -109,6 +115,11 @@ public class HistoryManager {
         @Override
         public void refresh() {
 
+        }
+
+        @Override
+        public boolean remove(String id) {
+            return HistoryManager.this.remove(id);
         }
 
         @Override
@@ -137,8 +148,7 @@ public class HistoryManager {
         return metaInfoListSource;
     }
 
-    public void add(NewsMetaInfo metaInfo, NewsContent newsContent){
-        //TODO: add news to history
+    public boolean add(NewsMetaInfo metaInfo, NewsContent newsContent){
         SQLiteDatabase db = openHelper.getWritableDatabase();
         //assume it is not yet in database
         //TODO: deal with exceptions
@@ -155,8 +165,15 @@ public class HistoryManager {
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
         StringBuilder pictureStr = new StringBuilder();
-        for(URL url : metaInfo.getPictures())
-            pictureStr.append(";" + url.toString());
+        boolean first = true;
+        for(URL url : metaInfo.getPictures()) {
+            if (first) {
+                first = false;
+                pictureStr.append(url.toString());
+            } else {
+                pictureStr.append(";" + url.toString());
+            }
+        };
         change.put(CacheDBOpenHelper.FIELD_PICTURES, pictureStr.toString());
 
         change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo() == null ? "" : metaInfo.getVideo().toString());
@@ -164,11 +181,18 @@ public class HistoryManager {
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
         change.put(CacheDBOpenHelper.FIELD_ID, metaInfo.getId());
 
-        db.insert(CacheDBOpenHelper.NEWS_TABLE_NAME, null, change); //comfortable
+        long res = db.insert(CacheDBOpenHelper.NEWS_TABLE_NAME, null, change); //comfortable
+
+        return res != -1;
     }
 
-    public void remove(String id){
-        //TODO: remove a piece of news from history
+    public boolean remove(String id){
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        int affectedNo = db.delete(CacheDBOpenHelper.NEWS_TABLE_NAME,
+                CacheDBOpenHelper.FIELD_ID + "=?",
+                new String[]{id});
+
+        return affectedNo != 0;
     }
 
     public boolean isInHistory(String id){

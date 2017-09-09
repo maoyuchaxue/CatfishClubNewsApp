@@ -26,6 +26,7 @@ import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsListRecyclerViewListener;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoLoader;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
+import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsMetaInfoListCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
@@ -59,15 +60,18 @@ public class NewsListFragment extends Fragment
 
     private static final String ARG_CATEGORY = "category";
     private static final String ARG_KEYWORD = "keyword";
-    private static final String ARG_IS_LOCAL = "is_local";
+    private static final String ARG_FRAGMENT_TYPE = "type";
 
     public static final int NEWS_CURSOR_LOADER_ID = 1;
     public static final int IMAGE_LOADER_ID = 2;
 
+    public static final int WEB_FRAGMENT = 0;
+    public static final int DATABASE_FRAGMENT = 1;
+    public static final int BOOKMARK_FRAGMENT = 2;
 
     private String category;
     private String keyword;
-    private boolean isLocal;
+    private int fragmentType;
 
     private OnFragmentInteractionListener mListener;
     private NewsMetainfoRecyclerViewAdapter mAdapter;
@@ -95,14 +99,14 @@ public class NewsListFragment extends Fragment
      * @param keyword Parameter 2.
      * @return A new instance of fragment NewsListFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static NewsListFragment newInstance(String category, String keyword, boolean isLocal) {
+
+    public static NewsListFragment newInstance(String category, String keyword, int fragmentType) {
         NewsListFragment fragment = new NewsListFragment();
         Bundle args = new Bundle();
 
         args.putString(ARG_CATEGORY, category);
         args.putString(ARG_KEYWORD, keyword);
-        args.putBoolean(ARG_IS_LOCAL, isLocal);
+        args.putInt(ARG_FRAGMENT_TYPE, fragmentType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -114,7 +118,7 @@ public class NewsListFragment extends Fragment
         if (getArguments() != null) {
             category = getArguments().getString(ARG_CATEGORY);
             keyword = getArguments().getString(ARG_KEYWORD);
-            isLocal = getArguments().getBoolean(ARG_IS_LOCAL);
+            fragmentType = getArguments().getInt(ARG_FRAGMENT_TYPE);
         }
     }
 
@@ -124,6 +128,25 @@ public class NewsListFragment extends Fragment
         if (mView != null) {
             ((ViewGroup) mView.getParent()).removeView(mView);
         }
+    }
+
+    private void initWebFragment() {
+        tag = NewsCategoryTag.getCategoryByTitleEN(category);
+        if (keyword != null) {
+            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
+        } else {
+            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
+        }
+    }
+
+    private void initDatabaseFragment() {
+//        TODO: database fragment
+    }
+
+    private void initBookmarkFragment() {
+        mMetaInfoListSource = BookmarkManager.getInstance(CacheDBOpenHelper.
+                getInstance(getContext().getApplicationContext())).getNewsMetaInfoListSource();
+        Log.i("bookmark", "bookmarkInited");
     }
 
     @Override
@@ -150,17 +173,16 @@ public class NewsListFragment extends Fragment
                 getInstance(getContext().getApplicationContext())).getNewsContentSource(
                 new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"));
 
-        tag = NewsCategoryTag.getCategoryByTitleEN(category);
-        if (keyword != null) {
-//            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
-//                getInstance(getContext().getApplicationContext()),
-//                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search"));
-            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
-        } else {
-//            mMetaInfoListSource = new DatabaseNewsMetaInfoListCache(CacheDBOpenHelper.
-//                getInstance(getContext().getApplicationContext()),
-//                    new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest"));
-            mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/latest");
+        switch (fragmentType) {
+            case WEB_FRAGMENT:
+                initWebFragment();
+                break;
+            case DATABASE_FRAGMENT:
+                initDatabaseFragment();
+                break;
+            case BOOKMARK_FRAGMENT:
+                initBookmarkFragment();
+                break;
         }
 
         mCursor = null;
@@ -195,23 +217,35 @@ public class NewsListFragment extends Fragment
 
     private void resetNewsList() {
         newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag);
+        mNewsListRecyclerViewListener.setFinished(false);
+        mNewsListRecyclerViewListener.setFirstBatchLoaded(false);
+        mAdapter.clear();
     }
 
-    private void reloadFromBeginning() {
+    public void reloadFromBeginning() {
+        Log.i("load_process", "reload from beginning");
         mCursor = null;
         resetNewsList();
         Bundle args = new Bundle();
         Loader<List<NewsCursor> > loader = getLoaderManager().getLoader(NEWS_CURSOR_LOADER_ID);
-        if (loader != null && loader.isReset()) {
+        Log.i("load_process", "loader can be get: " + String.valueOf(loader  == null));
+        if (loader != null) {
             getLoaderManager().destroyLoader(NEWS_CURSOR_LOADER_ID);
-        } else {
-            mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
         }
+        mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
+
+        Log.i("load_process", String.valueOf(((NewsMetainfoLoader)mLoader).isFinished()));
         mLoader.forceLoad();
     }
 
     private void loadNextData() {
-        mLoader.forceLoad();
+        Log.i("load_process", "load next data");
+        if (((NewsMetainfoLoader) mLoader).isFinished()) {
+            mNewsListRecyclerViewListener.setFinished(true);
+        } else {
+            mNewsListRecyclerViewListener.setFinished(false);
+            mLoader.forceLoad();
+        }
     }
 
 //    public void onButtonPressed(Uri uri) {
@@ -258,7 +292,9 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<List<NewsCursor>> loader, List<NewsCursor> data) {
+        Log.i("load_process", "load finished, data size: " + data.size());
         NewsMetainfoLoader metainfoLoader = (NewsMetainfoLoader) loader;
+        mNewsListRecyclerViewListener.setFirstBatchLoaded(true);
         mCursor = metainfoLoader.getCurrentCursor();
         for (int i = 0; i < data.size(); i++) {
             mAdapter.addItem(data.get(i));
@@ -271,6 +307,7 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onLoadMore() {
+        Log.i("load_process", "load more");
         loadNextData();
     }
 }

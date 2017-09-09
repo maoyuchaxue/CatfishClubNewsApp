@@ -43,11 +43,11 @@ public class DatabaseResourceCache extends ResourceCache {
                 new String[]{url.toString()},
                 null, null, null, null
                 );
-        byte[] res;
+        byte[] res = null;
         if(cursor.moveToFirst())
             res = cursor.getBlob(0);
         cursor.close();
-        return new byte[0];
+        return res;
     }
 
     @Override
