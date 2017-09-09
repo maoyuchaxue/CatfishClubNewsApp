@@ -30,7 +30,7 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
         selection = null;
         selectionArgs = null;
 
-        String order = null;
+        String order = "rowid desc";
         String limit = (getPageSize() * pageNo - getPageSize()) + "," + getPageSize();
 
         Cursor cursor = db.query(false, getTableName(),
