@@ -14,6 +14,8 @@ import android.graphics.BitmapFactory;
 
 public abstract class ResourceSource {
     public static Bitmap getBitmapFromBlob(byte[] blob){
+        if(blob == null)
+            return null;
         return BitmapFactory.decodeByteArray(blob, 0, blob.length);
     }
     public Bitmap getAsThumbnail(URL url) throws IOException{
