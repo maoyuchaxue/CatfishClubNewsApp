@@ -47,10 +47,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.NewsViewActivity" />
-        <activity
-            android:name=".activities.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:theme="@style/SettingsTheme" />
         <activity android:name=".activities.CategoryEditActivity" />
         <activity
             android:name="com.mob.tools.MobUIShell"

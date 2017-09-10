@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +31,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
+import com.maoyuchaxue.catfishclubnewsapp.fragments.SettingsFragment;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -49,7 +52,29 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private CategoryViewPagerAdapter mViewPagerAdapter;
     private SearchView mSearchView;
+    private DrawerLayout mDrawerLayout;
     private String globalKeyword = null;
+
+    public void initDrawerFragment() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        SettingsFragment fragment = new SettingsFragment();
+        getFragmentManager().beginTransaction().replace(R.id.setting_drawer, fragment).commit();
+
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {}
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                drawerView.setClickable(true);
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {}
+            @Override
+            public void onDrawerStateChanged(int newState) {}
+        });
+        mDrawerLayout.closeDrawers();
+    }
 
     private void initActionBar() {
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
@@ -62,11 +87,15 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = null;
                 switch (item.getItemId()) {
                     case R.id.main_menu_settings:
-                        intent = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivityForResult(intent, SETTINGS_ACTIVITY);
+//                        intent = new Intent(MainActivity.this, SettingsActivity.class);
+//                        startActivityForResult(intent, SETTINGS_ACTIVITY);
+                        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+                            mDrawerLayout.closeDrawers();
+                        } else {
+                            mDrawerLayout.openDrawer(Gravity.START);
+                        }
                         break;
                     case R.id.main_menu_search:
-
                         break;
                     case R.id.main_menu_bookmarks:
                         intent = new Intent(MainActivity.this, BookmarkListActivity.class);
@@ -139,6 +168,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initDrawerFragment();
         initActionBar();
         initTabLayout();
         initCategoryButton();
@@ -216,5 +246,14 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         refreshTabLayout();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+            mDrawerLayout.closeDrawers();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

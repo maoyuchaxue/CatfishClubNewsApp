@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.controller;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -88,7 +89,10 @@ public class NewsMetainfoRecyclerViewAdapter
     @Override
     public int getItemViewType(int position) {
         URL[] urls = cursors.get(position).getNewsMetaInfo().getPictures();
-        if (urls == null || urls.length == 0) {
+
+        Boolean isTextOnly = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("text_only_mode", false);
+        if (urls == null || urls.length == 0 || isTextOnly) {
             return TEXT_ONLY_VIEW;
         } else {
             return PICS_VIEW;

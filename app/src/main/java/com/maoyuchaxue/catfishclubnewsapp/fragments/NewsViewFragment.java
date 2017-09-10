@@ -1,6 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.fragments;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.constraint.solver.Cache;
 import android.support.v4.content.Loader;
 import android.net.Uri;
@@ -163,7 +164,15 @@ public class NewsViewFragment extends Fragment
         authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();
 
-        URL urls[] = metaInfo.getPictures();
+        URL urls[] = null;
+        Boolean isTextOnly = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getBoolean("text_only_mode", false);
+        if (isTextOnly) {
+            urls = new URL[0];
+        } else {
+            urls = metaInfo.getPictures();
+        }
+
         String splitContents[] = content.split("</p>");
 
         Log.i("madapter", "input data length: " + urls.length + " " + splitContents.length);
