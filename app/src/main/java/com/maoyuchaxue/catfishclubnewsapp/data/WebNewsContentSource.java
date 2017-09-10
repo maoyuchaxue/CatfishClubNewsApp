@@ -1,5 +1,8 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
+import android.text.Html;
+import android.util.Log;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -15,6 +18,8 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by YU_Jason on 2017/9/6.
@@ -27,6 +32,8 @@ public class WebNewsContentSource implements NewsContentSource {
     private static final JsonParser JSON_PARSER = new JsonParser();
     private String apiUrl;
     private static final String ENTITY_LINK_PREFIX = "https://baike.baidu.com/item/";
+
+    private static final List<String> replaceStrings = Arrays.asList("。 ","？ ", "！ ", "… ", "\\. ", "\\? ", "\\! ", "” ", "— ", "\" ");
 
     public WebNewsContentSource(String apiUrl){
         this.apiUrl = apiUrl;
@@ -59,11 +66,30 @@ public class WebNewsContentSource implements NewsContentSource {
         content.setJournalist(json.get("news_Journal").getAsString());
 
         String rawContent = json.get("news_Content").getAsString();
+
+        // from catfish's line splitting
+        for (String s : replaceStrings) {
+            String target = s.replace(" ", "\n");
+            rawContent = rawContent.replaceAll(s, target);
+        }
+
+        String[] lines = rawContent.split("\n");
+
+        String finalContent = "";
+        for (String s : lines) {
+            finalContent += "<p>" + Html.escapeHtml("        " + s.replace("　", "  ").trim()) + "</p>";
+        }
+
+//        Log.i("WebNewsContentSource", finalContent);
+
+        // add links to name entities
         String[] nameEntities = getNameEntities(json);
-        StringBuilder contentWithLinks = new StringBuilder(rawContent);
+        StringBuilder contentWithLinks = new StringBuilder(finalContent);
         for(String entity : nameEntities){
-            int index = contentWithLinks.indexOf(entity);
-            contentWithLinks.replace(index, index + entity.length(),
+            String escaped = Html.escapeHtml(entity);
+//            Log.i("WebNewsContentSource", Html.escapeHtml(entity));
+            int index = contentWithLinks.indexOf(escaped);
+            contentWithLinks.replace(index, index + escaped.length(),
                     "<a href=\"" + ENTITY_LINK_PREFIX + entity +
                     "\">" + entity + "</a>");
         }

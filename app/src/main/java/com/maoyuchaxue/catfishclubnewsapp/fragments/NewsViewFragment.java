@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,7 +50,6 @@ public class NewsViewFragment extends Fragment
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NEWS_ID = "news_id";
     private static final String ARG_TITLE = "title";
-    private static final List<String> replaceStrings = Arrays.asList("。 ","？ ", "！ ", "… ", "\\. ", "\\? ", "\\! ", "” ", "— ", "\" ");
     private View homeView;
     private String newsID;
     private String title;
@@ -167,21 +167,19 @@ public class NewsViewFragment extends Fragment
         authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();
 
-        for (String s : replaceStrings) {
-            String target = s.replace(" ", "\n");
-            content = content.replaceAll(s, target);
+
+        contentTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        Spanned spannedContent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            spannedContent = Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            spannedContent = Html.fromHtml(content);
         }
 
-        String[] lines = content.split("\n");
+        contentTextView.setText(spannedContent);
 
-        String finalContent = "";
-        for (String s : lines) {
-            finalContent += "        " + s.replace("　", "  ").trim() + "\n";
-        }
 
-        contentTextView.setText(finalContent);
-
-        speakContent = metaInfo.getTitle() + " " + finalContent;
+        speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).

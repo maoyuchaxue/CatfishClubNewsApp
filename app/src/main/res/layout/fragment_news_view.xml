@@ -42,6 +42,8 @@
         android:textSize="14sp"
         android:lineSpacingExtra="3dp"
         android:text="测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试"
+        android:linksClickable="true"
+        android:clickable="true"
         />
 
     </LinearLayout>

@@ -11,7 +11,7 @@ import android.support.constraint.solver.Cache;
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "cache";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
@@ -96,12 +96,17 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
         if(newVersion >= 4)
             db.execSQL(BOOKMARK_TABLE_CREATE);
 
-        if(newVersion >= 3){
+        if(oldVersion < 3){
             db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
             db.execSQL(NEWS_TABLE_CREATE);
 //            db.execSQL("alter table " + NEWS_TABLE_NAME +
 //            "add column " + FIELD_TITLE + " text;");
         }
+
+        if(newVersion == 5){
+            db.execSQL("delete from " + NEWS_TABLE_NAME + ";");
+        }
+
         if(oldVersion == 1)
             db.execSQL(RESOURCES_TABLE_CREATE);
     }
