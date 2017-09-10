@@ -32,6 +32,7 @@ public class WebNewsContentSource implements NewsContentSource {
     private static final JsonParser JSON_PARSER = new JsonParser();
     private String apiUrl;
     private static final String ENTITY_LINK_PREFIX = "https://baike.baidu.com/item/";
+    private static final int KEYWORD_LIM = 3;
 
     private static final List<String> replaceStrings = Arrays.asList("。 ","？ ", "！ ", "… ", "\\. ", "\\? ", "\\! ", "” ", "— ", "\" ");
 
@@ -96,6 +97,19 @@ public class WebNewsContentSource implements NewsContentSource {
             }
         }
         content.setContentStr(contentWithLinks.toString());
+
+        int i = 0;
+        JsonArray keywordArray = json.get("Keywords").getAsJsonArray();
+        ArrayList<String> keyList = new ArrayList<>();
+        for(JsonElement element : keywordArray){
+            if(i >= KEYWORD_LIM)
+                break;
+            JsonObject object = element.getAsJsonObject();
+            keyList.add(object.get("word").getAsString());
+
+            ++ i;
+        }
+        content.setKeywords(keyList.toArray(new String[0]));
 
         return content;
     }

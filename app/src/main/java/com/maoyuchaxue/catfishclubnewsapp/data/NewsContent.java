@@ -48,6 +48,16 @@ public class NewsContent implements Serializable{
 //    }
 
     private String contentStr, journalist, crawlSource, category;
+
+    public String[] getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
+    }
+
+    private String[] keywords;
 //    private Date crawTime;
 
     // empty constructor
