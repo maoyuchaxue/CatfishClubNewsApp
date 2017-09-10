@@ -89,9 +89,11 @@ public class WebNewsContentSource implements NewsContentSource {
             String escaped = Html.escapeHtml(entity);
 //            Log.i("WebNewsContentSource", Html.escapeHtml(entity));
             int index = contentWithLinks.indexOf(escaped);
-            contentWithLinks.replace(index, index + escaped.length(),
-                    "<a href=\"" + ENTITY_LINK_PREFIX + entity +
-                    "\">" + entity + "</a>");
+            if (index >= 0) {
+                contentWithLinks.replace(index, index + escaped.length(),
+                        "<a href=\"" + ENTITY_LINK_PREFIX + entity +
+                                "\">" + entity + "</a>");
+            }
         }
         content.setContentStr(contentWithLinks.toString());
 

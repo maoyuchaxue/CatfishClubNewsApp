@@ -1,15 +1,10 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="20dp"
     android:orientation="vertical"
     tools:context="com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="20dp">
 
     <TextView
         android:id="@+id/news_view_id"
@@ -20,32 +15,35 @@
 
     <TextView
         android:id="@+id/news_view_title"
+        android:layout_below="@+id/news_view_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="19sp"
-        android:text="测试测试测试测试测试测试测试测试测试测试"
+        android:text=""
         android:layout_marginBottom="15dp"/>
 
     <TextView
         android:id="@+id/news_view_author"
+        android:layout_below="@+id/news_view_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
         android:textSize="15sp"
         android:layout_marginBottom="10dp"/>
 
-
-    <TextView
-        android:id="@+id/news_view_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:lineSpacingExtra="3dp"
-        android:text="测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试"
-        android:linksClickable="true"
-        android:clickable="true"
-        />
-
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/news_view_author"
+        android:layout_height="fill_parent"
+        >
+        <ListView
+            android:id="@+id/news_view_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:footerDividersEnabled="false"
+            android:divider="@null">
+        </ListView>
     </LinearLayout>
 
-</LinearLayout>
+
+</RelativeLayout>

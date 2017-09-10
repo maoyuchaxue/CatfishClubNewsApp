@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
@@ -24,6 +25,7 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
+import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentAndImageAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
@@ -55,11 +57,15 @@ public class NewsViewFragment extends Fragment
     private String title;
     private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
+    private ListView mListView;
     private SpeechSynthesizer speechSynthesizer;
     private String speakContent = null;
+    private NewsContentAndImageAdapter mAdapter;
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
+    public final static int NEWS_RESOURCE_LOADER_ID = 1;
+
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -110,6 +116,8 @@ public class NewsViewFragment extends Fragment
             newsID = getArguments().getString(ARG_NEWS_ID);
             title = getArguments().getString(ARG_TITLE);
         }
+
+        mAdapter = new NewsContentAndImageAdapter(getContext(), getLoaderManager());
     }
 
     @Override
@@ -118,6 +126,8 @@ public class NewsViewFragment extends Fragment
         // Inflate the layout for this fragment
         homeView = inflater.inflate(R.layout.fragment_news_view, container, false);
 
+        mListView = (ListView) homeView.findViewById(R.id.news_view_content);
+        mListView.setAdapter(mAdapter);
 
         Bundle args = new Bundle();
         mLoader = getLoaderManager().initLoader(NEWS_CONTENT_LOADER_ID, args, this);
@@ -125,21 +135,11 @@ public class NewsViewFragment extends Fragment
 
         TextView idTextView = (TextView) homeView.findViewById(R.id.news_view_id);
         TextView titleTextView = (TextView) homeView.findViewById(R.id.news_view_title);
-//        TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
 
         idTextView.setText(newsID);
         titleTextView.setText(title);
-//        authorTextView.setText(Html.fromHtml("<a href=\"https://www.baidu.com\">作者网</a>")) ;
-//        authorTextView.setMovementMethod(LinkMovementMethod.getInstance());
         return homeView;
     }
-
-//    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -154,30 +154,28 @@ public class NewsViewFragment extends Fragment
 
     @Override
     public Loader<NewsContent> onCreateLoader(int id, Bundle args) {
-        Log.i("catclub", "loading content");
         return new NewsContentLoader(this.getContext(), newsID, contentSource);
     }
 
     @Override
     public void onLoadFinished(Loader<NewsContent> loader, NewsContent data) {
-        Log.i("catclub", "content loading finished");
 
-        TextView contentTextView = (TextView) homeView.findViewById(R.id.news_view_content);
         TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
         authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();
 
+        URL urls[] = metaInfo.getPictures();
+        String splitContents[] = content.split("</p>");
 
-        contentTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        Log.i("madapter", "input data length: " + urls.length + " " + splitContents.length);
+        mAdapter.resetData(splitContents, urls);
+
         Spanned spannedContent;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             spannedContent = Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY);
         } else {
             spannedContent = Html.fromHtml(content);
         }
-
-        contentTextView.setText(spannedContent);
-
 
         speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
 
