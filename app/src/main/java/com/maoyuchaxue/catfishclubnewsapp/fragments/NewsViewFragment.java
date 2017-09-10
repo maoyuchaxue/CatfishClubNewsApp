@@ -194,6 +194,44 @@ public class NewsViewFragment extends Fragment
 //        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
+    public boolean shareContent(Context context) {
+        if (speakContent == null) {
+            return false;
+        } else {
+
+            OnekeyShare oks = new OnekeyShare();
+            //关闭sso授权
+            oks.disableSSOWhenAuthorize();
+
+            // 分享时Notification的图标和文字  2.5.9以后的版本不     调用此方法
+            //oks.setNotification(R.drawable.ic_launcher, getString(R.string.app_name));
+            // title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间使用
+
+
+            oks.setTitle(metaInfo.getTitle() + " -- from CCNAPP");
+            // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
+//            oks.setTitleUrl(metaInfo.getUrl().toString());
+            // text是分享文本，所有平台都需要这个字段
+            oks.setText("分享新闻: " + metaInfo.getTitle() + " 点击查看：" + metaInfo.getUrl().toString() + " -- from CCNAPP");
+
+            URL pictures[] = metaInfo.getPictures();
+            if (pictures.length > 0) {
+                oks.setImageUrl(pictures[0].toString());
+            }
+
+            oks.setComment("输入评论：");
+            // site是分享此内容的网站名称，仅在QQ空间使用
+            oks.setSite(metaInfo.getUrl().toString());
+            // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+            oks.setSiteUrl(metaInfo.getUrl().toString());
+
+            oks.show(context);
+
+//          TODO: optimize share URL
+            return true;
+        }
+    }
+
     public void startSpeaking() {
         if (speakContent == null) {
             return;
