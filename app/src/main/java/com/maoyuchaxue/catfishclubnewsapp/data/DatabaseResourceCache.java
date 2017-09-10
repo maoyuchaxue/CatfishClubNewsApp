@@ -31,40 +31,45 @@ public class DatabaseResourceCache extends ResourceCache {
     }
 
     @Override
-    public Bitmap getAsBitmap(URL url) throws IOException {
-        byte[] cached = getAsBlobFromCache(url);
-        Bitmap bitmap;
-        if(cached == null){
-            bitmap = frontSrc.getAsBitmap(url);
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
-            cache(url, out.toByteArray());
-            out.close();
-
-        } else
-            bitmap = getBitmapFromBlob(cached);
-
-        return bitmap;
-    }
-
-    @Override
     protected ResourceSource getFrontSource() {
         return frontSrc;
     }
 
+
     @Override
     protected byte[] getAsBlobFromCache(URL url) throws IOException {
+        return null;
+    }
+
+    @Override
+    protected byte[] getAsThumbnailBlobFromCache(URL url) throws IOException{
         SQLiteDatabase db = openHelper.getReadableDatabase();
 
         Cursor cursor = db.query(false, CacheDBOpenHelper.RESOURCES_TABLE_NAME,
-                new String[]{CacheDBOpenHelper.FIELD_RESOURCE_BLOB},
+                new String[]{CacheDBOpenHelper.FIELD_RESOURCE_TN_BLOB},
                 CacheDBOpenHelper.FIELD_RESOURCE_URL + "=?",
                 new String[]{url.toString()},
                 null, null, null, null
                 );
         byte[] res = null;
-        if(cursor.moveToFirst())
+        if(cursor.moveToFirst() && !cursor.isNull(0))
+            res = cursor.getBlob(0);
+        cursor.close();
+        return res;
+    }
+
+        @Override
+    protected byte[] getAsBitmapBlobFromCache(URL url) throws IOException{
+        SQLiteDatabase db = openHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(false, CacheDBOpenHelper.RESOURCES_TABLE_NAME,
+                new String[]{CacheDBOpenHelper.FIELD_RESOURCE_BM_BLOB},
+                CacheDBOpenHelper.FIELD_RESOURCE_URL + "=?",
+                new String[]{url.toString()},
+                null, null, null, null
+                );
+        byte[] res = null;
+        if(cursor.moveToFirst() && !cursor.isNull(0))
             res = cursor.getBlob(0);
         cursor.close();
         return res;
@@ -72,11 +77,38 @@ public class DatabaseResourceCache extends ResourceCache {
 
     @Override
     protected void cache(URL url, byte[] blob) {
+        // does nothing
+    }
+
+    @Override
+    protected void cacheThumbnail(URL url, byte[] blob){
         SQLiteDatabase db = openHelper.getWritableDatabase();
 
         db.beginTransaction();
         ContentValues changes = new ContentValues();
-        changes.put(CacheDBOpenHelper.FIELD_RESOURCE_BLOB, blob);
+        changes.put(CacheDBOpenHelper.FIELD_RESOURCE_TN_BLOB, blob);
+
+        int affectedNo = db.update(CacheDBOpenHelper.RESOURCES_TABLE_NAME,
+                changes, CacheDBOpenHelper.FIELD_RESOURCE_URL + "=?",
+                new String[]{url.toString()});
+        if(affectedNo == 0){
+            changes.put(CacheDBOpenHelper.FIELD_RESOURCE_URL, url.toString());
+            db.insert(CacheDBOpenHelper.RESOURCES_TABLE_NAME,
+                    null,
+                    changes);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+
+        @Override
+    protected void cacheBitmap(URL url, byte[] blob){
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+
+        db.beginTransaction();
+        ContentValues changes = new ContentValues();
+        changes.put(CacheDBOpenHelper.FIELD_RESOURCE_BM_BLOB, blob);
 
         int affectedNo = db.update(CacheDBOpenHelper.RESOURCES_TABLE_NAME,
                 changes, CacheDBOpenHelper.FIELD_RESOURCE_URL + "=?",

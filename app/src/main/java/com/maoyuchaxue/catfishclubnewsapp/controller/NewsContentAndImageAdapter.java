@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -157,6 +158,7 @@ public class NewsContentAndImageAdapter extends BaseAdapter {
 
         void draw() {
             TextView textView = (TextView) view.findViewById(R.id.news_view_text_unit_content);
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
             textView.setText(content);
         }
     }
@@ -186,7 +188,7 @@ public class NewsContentAndImageAdapter extends BaseAdapter {
             imageView = (ImageView) view.findViewById(R.id.news_view_image_unit_image);
             return new ResourceLoader(context, url,
                     new DatabaseResourceCache(CacheDBOpenHelper.getInstance(context.getApplicationContext()),
-                            new WebResourceSource()));
+                            new WebResourceSource(200, 200, 1000, 1000)), false);
         }
 
         @Override

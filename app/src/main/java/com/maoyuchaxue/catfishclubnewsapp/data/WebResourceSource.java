@@ -16,10 +16,12 @@ import java.net.URL;
  */
 
 public class WebResourceSource extends ResourceSource {
-    private int hsize, wsize;
-    public WebResourceSource(int hsize, int wsize){
-        this.hsize = hsize;
-        this.wsize = wsize;
+    private int tnHSize, tnWSize, bmHSize, bmWSize;
+    public WebResourceSource(int tnHSize, int tnWSize, int bmHSize, int bmWSize){
+        this.tnHSize = tnHSize;
+        this.tnWSize = tnWSize;
+        this.bmHSize = bmHSize;
+        this.bmWSize = bmWSize;
     }
 
     @Override
@@ -46,15 +48,23 @@ public class WebResourceSource extends ResourceSource {
         return byteArray.toByteArray();
     }
 
-    @Override
-    protected Bitmap filterBitmap(Bitmap in) {
-        // does nothing
+    private Bitmap scaleToFit(Bitmap in, int hsize, int wsize){
         if(in == null)
             return null;
         Matrix matrix = new Matrix();
         float s = Math.min((float)hsize / in.getHeight(),
                 (float)wsize / in.getWidth());
         matrix.setScale(s, s);
-        return Bitmap.createBitmap(in, 0, 0, in.getHeight(), in.getWidth(), matrix, false);
+        return Bitmap.createBitmap(in, 0, 0, in.getWidth(), in.getHeight(), matrix, false);
+    }
+
+    @Override
+    protected Bitmap filterThumbnail(Bitmap in) {
+        return scaleToFit(in, tnHSize, tnWSize);
+    }
+
+    @Override
+    protected Bitmap filterBitmap(Bitmap in) {
+        return scaleToFit(in, bmHSize, bmWSize);
     }
 }
