@@ -11,6 +11,7 @@ import android.support.constraint.solver.Cache;
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "cache";
+    private static final int DB_VERSION = 5;
 
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
@@ -26,6 +27,7 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
     public static final String FIELD_JOURNALIST = "journalist";
     public static final String FIELD_CRAWL_SRC = "crawl_src";
     public static final String FIELD_CATEGORY = "category";
+    public static final String FIELD_TITLE = "title";
 
     private static final String NEWS_TABLE_CREATE = "create table if not exists " +
             NEWS_TABLE_NAME + " (" + FIELD_ID + " text primary key, " +
@@ -40,10 +42,35 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_CONTENT_STR + " text, " +
             FIELD_JOURNALIST + " text, " +
             FIELD_CRAWL_SRC + " text, " +
-            FIELD_CATEGORY + " text);";
+            FIELD_CATEGORY + " text, " +
+            FIELD_TITLE + " text);";
+
+
+    public static final String RESOURCES_TABLE_NAME = "resources_cache";
+    public static final String FIELD_RESOURCE_URL = "url";
+    public static final String FIELD_RESOURCE_BLOB = "rblob";
+    private static final String RESOURCES_TABLE_CREATE = "create table if not exists " +
+            RESOURCES_TABLE_NAME + " (" +
+            FIELD_RESOURCE_URL + " text primary key, " +
+            FIELD_RESOURCE_BLOB + " blob);";
+
+    public static final String BOOKMARK_TABLE_NAME = "bookmark_cache";
+    private static final String BOOKMARK_TABLE_CREATE = "create table if not exists " +
+            BOOKMARK_TABLE_NAME + " (" +
+            FIELD_ID + " text primary key, " +
+            FIELD_INTRO + " text, " +
+            FIELD_CATEGORY_TAG + " integer, " +
+            FIELD_AUTHOR + " text, " +
+            FIELD_TITLE + " text, " +
+            FIELD_URL + " text, " +
+            FIELD_LANG + " text, " +
+            FIELD_SRC + " text, " +
+            FIELD_PICTURES + " text, " +
+            FIELD_VIDEO + " text);";
+
 
     private CacheDBOpenHelper(Context context){
-        super(context, DB_NAME, null, 1);
+        super(context, DB_NAME, null, DB_VERSION);
     }
     private static CacheDBOpenHelper instance;
 
@@ -56,14 +83,32 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(NEWS_TABLE_CREATE);
+        db.execSQL(RESOURCES_TABLE_CREATE);
+        db.execSQL(BOOKMARK_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //brute-force upgrade
         //remove old tables and create new ones
-        db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
-        db.execSQL(NEWS_TABLE_CREATE);
+//        db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
+//        db.execSQL(NEWS_TABLE_CREATE);
+        if(newVersion >= 4)
+            db.execSQL(BOOKMARK_TABLE_CREATE);
+
+        if(oldVersion < 3){
+            db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
+            db.execSQL(NEWS_TABLE_CREATE);
+//            db.execSQL("alter table " + NEWS_TABLE_NAME +
+//            "add column " + FIELD_TITLE + " text;");
+        }
+
+        if(newVersion == 5){
+            db.execSQL("delete from " + NEWS_TABLE_NAME + ";");
+        }
+
+        if(oldVersion == 1)
+            db.execSQL(RESOURCES_TABLE_CREATE);
     }
 
     @Override

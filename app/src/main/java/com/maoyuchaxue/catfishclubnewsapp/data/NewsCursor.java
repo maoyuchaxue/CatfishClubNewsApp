@@ -25,5 +25,12 @@ public interface NewsCursor {
     int getIndex();
     int getIndexInList();
 
+    void dismiss();
+
+    boolean isClosed();
     void close();
+
+    class NewsCursorClosedException extends RuntimeException{
+        //TODO: something more in this exception
+    }
 }

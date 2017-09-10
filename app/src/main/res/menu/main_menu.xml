@@ -4,16 +4,23 @@
     <item
         android:id="@+id/main_menu_search"
         android:icon="@drawable/ic_search_white_24dp"
-        android:title="search"
+        android:title="搜索"
         app:showAsAction="collapseActionView|ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:imeOptions="actionSearch"
         />
 
     <item
+        android:id="@+id/main_menu_bookmarks"
+        android:icon="@drawable/ic_collections_bookmark_white_24dp"
+        android:title="收藏夹"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
         android:id="@+id/main_menu_settings"
         android:icon="@drawable/ic_settings_white_24dp"
-        android:title="settings"
+        android:title="设置"
         app:showAsAction="ifRoom"
         />
 </menu>

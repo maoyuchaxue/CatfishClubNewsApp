@@ -167,6 +167,11 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         return new Pair<>(new NewsMetaInfo[0], 0);
     }
 
+    @Override
+    public boolean isReversed() {
+        return true;
+    }
+
 
     @Override
     public int getPageSize() {
@@ -181,6 +186,12 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
     @Override
     public void refresh(){
         // TODO: update the capacity
+    }
+
+    @Override
+    public boolean remove(String id) {
+        // does nothing, for the contents on web cannot be removed
+        return false;
     }
 
     @Override

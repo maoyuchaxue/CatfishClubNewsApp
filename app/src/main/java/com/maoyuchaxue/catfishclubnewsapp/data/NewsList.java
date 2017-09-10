@@ -14,4 +14,5 @@ public interface NewsList {
     int getLength();
 
     void close();
+
 }
