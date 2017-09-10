@@ -3,9 +3,11 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
@@ -26,6 +28,24 @@ public class DatabaseResourceCache extends ResourceCache {
     @Override
     public void flush() {
 
+    }
+
+    @Override
+    public Bitmap getAsBitmap(URL url) throws IOException {
+        byte[] cached = getAsBlobFromCache(url);
+        Bitmap bitmap;
+        if(cached == null){
+            bitmap = frontSrc.getAsBitmap(url);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
+            cache(url, out.toByteArray());
+            out.close();
+
+        } else
+            bitmap = getBitmapFromBlob(cached);
+
+        return bitmap;
     }
 
     @Override
@@ -69,5 +89,10 @@ public class DatabaseResourceCache extends ResourceCache {
         }
         db.setTransactionSuccessful();
         db.endTransaction();
+    }
+
+    @Override
+    protected Bitmap filterBitmap(Bitmap in) {
+        return null;
     }
 }

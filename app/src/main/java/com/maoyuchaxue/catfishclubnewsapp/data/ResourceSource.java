@@ -16,7 +16,11 @@ public abstract class ResourceSource {
         return BitmapFactory.decodeByteArray(blob, 0, blob.length);
     }
     public Bitmap getAsBitmap(URL url) throws IOException{
-        return getBitmapFromBlob(getAsBlob(url));
+        return filterBitmap(getBitmapFromBlob(getAsBlob(url)));
     }
     public abstract byte[] getAsBlob(URL url) throws IOException;
+
+    protected Bitmap filterBitmap(Bitmap in){
+        return in;
+    }
 }

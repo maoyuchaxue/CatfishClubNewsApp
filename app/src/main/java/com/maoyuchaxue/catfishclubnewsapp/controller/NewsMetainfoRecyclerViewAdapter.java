@@ -218,7 +218,7 @@ public class NewsMetainfoRecyclerViewAdapter
             imageView = (ImageView) view.findViewById(R.id.news_unit_pics_image);
             return new ResourceLoader(context, summaryPicURL,
                     new DatabaseResourceCache(CacheDBOpenHelper.getInstance(context.getApplicationContext()),
-                            new WebResourceSource()));
+                            new WebResourceSource(100, 100)));
         }
 
         @Override

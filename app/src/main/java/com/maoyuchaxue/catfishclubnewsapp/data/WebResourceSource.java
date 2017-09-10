@@ -2,6 +2,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
 
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -15,6 +16,12 @@ import java.net.URL;
  */
 
 public class WebResourceSource extends ResourceSource {
+    private int hsize, wsize;
+    public WebResourceSource(int hsize, int wsize){
+        this.hsize = hsize;
+        this.wsize = wsize;
+    }
+
     @Override
     public byte[] getAsBlob(URL url) throws IOException{
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
@@ -37,5 +44,17 @@ public class WebResourceSource extends ResourceSource {
 
         Log.i("catclub", url.toString() + byteArray.size());
         return byteArray.toByteArray();
+    }
+
+    @Override
+    protected Bitmap filterBitmap(Bitmap in) {
+        // does nothing
+        if(in == null)
+            return null;
+        Matrix matrix = new Matrix();
+        float s = Math.min((float)hsize / in.getHeight(),
+                (float)wsize / in.getWidth());
+        matrix.setScale(s, s);
+        return Bitmap.createBitmap(in, 0, 0, in.getHeight(), in.getWidth(), matrix, false);
     }
 }
