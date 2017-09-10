@@ -71,7 +71,6 @@ public class NewsViewFragment extends Fragment
 
     public NewsViewFragment() {
         // Required empty public constructor
-
     }
 
     /**
@@ -188,11 +187,11 @@ public class NewsViewFragment extends Fragment
     public void onLoaderReset(Loader<NewsContent> loader) {}
 
     public void addCurrentNewsToBookmark(BookmarkManager bookmarkManager) {
-        bookmarkManager.add(metaInfo);
+//        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
     public void removeCurrentNewsFromBookmark(BookmarkManager bookmarkManager) {
-//        TODO: remove!
+//        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
     public void startSpeaking() {

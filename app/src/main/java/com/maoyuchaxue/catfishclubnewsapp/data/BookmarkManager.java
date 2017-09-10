@@ -1,6 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.constraint.solver.Cache;
@@ -148,5 +149,23 @@ public class BookmarkManager {
         long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
 
         return res != -1;
+    }
+
+    public void modifyBookmarkAccordingToIntent(Intent intent) {
+        boolean isModified = intent.getExtras().getBoolean("is_bookmark_modified", false);
+        if (isModified) {
+            boolean isInBookmark = intent.getExtras().getBoolean("final_bookmark_state", false);
+            String id = intent.getExtras().getString("id", null);
+            NewsMetaInfo metaInfo = (NewsMetaInfo)intent.getSerializableExtra("meta_info");
+            if (isInBookmark) {
+                if (metaInfo != null) {
+                    add(metaInfo);
+                }
+            } else {
+                if (id != null) {
+                    remove(id);
+                }
+            }
+        }
     }
 }

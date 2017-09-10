@@ -1,5 +1,6 @@
 package com.maoyuchaxue.catfishclubnewsapp.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -36,7 +37,9 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
     private BookmarkManager bookmarkManager;
     private Toolbar toolbar;
-    private boolean isInBookmark;
+    private boolean isInBookmark, initiallyIsInBookmark;
+
+    private Intent resultIntent;
 
     private void initSynthesizer() {
         SpeechUtility.createUtility(NewsViewActivity.this, SpeechConstant.APPID +"=59b0c3fb");
@@ -51,6 +54,10 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        resultIntent = new Intent();
+        resultIntent.putExtra("is_bookmark_modified", false);
+
         initSynthesizer();
 
         setContentView(R.layout.activity_news_view);
@@ -66,6 +73,12 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
         bookmarkManager = BookmarkManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext()));
         isInBookmark = bookmarkManager.isBookmarked(metaInfo.getId());
+        initiallyIsInBookmark = isInBookmark;
+
+        resultIntent.putExtra("id", metaInfo.getId());
+        resultIntent.putExtra("meta_info", metaInfo);
+
+        setResult(Activity.RESULT_OK, resultIntent);
 
         toolbar = (Toolbar)findViewById(R.id.news_view_menu_toolbar);
         toolbar.setTitle("新闻详细");
@@ -125,12 +138,15 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
                         Log.i("bookmark", String.valueOf(isInBookmark));
                         if (isInBookmark) {
                             newsViewFragment.removeCurrentNewsFromBookmark(bookmarkManager);
-//                            TODO: should set isInBookmark = false, when DB implemented
+                            isInBookmark = false;
                         } else {
                             newsViewFragment.addCurrentNewsToBookmark(bookmarkManager);
                             isInBookmark = true;
-
                         }
+
+                        resultIntent.putExtra("is_bookmark_modified", (isInBookmark != initiallyIsInBookmark));
+                        resultIntent.putExtra("final_bookmark_state", isInBookmark);
+//                        setResult(Activity.RESULT_OK, resultIntent);
 
                         resetMenuItemAppearance();
                         break;

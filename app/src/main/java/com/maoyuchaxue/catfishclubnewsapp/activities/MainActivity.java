@@ -24,8 +24,10 @@ import com.flyco.tablayout.SlidingTabLayout;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.CategoryViewPagerAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
+import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
+import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 
 import java.net.URLEncoder;
@@ -188,6 +190,8 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case NEWS_VIEW_ACTIVITY:
+                BookmarkManager.getInstance(CacheDBOpenHelper.
+                        getInstance(getApplicationContext())).modifyBookmarkAccordingToIntent(data);
                 break;
             case SETTINGS_ACTIVITY:
                 break;
