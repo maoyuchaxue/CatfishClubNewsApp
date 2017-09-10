@@ -20,9 +20,12 @@ public interface NewsMetaInfoListSource {
  *                 no restriction in the category tag of the news shall be assumed.  */
     Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException;
     Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException;
+    boolean isReversed();
+
     int getPageSize();
     int getCapacity();
     void refresh();
+    boolean remove(String id);
 
     void close() throws NewsSourceException;
 }

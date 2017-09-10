@@ -58,7 +58,7 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
         ContentValues change = new ContentValues();
         change.put(CacheDBOpenHelper.FIELD_INTRO, metaInfo.getIntro());
         change.put(CacheDBOpenHelper.FIELD_AUTHOR, metaInfo.getAuthor());
-        change.put(CacheDBOpenHelper.FIELD_PICTURES, metaInfo.getTitle());
+        change.put(CacheDBOpenHelper.FIELD_TITLE, metaInfo.getTitle());
         change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
@@ -98,6 +98,11 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
     }
 
     @Override
+    public boolean isReversed() {
+        return false;
+    }
+
+    @Override
     public int getPageSize() {
         return frontSrc.getPageSize();
     }
@@ -110,6 +115,12 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
     @Override
     public void refresh() {
 
+    }
+
+    @Override
+    public boolean remove(String id) {
+        //TODO: I don't know whether it is necessary to implement this. I will check whether this class is useful or not.
+        return false;
     }
 
     @Override
