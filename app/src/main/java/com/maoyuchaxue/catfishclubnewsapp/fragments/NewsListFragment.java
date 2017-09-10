@@ -223,23 +223,19 @@ public class NewsListFragment extends Fragment
     }
 
     public void reloadFromBeginning() {
-        Log.i("load_process", "reload from beginning");
         mCursor = null;
         resetNewsList();
         Bundle args = new Bundle();
         Loader<List<NewsCursor> > loader = getLoaderManager().getLoader(NEWS_CURSOR_LOADER_ID);
-        Log.i("load_process", "loader can be get: " + String.valueOf(loader  == null));
         if (loader != null) {
             getLoaderManager().destroyLoader(NEWS_CURSOR_LOADER_ID);
         }
         mLoader = getLoaderManager().initLoader(NEWS_CURSOR_LOADER_ID, args, this);
 
-        Log.i("load_process", String.valueOf(((NewsMetainfoLoader)mLoader).isFinished()));
         mLoader.forceLoad();
     }
 
     private void loadNextData() {
-        Log.i("load_process", "load next data");
         if (((NewsMetainfoLoader) mLoader).isFinished()) {
             mNewsListRecyclerViewListener.setFinished(true);
         } else {
@@ -309,5 +305,11 @@ public class NewsListFragment extends Fragment
     public void onLoadMore() {
         Log.i("load_process", "load more");
         loadNextData();
+    }
+
+    @Override
+    public void onDestroy() {
+        mAdapter.clear();
+        super.onDestroy();
     }
 }

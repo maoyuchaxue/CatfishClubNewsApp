@@ -71,4 +71,5 @@ public class CategoryCheckboxAdapter extends BaseAdapter {
         return convertView;
     }
 
+
 }

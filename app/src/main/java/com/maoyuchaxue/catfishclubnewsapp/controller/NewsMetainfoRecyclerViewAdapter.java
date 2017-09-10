@@ -123,7 +123,12 @@ public class NewsMetainfoRecyclerViewAdapter
 
             viewHolder.itemView.setTag(cursors.get(position));
 
-            loaderManager.initLoader(NewsListFragment.IMAGE_LOADER_ID + position , null, picsViewHolder).forceLoad();
+            int loaderID = NewsListFragment.IMAGE_LOADER_ID + position;
+            Loader loader = loaderManager.getLoader(loaderID);
+            if (loader != null) {
+                loaderManager.destroyLoader(loaderID);
+            }
+            loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
 
         } else if (viewHolder instanceof TextViewHolder) {
             TextViewHolder textViewHolder = (TextViewHolder) viewHolder;
@@ -191,6 +196,12 @@ public class NewsMetainfoRecyclerViewAdapter
     }
 
     public void clear() {
+        for (int i = 0; i < cursors.size(); i++) {
+            NewsCursor cursor = cursors.get(i);
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
         cursors = new ArrayList<NewsCursor>();
         IDToPosition = new HashMap<String, Integer>();
         notifyDataSetChanged();

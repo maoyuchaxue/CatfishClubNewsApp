@@ -9,12 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
@@ -23,6 +25,7 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
+import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentAndImageAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
@@ -49,23 +52,25 @@ public class NewsViewFragment extends Fragment
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NEWS_ID = "news_id";
     private static final String ARG_TITLE = "title";
-    private static final List<String> replaceStrings = Arrays.asList("。 ","？ ", "！ ", "… ", "\\. ", "\\? ", "\\! ", "” ", "— ", "\" ");
     private View homeView;
     private String newsID;
     private String title;
     private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
+    private ListView mListView;
     private SpeechSynthesizer speechSynthesizer;
     private String speakContent = null;
+    private NewsContentAndImageAdapter mAdapter;
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
+    public final static int NEWS_RESOURCE_LOADER_ID = 1;
+
 
 //    private OnFragmentInteractionListener mListener;
 
     public NewsViewFragment() {
         // Required empty public constructor
-
     }
 
     /**
@@ -110,6 +115,8 @@ public class NewsViewFragment extends Fragment
             newsID = getArguments().getString(ARG_NEWS_ID);
             title = getArguments().getString(ARG_TITLE);
         }
+
+        mAdapter = new NewsContentAndImageAdapter(getContext(), getLoaderManager());
     }
 
     @Override
@@ -118,6 +125,8 @@ public class NewsViewFragment extends Fragment
         // Inflate the layout for this fragment
         homeView = inflater.inflate(R.layout.fragment_news_view, container, false);
 
+        mListView = (ListView) homeView.findViewById(R.id.news_view_content);
+        mListView.setAdapter(mAdapter);
 
         Bundle args = new Bundle();
         mLoader = getLoaderManager().initLoader(NEWS_CONTENT_LOADER_ID, args, this);
@@ -125,21 +134,11 @@ public class NewsViewFragment extends Fragment
 
         TextView idTextView = (TextView) homeView.findViewById(R.id.news_view_id);
         TextView titleTextView = (TextView) homeView.findViewById(R.id.news_view_title);
-//        TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
 
         idTextView.setText(newsID);
         titleTextView.setText(title);
-//        authorTextView.setText(Html.fromHtml("<a href=\"https://www.baidu.com\">作者网</a>")) ;
-//        authorTextView.setMovementMethod(LinkMovementMethod.getInstance());
         return homeView;
     }
-
-//    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -154,34 +153,30 @@ public class NewsViewFragment extends Fragment
 
     @Override
     public Loader<NewsContent> onCreateLoader(int id, Bundle args) {
-        Log.i("catclub", "loading content");
         return new NewsContentLoader(this.getContext(), newsID, contentSource);
     }
 
     @Override
     public void onLoadFinished(Loader<NewsContent> loader, NewsContent data) {
-        Log.i("catclub", "content loading finished");
 
-        TextView contentTextView = (TextView) homeView.findViewById(R.id.news_view_content);
         TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
         authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();
 
-        for (String s : replaceStrings) {
-            String target = s.replace(" ", "\n");
-            content = content.replaceAll(s, target);
+        URL urls[] = metaInfo.getPictures();
+        String splitContents[] = content.split("</p>");
+
+        Log.i("madapter", "input data length: " + urls.length + " " + splitContents.length);
+        mAdapter.resetData(splitContents, urls);
+
+        Spanned spannedContent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            spannedContent = Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            spannedContent = Html.fromHtml(content);
         }
 
-        String[] lines = content.split("\n");
-
-        String finalContent = "";
-        for (String s : lines) {
-            finalContent += "        " + s.replace("　", "  ").trim() + "\n";
-        }
-
-        contentTextView.setText(finalContent);
-
-        speakContent = metaInfo.getTitle() + " " + finalContent;
+        speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
@@ -192,11 +187,11 @@ public class NewsViewFragment extends Fragment
     public void onLoaderReset(Loader<NewsContent> loader) {}
 
     public void addCurrentNewsToBookmark(BookmarkManager bookmarkManager) {
-        bookmarkManager.add(metaInfo);
+//        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
     public void removeCurrentNewsFromBookmark(BookmarkManager bookmarkManager) {
-//        TODO: remove!
+//        DO NOTHING TILL USER LEAVE THIS ACTIVITY
     }
 
     public void startSpeaking() {
