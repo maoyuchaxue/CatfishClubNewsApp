@@ -6,4 +6,6 @@
     <color name="colorWhiteText">#FFFFFF</color>
     <color name="colorHasReadText">#CCCCCC</color>
     <color name="colorLine">#000000</color>
+    <color name="colorBasicBackground">#FFFFFF</color>
+    <color name="colorBasicText">#000000</color>
 </resources>

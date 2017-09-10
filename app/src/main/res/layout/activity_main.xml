@@ -32,7 +32,7 @@
         android:orientation="horizontal"
         android:layout_below="@+id/main_menu_toolbar"
         android:layout_height="48dp"
-        android:background="@android:color/white">
+        android:background="@color/colorBasicBackground">
 
         <com.flyco.tablayout.SlidingTabLayout
             android:layout_toLeftOf="@+id/main_menu_category_button"
@@ -42,7 +42,7 @@
             app:tl_underline_color="@color/colorPrimary"
             app:tl_indicator_color="@color/colorPrimary"
             app:tl_textSelectColor="@color/colorPrimary"
-            app:tl_textUnselectColor="@android:color/black"
+            app:tl_textUnselectColor="@color/colorBasicText"
             app:tl_textBold="SELECT"
             app:tl_textsize="16sp"
             app:tl_divider_color="@android:color/darker_gray"
@@ -94,7 +94,7 @@
         android:layout_height="match_parent"
         android:choiceMode="singleChoice"
         android:layout_gravity="start"
-        android:background="@android:color/white"
+        android:background="@color/colorBasicBackground"
         >
 
     </FrameLayout>

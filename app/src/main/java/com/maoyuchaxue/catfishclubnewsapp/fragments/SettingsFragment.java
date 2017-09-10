@@ -16,7 +16,9 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.activities.BookmarkListActivity;
 import com.maoyuchaxue.catfishclubnewsapp.activities.MainActivity;
+import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 
 import java.util.Set;
 
@@ -26,37 +28,40 @@ import java.util.Set;
 
 public class SettingsFragment extends PreferenceFragment {
 
+    private Preference darkModePreference;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
-
+        darkModePreference = getPreferenceManager().findPreference("dark_style");
+        darkModePreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                Boolean result = (Boolean) o;
+                if (result) {
+                    if(AppCompatDelegate.getDefaultNightMode() == -1 ||
+                            AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)  {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        getActivity().recreate();
+                    }
+                } else {
+                    if(AppCompatDelegate.getDefaultNightMode() == -1 ||
+                            AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)  {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        getActivity().recreate();
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-
         return view;
     }
 
-    @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference)
-    {
-        if(preference.getKey().equals("dark_style"))
-        {
-            if(AppCompatDelegate.getDefaultNightMode() == -1 || AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)
-            {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                getActivity().recreate();
-            }
-            else if(AppCompatDelegate.getDefaultNightMode() == -1 || AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
-            {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                getActivity().recreate();
-            }
-        }
-        return super.onPreferenceTreeClick(preferenceScreen, preference);
-    }
 
 }
