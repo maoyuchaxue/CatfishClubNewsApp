@@ -309,7 +309,9 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onDestroy() {
-        mAdapter.clear();
+        if (mAdapter != null) {
+            mAdapter.clear();
+        }
         super.onDestroy();
     }
 }

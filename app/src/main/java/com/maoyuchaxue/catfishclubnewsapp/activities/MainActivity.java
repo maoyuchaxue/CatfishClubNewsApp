@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -11,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -54,6 +56,26 @@ public class MainActivity extends AppCompatActivity
     private SearchView mSearchView;
     private DrawerLayout mDrawerLayout;
     private String globalKeyword = null;
+
+    public void initNightMode() {
+
+        Boolean isNightMode = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("dark_style", false);
+
+        if (isNightMode) {
+            if (AppCompatDelegate.getDefaultNightMode() == -1 ||
+                    AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                MainActivity.this.recreate();
+            }
+        } else {
+            if (AppCompatDelegate.getDefaultNightMode() == -1 ||
+                    AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                MainActivity.this.recreate();
+            }
+        }
+    }
 
     public void initDrawerFragment() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,6 +190,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initNightMode();
         initDrawerFragment();
         initActionBar();
         initTabLayout();
