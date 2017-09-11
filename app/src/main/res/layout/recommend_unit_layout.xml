@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/draw_line">
 
     <TextView
         android:id="@+id/recommend_title"
+        android:textSize="19sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/recommend_intro"
+        android:textSize="17sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/recommend_author"
+        android:textSize="12sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

@@ -262,6 +262,8 @@ public class NewsMetainfoRecyclerViewAdapter
             URL resourceUrl = ((ResourceLoader) loader).getUrl();
 
             if (!url.equals(resourceUrl)) {
+                Log.i("recommend", "url:" + url.toString());
+                Log.i("recommend", "res url:" + resourceUrl.toString());
                 return;
             }
 
@@ -284,6 +286,8 @@ public class NewsMetainfoRecyclerViewAdapter
             this.view = view;
         }
     }
+
+
 
 }
 

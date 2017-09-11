@@ -1,6 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.constraint.solver.Cache;
 import android.support.v4.content.Loader;
@@ -17,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.activities.MainActivity;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentAndImageAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
@@ -34,6 +37,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
@@ -50,20 +54,22 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
  * create an instance of this fragment.
  */
 public class NewsViewFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<NewsContent> {
+        implements LoaderManager.LoaderCallbacks<NewsContent>,
+        NewsContentAndImageAdapter.OnClickNewsListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NEWS_ID = "news_id";
     private static final String ARG_TITLE = "title";
+
+    private NewsViewActivity activity;
     private View homeView;
     private String newsID;
     private String title;
     private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
-    private ListView mListView, mRecommendListView;
+    private ListView mListView;
     private SpeechSynthesizer speechSynthesizer;
     private String speakContent = null;
     private NewsContentAndImageAdapter mAdapter;
-    private RecommendListViewAdapter mRecommendAdapter;
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
@@ -94,9 +100,9 @@ public class NewsViewFragment extends Fragment
         return fragment;
     }
 
-    public static NewsViewFragment newInstance(SpeechSynthesizer speechSynthesizer, NewsMetaInfo metaInfo){
+    public static NewsViewFragment newInstance(NewsViewActivity activity, SpeechSynthesizer speechSynthesizer, NewsMetaInfo metaInfo){
         NewsViewFragment instance = newInstance(metaInfo.getId(), metaInfo.getTitle());
-
+        instance.activity = activity;
         instance.metaInfo = metaInfo;
         instance.speechSynthesizer = speechSynthesizer;
         return instance;
@@ -131,12 +137,6 @@ public class NewsViewFragment extends Fragment
 
         mListView = (ListView) homeView.findViewById(R.id.news_view_content);
         mListView.setAdapter(mAdapter);
-
-        mRecommendListView = (ListView) homeView.findViewById(R.id.recommend_list);
-        mRecommendAdapter = new RecommendListViewAdapter(getContext(),
-                getLoaderManager());
-        mRecommendListView.setAdapter(mRecommendAdapter);
-
 
 
         Bundle args = new Bundle();
@@ -197,7 +197,9 @@ public class NewsViewFragment extends Fragment
 
         speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
 
-        mRecommendAdapter.startLoading(data, 5);
+        mAdapter.startRecommendLoading(data, 5);
+        mListView.setOnItemClickListener(mAdapter);
+        mAdapter.setOnClickNewsListener(this);
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
@@ -301,6 +303,11 @@ public class NewsViewFragment extends Fragment
         if (speechSynthesizer.isSpeaking()) {
             speechSynthesizer.stopSpeaking();
         }
+    }
+
+    @Override
+    public void onClickNews(NewsCursor cursor) {
+        activity.onClickNews(cursor);
     }
 
 }

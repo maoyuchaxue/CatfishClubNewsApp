@@ -17,6 +17,7 @@ import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
@@ -31,6 +32,8 @@ import com.iflytek.cloud.SpeechError;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 public class NewsViewActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final int NEWS_VIEW_ACTIVITY = 0;
 
     private SpeechSynthesizer mTts;
     private NewsViewFragment newsViewFragment;
@@ -65,7 +68,7 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = getIntent();
         NewsMetaInfo metaInfo = (NewsMetaInfo)intent.getSerializableExtra("meta_info");
 
-        newsViewFragment = NewsViewFragment.newInstance(mTts, metaInfo);
+        newsViewFragment = NewsViewFragment.newInstance(this, mTts, metaInfo);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         transaction.replace(R.id.news_view, newsViewFragment);
@@ -162,5 +165,11 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
         if (mTts.isSpeaking()) {
             mTts.stopSpeaking();
         }
+    }
+
+    public void onClickNews(NewsCursor cursor) {
+        Intent intent = new Intent(NewsViewActivity.this, NewsViewActivity.class);
+        intent.putExtra("meta_info", cursor.getNewsMetaInfo());
+        startActivityForResult(intent, NEWS_VIEW_ACTIVITY);
     }
 }
