@@ -101,6 +101,7 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        Log.i("madapter", "bind on " + position);
         if (viewHolder instanceof PicsViewHolder) {
             PicsViewHolder picsViewHolder= (PicsViewHolder) viewHolder;
             View view = picsViewHolder.view;
@@ -116,12 +117,16 @@ public class NewsMetainfoRecyclerViewAdapter
             sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
 
             String id = info.getId();
+            int color;
             if (HistoryManager.getInstance(CacheDBOpenHelper.getInstance(context.getApplicationContext())).isInHistory(id)) {
-                int color = ContextCompat.getColor(context, R.color.colorHasReadText);
-                titleView.setTextColor(color);
-                introView.setTextColor(color);
-                sourceView.setTextColor(color);
+                Log.i("madapter", "has read " + id);
+                color = ContextCompat.getColor(context, R.color.colorHasReadText);
+            } else {
+                color = ContextCompat.getColor(context, R.color.colorBasicText);
             }
+            titleView.setTextColor(color);
+            introView.setTextColor(color);
+            sourceView.setTextColor(color);
 
             picsViewHolder.setSummaryPicURL(info.getPictures()[0]);
 
@@ -133,6 +138,8 @@ public class NewsMetainfoRecyclerViewAdapter
                 loaderManager.destroyLoader(loaderID);
             }
             loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
+
+            viewHolder.itemView.setTag(info.getPictures()[0]);
 
         } else if (viewHolder instanceof TextViewHolder) {
             TextViewHolder textViewHolder = (TextViewHolder) viewHolder;
@@ -148,14 +155,18 @@ public class NewsMetainfoRecyclerViewAdapter
             sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
 
             String id = info.getId();
+            int color;
             if (HistoryManager.getInstance(CacheDBOpenHelper.getInstance(context.getApplicationContext())).isInHistory(id)) {
-                int color = ContextCompat.getColor(context, R.color.colorHasReadText);
-                titleView.setTextColor(color);
-                introView.setTextColor(color);
-                sourceView.setTextColor(color);
+                Log.i("madapter", "has read " + id);
+                color = ContextCompat.getColor(context, R.color.colorHasReadText);
+            } else {
+                color = ContextCompat.getColor(context, R.color.colorBasicText);
             }
+            titleView.setTextColor(color);
+            introView.setTextColor(color);
+            sourceView.setTextColor(color);
 
-            viewHolder.itemView.setTag(cursors.get(position));
+            viewHolder.itemView.setTag(null);
         }
     }
 
@@ -238,6 +249,17 @@ public class NewsMetainfoRecyclerViewAdapter
 
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
+            URL url = (URL) itemView.getTag();
+            if (url == null) {
+                return;
+            }
+
+            URL resourceUrl = ((ResourceLoader) loader).getUrl();
+
+            if (!url.equals(resourceUrl)) {
+                return;
+            }
+
             if (data == null || data.getByteCount() == 0 || data.getHeight() == 0) {
                 imageView.setImageResource(R.mipmap.ic_placeholder);
             } else {
