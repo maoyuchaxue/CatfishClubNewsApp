@@ -35,8 +35,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
             newsContent = cacheNewsContent(id);
         return newsContent;
     }
-
-    @Override
+@Override
     public NewsContent getNewsContentFromCache(String id) throws NewsSourceException {
         SQLiteDatabase db = openHelper.getReadableDatabase();
         Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME, new String[]{CacheDBOpenHelper.FIELD_CONTENT_STR,
@@ -44,7 +43,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
                 CacheDBOpenHelper.FIELD_CRAWL_SRC, CacheDBOpenHelper.FIELD_KEYWORDS}, CacheDBOpenHelper.FIELD_ID + "=?",
                 new String[]{id}, null, null, null, null);
         NewsContent newsContent = null;
-        if(cursor.moveToFirst() && cursor.getString(0) != null){ // found the record
+        if(cursor.moveToFirst() && !cursor.isNull(0)){ // found the record
             String contentStr = cursor.getString(0);
             String journalist = cursor.getString(1);
             String category = cursor.getString(2);
