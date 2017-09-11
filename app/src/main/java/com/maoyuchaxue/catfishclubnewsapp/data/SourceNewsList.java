@@ -247,12 +247,13 @@ public class SourceNewsList implements NewsList {
 
     private NewsCursor getCursorAt(int index, int oPage, boolean next){
         SourceNewsCursor cursor = buffer.get(index);
-        if(cursor != null)  // already in buffer
-        {
-            cursor = allocated.get(index);
-            if(cursor != null)
-                return cursor;
+        if(cursor != null) {  // already in buffer
+            allocate(cursor);
+            return cursor;
         }
+        cursor = allocated.get(index);
+        if(cursor != null)
+            return cursor;
 
         // not in buffer
         // the expected new page

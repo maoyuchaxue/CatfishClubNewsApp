@@ -45,6 +45,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
     }
 
     private String buildQueryString(int pageNo, String keyword, NewsCategoryTag category){
+        Log.i("WebNewsMeta", "invoked " + pageNo);
         StringBuilder queryStr = new StringBuilder(apiUrl);
         queryStr.append("?pageSize=" + PAGE_SIZE);
         queryStr.append("&pageNo=" + pageNo);
