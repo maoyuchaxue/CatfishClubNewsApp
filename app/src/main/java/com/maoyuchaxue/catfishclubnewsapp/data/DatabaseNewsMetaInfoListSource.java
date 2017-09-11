@@ -24,11 +24,15 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
     public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
         SQLiteDatabase db = getOpenHelper().getReadableDatabase();
 
-        String selection;
-        String[] selectionArgs;
+        String selection = null;
+        String[] selectionArgs = null;
         // TODO: support no searching now
-        selection = null;
-        selectionArgs = null;
+        if(category != null){
+            selection = CacheDBOpenHelper.FIELD_CATEGORY_TAG + "=?";
+            selectionArgs = new String[]{
+                    Integer.toString(category.getIndex())
+            };
+        }
 
         String order = "rowid desc";
         String limit = (getPageSize() * pageNo - getPageSize()) + "," + getPageSize();

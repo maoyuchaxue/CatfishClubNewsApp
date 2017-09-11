@@ -63,7 +63,11 @@ public class WebNewsContentSource implements NewsContentSource {
 
         content.setCrawlSource(json.get("crawl_Source").getAsString());
 //        content.setCrawTime(DATE_FORMAT.parse(json.get("crawl_Time").getAsString()));
-        content.setCategory(json.get("news_Category").getAsString());
+        try {
+            content.setCategory(json.get("news_Category").getAsString());
+        } catch(Exception e){
+            content.setCategory("");
+        }
         content.setJournalist(json.get("news_Journal").getAsString());
 
         String rawContent = json.get("news_Content").getAsString();
