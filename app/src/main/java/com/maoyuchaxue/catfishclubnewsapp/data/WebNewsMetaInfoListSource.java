@@ -53,6 +53,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         if(category != null)
             queryStr.append("&category=" + category.getIndex());
 
+        Log.i("recommend", queryStr.toString());
 //        System.out.println(queryStr);
         return queryStr.toString();
     }

@@ -28,6 +28,7 @@ import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentAndImageAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
+import com.maoyuchaxue.catfishclubnewsapp.controller.RecommendListViewAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
@@ -58,14 +59,16 @@ public class NewsViewFragment extends Fragment
     private String title;
     private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
-    private ListView mListView;
+    private ListView mListView, mRecommendListView;
     private SpeechSynthesizer speechSynthesizer;
     private String speakContent = null;
     private NewsContentAndImageAdapter mAdapter;
+    private RecommendListViewAdapter mRecommendAdapter;
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
-    public final static int NEWS_RESOURCE_LOADER_ID = 1;
+    public final static int NEWS_RECOMMEND_LOADER_ID = 1;
+    public final static int NEWS_RESOURCE_LOADER_ID = 2;
 
 
 //    private OnFragmentInteractionListener mListener;
@@ -129,6 +132,13 @@ public class NewsViewFragment extends Fragment
         mListView = (ListView) homeView.findViewById(R.id.news_view_content);
         mListView.setAdapter(mAdapter);
 
+        mRecommendListView = (ListView) homeView.findViewById(R.id.recommend_list);
+        mRecommendAdapter = new RecommendListViewAdapter(getContext(),
+                getLoaderManager());
+        mRecommendListView.setAdapter(mRecommendAdapter);
+
+
+
         Bundle args = new Bundle();
         mLoader = getLoaderManager().initLoader(NEWS_CONTENT_LOADER_ID, args, this);
         mLoader.forceLoad();
@@ -186,6 +196,8 @@ public class NewsViewFragment extends Fragment
         }
 
         speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
+
+        mRecommendAdapter.startLoading(data, 5);
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).

@@ -81,6 +81,10 @@ public class NewsMetainfoRecyclerViewAdapter
         }
         if (view != null) {
             view.setOnClickListener(this);
+            view.setLayoutParams(new RecyclerView.LayoutParams(
+                    RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT
+            ));
         }
 
         return viewHolder;
@@ -139,7 +143,7 @@ public class NewsMetainfoRecyclerViewAdapter
             }
             loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
 
-            viewHolder.itemView.setTag(info.getPictures()[0]);
+            viewHolder.itemView.setTag(cursors.get(position));
 
         } else if (viewHolder instanceof TextViewHolder) {
             TextViewHolder textViewHolder = (TextViewHolder) viewHolder;
@@ -166,7 +170,7 @@ public class NewsMetainfoRecyclerViewAdapter
             introView.setTextColor(color);
             sourceView.setTextColor(color);
 
-            viewHolder.itemView.setTag(null);
+            viewHolder.itemView.setTag(cursors.get(position));
         }
     }
 
@@ -249,11 +253,12 @@ public class NewsMetainfoRecyclerViewAdapter
 
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
-            URL url = (URL) itemView.getTag();
-            if (url == null) {
+            URL urls[] = ((NewsCursor) itemView.getTag()).getNewsMetaInfo().getPictures();
+            if (urls == null || urls.length == 0) {
                 return;
             }
 
+            URL url = urls[0];
             URL resourceUrl = ((ResourceLoader) loader).getUrl();
 
             if (!url.equals(resourceUrl)) {
