@@ -29,6 +29,7 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.iflytek.cloud.SpeechError;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 public class NewsViewActivity extends AppCompatActivity implements View.OnClickListener {
@@ -118,6 +119,11 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
                         resultIntent.putExtra("is_bookmark_modified", (isInBookmark != initiallyIsInBookmark));
                         resultIntent.putExtra("final_bookmark_state", isInBookmark);
 //                        setResult(Activity.RESULT_OK, resultIntent);
+
+                        String alertText = isInBookmark ? "收藏成功辣" : "收藏取消辣";
+                        new SweetAlertDialog(NewsViewActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText(alertText)
+                                .show();
 
                         resetMenuItemAppearance();
                         break;
