@@ -3,7 +3,6 @@ package com.maoyuchaxue.catfishclubnewsapp.data.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.constraint.solver.Cache;
 
 /**
  * Created by YU_Jason on 2017/9/7.
@@ -11,7 +10,7 @@ import android.support.constraint.solver.Cache;
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "cache";
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 7;
 
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
@@ -28,6 +27,7 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
     public static final String FIELD_CRAWL_SRC = "crawl_src";
     public static final String FIELD_CATEGORY = "category";
     public static final String FIELD_TITLE = "title";
+    public static final String FIELD_KEYWORDS = "keywords";
 
     private static final String NEWS_TABLE_CREATE = "create table if not exists " +
             NEWS_TABLE_NAME + " (" + FIELD_ID + " text primary key, " +
@@ -43,16 +43,19 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_JOURNALIST + " text, " +
             FIELD_CRAWL_SRC + " text, " +
             FIELD_CATEGORY + " text, " +
-            FIELD_TITLE + " text);";
+            FIELD_TITLE + " text, " +
+            FIELD_KEYWORDS + " text);";
 
 
     public static final String RESOURCES_TABLE_NAME = "resources_cache";
     public static final String FIELD_RESOURCE_URL = "url";
-    public static final String FIELD_RESOURCE_BLOB = "rblob";
+    public static final String FIELD_RESOURCE_TN_BLOB = "thumbnail_blob";
+    public static final String FIELD_RESOURCE_BM_BLOB = "bitmap_blob";
     private static final String RESOURCES_TABLE_CREATE = "create table if not exists " +
             RESOURCES_TABLE_NAME + " (" +
             FIELD_RESOURCE_URL + " text primary key, " +
-            FIELD_RESOURCE_BLOB + " blob);";
+            FIELD_RESOURCE_TN_BLOB + " blob, " +
+            FIELD_RESOURCE_BM_BLOB + " blob);";
 
     public static final String BOOKMARK_TABLE_NAME = "bookmark_cache";
     private static final String BOOKMARK_TABLE_CREATE = "create table if not exists " +
@@ -93,22 +96,27 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
         //remove old tables and create new ones
 //        db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
 //        db.execSQL(NEWS_TABLE_CREATE);
-        if(newVersion >= 4)
+        if(oldVersion < 4)
             db.execSQL(BOOKMARK_TABLE_CREATE);
 
-        if(oldVersion < 3){
+        if(oldVersion < 3 || newVersion >= 7){
             db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
             db.execSQL(NEWS_TABLE_CREATE);
 //            db.execSQL("alter table " + NEWS_TABLE_NAME +
 //            "add column " + FIELD_TITLE + " text;");
         }
 
-        if(newVersion == 5){
+        if(oldVersion < 5){
             db.execSQL("delete from " + NEWS_TABLE_NAME + ";");
         }
 
         if(oldVersion == 1)
             db.execSQL(RESOURCES_TABLE_CREATE);
+
+        if(oldVersion < 6){
+            db.execSQL("drop table if exists " + RESOURCES_TABLE_NAME + ";");
+            db.execSQL(RESOURCES_TABLE_CREATE);
+        }
     }
 
     @Override
