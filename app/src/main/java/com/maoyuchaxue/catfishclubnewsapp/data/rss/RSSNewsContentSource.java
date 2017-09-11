@@ -4,12 +4,11 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.regex.Pattern;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 
 /**
  * Created by YU_Jason on 2017/9/11.
@@ -23,30 +22,27 @@ public class RSSNewsContentSource implements NewsContentSource{
 
     @Override
     public NewsContent getNewsContent(String id) throws NewsSourceException {
-        NewsContent content = new NewsContent();
+        NewsContent content;
         try {
-            URL url = new URL(id);
+            Document doc = Jsoup.connect(id).get();
+            Elements params = doc.select("p");
 
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
-            con.setRequestMethod("GET");
+            StringBuilder contentStr = new StringBuilder();
+            for(Element element: params){
+                contentStr.append("<p>" + element.html() + "</p>");
+            }
 
+            content = new NewsContent();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            StringWriter pageHtmlBuffer = new StringWriter();
-            for(int c = reader.read(); c != -1; c = reader.read())
-                pageHtmlBuffer.write(c);
-            String pageHtml = pageHtmlBuffer.toString();
-
-            pageHtmlBuffer.close();
-            reader.close();
-            con.disconnect();
-
-
-
+            content.setJournalist("");
+            content.setCrawlSource("");
+            content.setCategory("");
+            content.setContentStr(contentStr.toString());
+            content.setKeywords(new String[0]);
         } catch(Exception e){
             e.printStackTrace();
             throw new NewsSourceException();
         }
-        return null;
+        return content;
     }
 }
