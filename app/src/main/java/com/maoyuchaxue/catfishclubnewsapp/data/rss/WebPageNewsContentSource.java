@@ -14,7 +14,7 @@ import org.jsoup.select.Elements;
  * Created by YU_Jason on 2017/9/11.
  */
 
-public class RSSNewsContentSource implements NewsContentSource{
+public class WebPageNewsContentSource implements NewsContentSource{
     @Override
     public void close() throws NewsSourceException {
 
