@@ -31,17 +31,17 @@ class RSSFeedHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes){
-        if(uri.equalsIgnoreCase("item")) {
+        if(localName.equalsIgnoreCase("item")) {
             currentNewsMetaInfo = new NewsMetaInfo();
             inItem = true;
         }
-        currentElement = uri;
+        currentElement = localName;
 
     }
 
     @Override
     public void endElement(String uri, String localName, String qName){
-        if(uri.equalsIgnoreCase("item")) {
+        if(localName.equalsIgnoreCase("item")) {
             inItem = false;
             newsMetaInfos.add(currentNewsMetaInfo);
         }

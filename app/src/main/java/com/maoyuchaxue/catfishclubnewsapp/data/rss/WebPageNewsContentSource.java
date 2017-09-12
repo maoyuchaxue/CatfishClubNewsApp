@@ -2,6 +2,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data.rss;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 import org.jsoup.Jsoup;
@@ -21,10 +22,12 @@ public class WebPageNewsContentSource implements NewsContentSource{
     }
 
     @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
+    public NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+        String url = metaInfo.getUrl().toString();
+
         NewsContent content;
         try {
-            Document doc = Jsoup.connect(id).get();
+            Document doc = Jsoup.connect(url).get();
             Elements params = doc.select("p");
 
             StringBuilder contentStr = new StringBuilder();

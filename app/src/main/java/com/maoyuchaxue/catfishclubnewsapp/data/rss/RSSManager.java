@@ -41,6 +41,15 @@ public class RSSManager {
     private ArrayList<Pair<URL, ChannelMetaInfo>> feeds;
     private ArrayList<NewsMetaInfo> newsMetaInfos;
     private HashSet<String> idSet;
+
+    private static RSSManager instance;
+
+    public synchronized static RSSManager getInstance(CacheDBOpenHelper openHelper) throws
+        SAXException, ParserConfigurationException{
+        if(instance == null)
+            instance = new RSSManager(openHelper);
+        return instance;
+    }
 //
 //    private class RSSNewsContentSource implements NewsContentSource{
 //        @Override
@@ -92,7 +101,11 @@ public class RSSManager {
 
         @Override
         public void refresh() {
-
+            try {
+                RSSManager.this.synchronise();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -106,8 +119,12 @@ public class RSSManager {
         }
     }
 
-    public RSSManager(CacheDBOpenHelper openHelper) throws SAXException, ParserConfigurationException{
+    private RSSManager(CacheDBOpenHelper openHelper) throws SAXException, ParserConfigurationException{
         this.openHelper = openHelper;
+        feeds = new ArrayList<>();
+        newsMetaInfos = new ArrayList<>();
+        idSet = new HashSet<>();
+
         xmlParser = SAXParserFactory.newInstance().newSAXParser();
     }
 
@@ -208,23 +225,24 @@ public class RSSManager {
         cursor.close();
     }
 
-    public void addRSSFeed(URL url) throws IOException, SAXException{
-        ChannelMetaInfo channelMetaInfo = synchronise(url);
-        feeds.add(new Pair<>(url, channelMetaInfo));
+    public void addRSSFeed(URL url){
+//        ChannelMetaInfo channelMetaInfo = synchronise(url);
+//        feeds.add(new Pair<>(url, channelMetaInfo));
+        feeds.add(new Pair<URL, ChannelMetaInfo>(url, null));
 
         SQLiteDatabase db = openHelper.getWritableDatabase();
         ContentValues change = new ContentValues();
         change.put(CacheDBOpenHelper.FIELD_URL, url.toString());
-        change.put(CacheDBOpenHelper.FIELD_TITLE, channelMetaInfo.getTitle());
-        change.put(CacheDBOpenHelper.FIELD_LINK, channelMetaInfo.getLink());
-        change.put(CacheDBOpenHelper.FIELD_DESC, channelMetaInfo.getDescription());
+//        change.put(CacheDBOpenHelper.FIELD_TITLE, channelMetaInfo.getTitle());
+//        change.put(CacheDBOpenHelper.FIELD_LINK, channelMetaInfo.getLink());
+//        change.put(CacheDBOpenHelper.FIELD_DESC, channelMetaInfo.getDescription());
 
         db.insert(CacheDBOpenHelper.RSS_TABLE_NAME, null, change);
     }
 
 
     public NewsMetaInfoListSource getNewsMetaInfoListSource(){
-        return null;
+        return new RSSNewsMetaInfoListSource();
     }
 //    public NewsContentSource getNewsContentSource() {
 //        return new RSSNewsContentSource();

@@ -176,7 +176,10 @@ public class HistoryManager {
         change.put(CacheDBOpenHelper.FIELD_INTRO, metaInfo.getIntro());
         change.put(CacheDBOpenHelper.FIELD_AUTHOR, metaInfo.getAuthor());
         change.put(CacheDBOpenHelper.FIELD_TITLE, metaInfo.getTitle());
-        change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
+        if(metaInfo.getCategoryTag() == null)
+            change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, 0);
+        else
+            change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
         change.put(CacheDBOpenHelper.FIELD_TYPE, metaInfo.getType());
 

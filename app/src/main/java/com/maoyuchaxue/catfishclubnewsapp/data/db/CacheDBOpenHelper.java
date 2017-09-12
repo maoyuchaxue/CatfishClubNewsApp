@@ -129,7 +129,7 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
         if(oldVersion < 4)
             db.execSQL(BOOKMARK_TABLE_CREATE);
 
-        if(oldVersion < 3 || (newVersion >= 7 && oldVersion < 7)){
+        if(oldVersion < 3 || (newVersion >= 7 && oldVersion < 7) || newVersion == 8){
             db.execSQL("drop table if exists " + NEWS_TABLE_NAME + ";");
             db.execSQL(NEWS_TABLE_CREATE);
 //            db.execSQL("alter table " + NEWS_TABLE_NAME +
@@ -155,13 +155,6 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
 
         if(oldVersion < 8)
             db.execSQL(RSS_TABLE_CREATE);
-
-        if(newVersion == 8){
-            db.execSQL("alter table " + NEWS_TABLE_NAME + " add column " +
-                FIELD_TYPE + " integer not null default 0;");
-            db.execSQL("alter table " + BOOKMARK_TABLE_NAME + " add column " +
-                    FIELD_TYPE + " integer not null default 0;");
-        }
 
     }
 

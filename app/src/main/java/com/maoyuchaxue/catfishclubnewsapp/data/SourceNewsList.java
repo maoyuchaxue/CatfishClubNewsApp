@@ -169,12 +169,15 @@ public class SourceNewsList implements NewsList {
     public SourceNewsList(NewsMetaInfoListSource metaInfoSource,
                           NewsContentSource contentSource,
                           String keyword, NewsCategoryTag newsCategoryTag){
+
         this.metaInfoSource = metaInfoSource;
         this.contentSource = contentSource;
         this.keyword = keyword;
         this.categoryTag = newsCategoryTag;
 
+
         random = new Random();
+
         sourceReversed = metaInfoSource.isReversed();
         previousD = sourceReversed ? 1 : -1;
         nextD = sourceReversed ? -1 : 1;
@@ -300,6 +303,11 @@ public class SourceNewsList implements NewsList {
     public int getLength() {
         //TODO: getLength() of SourceNewsList
         return 0;
+    }
+
+    @Override
+    public void refresh() {
+        metaInfoSource.refresh();
     }
 
     @Override

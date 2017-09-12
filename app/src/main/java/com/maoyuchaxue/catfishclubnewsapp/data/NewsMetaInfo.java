@@ -8,22 +8,22 @@ import java.net.URL;
  */
 
 public class NewsMetaInfo implements Serializable{
-    private NewsCategoryTag categoryTag;
-    private int type;
-    private String id;
-    private String srcSite;
-    private String title;
+    private NewsCategoryTag categoryTag = null;
+    private int type = 0;
+    private String id = null;
+    private String srcSite = "";
+    private String title = "";
 //    private Date time;
-    private URL url;
-    private String author, lang;
+    private URL url = null;
+    private String author = "", lang = "";
 
     public void setPictures(URL[] pictures) {
         this.pictures = pictures;
     }
 
-    private URL[] pictures;
-    private URL video;
-    private String intro;
+    private URL[] pictures = new URL[0];
+    private URL video = null;
+    private String intro = "";
 
     public NewsMetaInfo(){}
 
