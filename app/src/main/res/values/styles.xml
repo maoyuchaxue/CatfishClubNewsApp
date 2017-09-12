@@ -9,7 +9,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/colorWhiteText</item>
+        <!--<item name="android:textColorPrimary">@color/colorWhiteText</item>-->
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
 
@@ -39,10 +39,10 @@
     </style>
 
     <style name="ToolBarTheme" parent="Theme.AppCompat">
-        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorPrimary">@color/colorIcon</item>
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="android:actionMenuTextColor">@android:color/white</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:actionMenuTextColor">@color/colorIcon</item>
+        <item name="android:textColor">@color/colorIcon</item>
         <item name="actionBarItemBackground">@android:color/white</item>
     </style>
 

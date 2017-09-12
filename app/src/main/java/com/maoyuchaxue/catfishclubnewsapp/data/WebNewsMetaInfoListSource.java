@@ -45,6 +45,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
     }
 
     private String buildQueryString(int pageNo, String keyword, NewsCategoryTag category){
+        Log.i("WebNewsMeta", "invoked " + pageNo);
         StringBuilder queryStr = new StringBuilder(apiUrl);
         queryStr.append("?pageSize=" + PAGE_SIZE);
         queryStr.append("&pageNo=" + pageNo);
@@ -53,6 +54,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         if(category != null)
             queryStr.append("&category=" + category.getIndex());
 
+        Log.i("recommend", queryStr.toString());
 //        System.out.println(queryStr);
         return queryStr.toString();
     }
@@ -136,6 +138,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             con.connect();
 

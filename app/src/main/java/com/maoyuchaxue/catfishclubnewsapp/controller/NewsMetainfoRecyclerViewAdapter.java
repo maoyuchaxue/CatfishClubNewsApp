@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.controller;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -53,6 +54,7 @@ public class NewsMetainfoRecyclerViewAdapter
 
     private static final int PICS_VIEW = 0;
     private static final int TEXT_ONLY_VIEW = 1;
+    private static final int FOOTER_VIEW = 2;
 
     public static interface OnRecyclerViewItemClickListener {
         void onItemClick(View view, NewsCursor cursor);
@@ -77,9 +79,17 @@ public class NewsMetainfoRecyclerViewAdapter
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.news_into_unit_layout, null);
                 viewHolder = new TextViewHolder(view);
                 break;
+            case FOOTER_VIEW:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.footer_unit_layout, null);
+                viewHolder = new FooterViewHolder(view);
+                break;
         }
         if (view != null) {
             view.setOnClickListener(this);
+            view.setLayoutParams(new RecyclerView.LayoutParams(
+                    RecyclerView.LayoutParams.MATCH_PARENT,
+                    RecyclerView.LayoutParams.WRAP_CONTENT
+            ));
         }
 
         return viewHolder;
@@ -87,8 +97,15 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public int getItemViewType(int position) {
+        if (position >= cursors.size()) {
+            return FOOTER_VIEW;
+        }
+
         URL[] urls = cursors.get(position).getNewsMetaInfo().getPictures();
-        if (urls == null || urls.length == 0) {
+
+        Boolean isTextOnly = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("text_only_mode", false);
+        if (urls == null || urls.length == 0 || isTextOnly) {
             return TEXT_ONLY_VIEW;
         } else {
             return PICS_VIEW;
@@ -97,6 +114,7 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        Log.i("madapter", "bind on " + position);
         if (viewHolder instanceof PicsViewHolder) {
             PicsViewHolder picsViewHolder= (PicsViewHolder) viewHolder;
             View view = picsViewHolder.view;
@@ -109,15 +127,31 @@ public class NewsMetainfoRecyclerViewAdapter
 
             titleView.setText(info.getTitle());
             introView.setText(info.getIntro());
-            sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
+
+            String src = info.getSrcSite();
+            String author = info.getAuthor();
+
+            if (src.isEmpty()) {
+                src = "匿名来源";
+            }
+
+            if (author.isEmpty()) {
+                author = "匿名作者";
+            }
+
+            sourceView.setText(src+ "  " + author);
 
             String id = info.getId();
+            int color;
             if (HistoryManager.getInstance(CacheDBOpenHelper.getInstance(context.getApplicationContext())).isInHistory(id)) {
-                int color = ContextCompat.getColor(context, R.color.colorHasReadText);
-                titleView.setTextColor(color);
-                introView.setTextColor(color);
-                sourceView.setTextColor(color);
+                Log.i("madapter", "has read " + id);
+                color = ContextCompat.getColor(context, R.color.colorHasReadText);
+            } else {
+                color = ContextCompat.getColor(context, R.color.colorBasicText);
             }
+            titleView.setTextColor(color);
+            introView.setTextColor(color);
+            sourceView.setTextColor(color);
 
             picsViewHolder.setSummaryPicURL(info.getPictures()[0]);
 
@@ -130,6 +164,8 @@ public class NewsMetainfoRecyclerViewAdapter
             }
             loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
 
+            viewHolder.itemView.setTag(cursors.get(position));
+
         } else if (viewHolder instanceof TextViewHolder) {
             TextViewHolder textViewHolder = (TextViewHolder) viewHolder;
             View view = textViewHolder.view;
@@ -141,15 +177,31 @@ public class NewsMetainfoRecyclerViewAdapter
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_source);
             titleView.setText(info.getTitle());
             introView.setText(info.getIntro());
-            sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
+
+            String src = info.getSrcSite();
+            String author = info.getAuthor();
+
+            if (src.isEmpty()) {
+                src = "匿名来源";
+            }
+
+            if (author.isEmpty()) {
+                author = "匿名作者";
+            }
+
+            sourceView.setText(src+ "  " + author);
 
             String id = info.getId();
+            int color;
             if (HistoryManager.getInstance(CacheDBOpenHelper.getInstance(context.getApplicationContext())).isInHistory(id)) {
-                int color = ContextCompat.getColor(context, R.color.colorHasReadText);
-                titleView.setTextColor(color);
-                introView.setTextColor(color);
-                sourceView.setTextColor(color);
+                Log.i("madapter", "has read " + id);
+                color = ContextCompat.getColor(context, R.color.colorHasReadText);
+            } else {
+                color = ContextCompat.getColor(context, R.color.colorBasicText);
             }
+            titleView.setTextColor(color);
+            introView.setTextColor(color);
+            sourceView.setTextColor(color);
 
             viewHolder.itemView.setTag(cursors.get(position));
         }
@@ -157,7 +209,7 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return cursors.size();
+        return cursors.size() + 1;
     }
 
     @Override
@@ -175,6 +227,9 @@ public class NewsMetainfoRecyclerViewAdapter
             if (titleView != null) {
                 introView = (TextView) v.findViewById(R.id.news_unit_pics_intro);
                 sourceView = (TextView) v.findViewById(R.id.news_unit_pics_source);
+            } else {
+//                is footer view
+                return;
             }
         }
 
@@ -229,11 +284,25 @@ public class NewsMetainfoRecyclerViewAdapter
             imageView = (ImageView) view.findViewById(R.id.news_unit_pics_image);
             return new ResourceLoader(context, summaryPicURL,
                     new DatabaseResourceCache(CacheDBOpenHelper.getInstance(context.getApplicationContext()),
-                            new WebResourceSource()));
+                            new WebResourceSource(200, 200, 1000, 1000)), true);
         }
 
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
+            URL urls[] = ((NewsCursor) itemView.getTag()).getNewsMetaInfo().getPictures();
+            if (urls == null || urls.length == 0) {
+                return;
+            }
+
+            URL url = urls[0];
+            URL resourceUrl = ((ResourceLoader) loader).getUrl();
+
+            if (!url.equals(resourceUrl)) {
+                Log.i("recommend", "url:" + url.toString());
+                Log.i("recommend", "res url:" + resourceUrl.toString());
+                return;
+            }
+
             if (data == null || data.getByteCount() == 0 || data.getHeight() == 0) {
                 imageView.setImageResource(R.mipmap.ic_placeholder);
             } else {
@@ -249,6 +318,14 @@ public class NewsMetainfoRecyclerViewAdapter
     private static class TextViewHolder extends RecyclerView.ViewHolder {
         public View view;
         TextViewHolder(View view) {
+            super(view);
+            this.view = view;
+        }
+    }
+
+    private static class FooterViewHolder extends RecyclerView.ViewHolder {
+        public View view;
+        FooterViewHolder(View view) {
             super(view);
             this.view = view;
         }

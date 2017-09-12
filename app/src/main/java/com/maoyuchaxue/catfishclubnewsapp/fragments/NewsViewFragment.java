@@ -1,6 +1,8 @@
 package com.maoyuchaxue.catfishclubnewsapp.fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.constraint.solver.Cache;
 import android.support.v4.content.Loader;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,14 +27,17 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
+import com.maoyuchaxue.catfishclubnewsapp.activities.MainActivity;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentAndImageAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
+import com.maoyuchaxue.catfishclubnewsapp.controller.RecommendListViewAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
@@ -48,10 +54,13 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
  * create an instance of this fragment.
  */
 public class NewsViewFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<NewsContent> {
+        implements LoaderManager.LoaderCallbacks<NewsContent>,
+        NewsContentAndImageAdapter.OnClickNewsListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NEWS_ID = "news_id";
     private static final String ARG_TITLE = "title";
+
+    private NewsViewActivity activity;
     private View homeView;
     private String newsID;
     private String title;
@@ -64,7 +73,8 @@ public class NewsViewFragment extends Fragment
     Loader<NewsContent> mLoader;
 
     public final static int NEWS_CONTENT_LOADER_ID = 0;
-    public final static int NEWS_RESOURCE_LOADER_ID = 1;
+    public final static int NEWS_RECOMMEND_LOADER_ID = 1;
+    public final static int NEWS_RESOURCE_LOADER_ID = 2;
 
 
 //    private OnFragmentInteractionListener mListener;
@@ -90,9 +100,9 @@ public class NewsViewFragment extends Fragment
         return fragment;
     }
 
-    public static NewsViewFragment newInstance(SpeechSynthesizer speechSynthesizer, NewsMetaInfo metaInfo){
+    public static NewsViewFragment newInstance(NewsViewActivity activity, SpeechSynthesizer speechSynthesizer, NewsMetaInfo metaInfo){
         NewsViewFragment instance = newInstance(metaInfo.getId(), metaInfo.getTitle());
-
+        instance.activity = activity;
         instance.metaInfo = metaInfo;
         instance.speechSynthesizer = speechSynthesizer;
         return instance;
@@ -107,10 +117,20 @@ public class NewsViewFragment extends Fragment
 //                CacheDBOpenHelper.getInstance(getContext().getApplicationContext())
 //               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
 //        );
+
+        NewsContentSource frontSource = null;
+        Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getBoolean("offline_mode", false);
+
+//        if offline, front src should be set to null to prevent network connection
+        if (!isOfflineMode) {
+            frontSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+        }
+
         contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
-                getInstance(getContext().getApplicationContext())).getNewsContentSource(
-               new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
-        );
+                getInstance(getContext().getApplicationContext())).
+                getNewsContentSource(frontSource);
+
         if (getArguments() != null) {
             newsID = getArguments().getString(ARG_NEWS_ID);
             title = getArguments().getString(ARG_TITLE);
@@ -127,6 +147,7 @@ public class NewsViewFragment extends Fragment
 
         mListView = (ListView) homeView.findViewById(R.id.news_view_content);
         mListView.setAdapter(mAdapter);
+
 
         Bundle args = new Bundle();
         mLoader = getLoaderManager().initLoader(NEWS_CONTENT_LOADER_ID, args, this);
@@ -159,11 +180,24 @@ public class NewsViewFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<NewsContent> loader, NewsContent data) {
 
+        if (data == null) {
+            mAdapter.setUnavailable();
+            return;
+        }
+
         TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
         authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();
 
-        URL urls[] = metaInfo.getPictures();
+        URL urls[] = null;
+        Boolean isTextOnly = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getBoolean("text_only_mode", false);
+        if (isTextOnly) {
+            urls = new URL[0];
+        } else {
+            urls = metaInfo.getPictures();
+        }
+
         String splitContents[] = content.split("</p>");
 
         Log.i("madapter", "input data length: " + urls.length + " " + splitContents.length);
@@ -177,6 +211,15 @@ public class NewsViewFragment extends Fragment
         }
 
         speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
+
+        String recommendLimit = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("recommend_limit", "5");
+        int recommend = Integer.parseInt(recommendLimit);
+        if (recommend > 0) {
+            mAdapter.startRecommendLoading(data, recommend);
+            mListView.setOnItemClickListener(mAdapter);
+            mAdapter.setOnClickNewsListener(this);
+        }
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
@@ -192,6 +235,44 @@ public class NewsViewFragment extends Fragment
 
     public void removeCurrentNewsFromBookmark(BookmarkManager bookmarkManager) {
 //        DO NOTHING TILL USER LEAVE THIS ACTIVITY
+    }
+
+    public boolean shareContent(Context context) {
+        if (speakContent == null) {
+            return false;
+        } else {
+
+            OnekeyShare oks = new OnekeyShare();
+            //关闭sso授权
+            oks.disableSSOWhenAuthorize();
+
+            // 分享时Notification的图标和文字  2.5.9以后的版本不     调用此方法
+            //oks.setNotification(R.drawable.ic_launcher, getString(R.string.app_name));
+            // title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间使用
+
+
+            oks.setTitle(metaInfo.getTitle() + " -- from CCNAPP");
+            // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
+//            oks.setTitleUrl(metaInfo.getUrl().toString());
+            // text是分享文本，所有平台都需要这个字段
+            oks.setText("分享新闻: " + metaInfo.getTitle() + " 点击查看：" + metaInfo.getUrl().toString() + " -- from CCNAPP");
+
+            URL pictures[] = metaInfo.getPictures();
+            if (pictures.length > 0) {
+                oks.setImageUrl(pictures[0].toString());
+            }
+
+            oks.setComment("输入评论：");
+            // site是分享此内容的网站名称，仅在QQ空间使用
+            oks.setSite(metaInfo.getUrl().toString());
+            // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+            oks.setSiteUrl(metaInfo.getUrl().toString());
+
+            oks.show(context);
+
+//          TODO: optimize share URL
+            return true;
+        }
     }
 
     public void startSpeaking() {
@@ -242,6 +323,11 @@ public class NewsViewFragment extends Fragment
         if (speechSynthesizer.isSpeaking()) {
             speechSynthesizer.stopSpeaking();
         }
+    }
+
+    @Override
+    public void onClickNews(NewsCursor cursor) {
+        activity.onClickNews(cursor);
     }
 
 }

@@ -140,7 +140,10 @@ public class NewsListFragment extends Fragment
     }
 
     private void initDatabaseFragment() {
-//        TODO: database fragment
+        tag = NewsCategoryTag.getCategoryByTitleEN(category);
+        HistoryManager historyManager = HistoryManager.getInstance(CacheDBOpenHelper
+                .getInstance(getContext().getApplicationContext()));
+        mMetaInfoListSource = historyManager.getNewsMetaInfoListSource();
     }
 
     private void initBookmarkFragment() {
@@ -203,7 +206,8 @@ public class NewsListFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        if (mAdapter.getItemCount() == 0) {
+        if (mAdapter.getItemCount() <= 1) {
+            // contains footer
             mSwipeRefreshLayout.setRefreshing(true);
             reloadFromBeginning();
         }
@@ -244,11 +248,6 @@ public class NewsListFragment extends Fragment
         }
     }
 
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -309,7 +308,9 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onDestroy() {
-        mAdapter.clear();
+        if (mAdapter != null) {
+            mAdapter.clear();
+        }
         super.onDestroy();
     }
 }
