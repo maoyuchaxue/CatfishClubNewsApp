@@ -207,10 +207,14 @@ public class NewsViewFragment extends Fragment
 
         speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
 
-        mAdapter.startRecommendLoading(data, 5);
-        mListView.setOnItemClickListener(mAdapter);
-        mAdapter.setOnClickNewsListener(this);
-
+        String recommendLimit = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getString("recommend_limit", "5");
+        int recommend = Integer.parseInt(recommendLimit);
+        if (recommend > 0) {
+            mAdapter.startRecommendLoading(data, recommend);
+            mListView.setOnItemClickListener(mAdapter);
+            mAdapter.setOnClickNewsListener(this);
+        }
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).

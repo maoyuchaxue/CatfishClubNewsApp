@@ -61,6 +61,8 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     private List<NewsCursor> cursors;
 
+    private int limit;
+
     public static interface OnClickNewsListener {
         public void onClickNews(NewsCursor cursor);
     }
@@ -285,6 +287,7 @@ public class NewsContentAndImageAdapter extends BaseAdapter
     }
 
     public void startRecommendLoading(NewsContent content, int limit) {
+        this.limit = limit;
         Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean("offline_mode", false);
 
@@ -310,7 +313,7 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     @Override
     public Loader<List<NewsCursor> > onCreateLoader(int id, Bundle args) {
-        return new NewsMetainfoLoader(context, 5, null, newsList);
+        return new NewsMetainfoLoader(context, limit, null, newsList);
     }
 
     @Override

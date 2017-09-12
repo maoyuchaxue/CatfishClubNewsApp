@@ -19,4 +19,14 @@
         android:title="@string/pref_text_only"
         android:summary="@string/pref_text_only_description"/>
 
+    <ListPreference
+        android:key="recommend_limit"
+        android:title="@string/pref_recommend"
+        android:dialogTitle="@string/pref_recommend_dia_title"
+        android:summary="@string/pref_recommend_description"
+        android:entries="@array/pref_recommend_entries"
+        android:entryValues="@array/pref_recommend_values"
+        android:defaultValue="5"
+        />
+
 </PreferenceScreen>
