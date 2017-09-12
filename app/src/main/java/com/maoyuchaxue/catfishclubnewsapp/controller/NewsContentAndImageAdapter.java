@@ -63,6 +63,8 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     private int limit;
 
+    private boolean isAvailable = true;
+
     public static interface OnClickNewsListener {
         public void onClickNews(NewsCursor cursor);
     }
@@ -76,6 +78,11 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     public void setOnClickNewsListener(OnClickNewsListener listener) {
         onClickNewsListener = listener;
+    }
+
+    public void setUnavailable() {
+        isAvailable = false;
+        notifyDataSetChanged();
     }
 
     public void resetData(String[] contents, URL[] urls) {
@@ -126,6 +133,10 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     @Override
     public int getCount() {
+        if (!isAvailable) {
+            return 1;
+        }
+
         int count = 0;
         if (indexes != null) {
             count += indexes.size();
@@ -143,6 +154,11 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        if (!isAvailable) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.news_view_unavailable, null);
+            return convertView;
+        }
+
         Log.i("madapter", "get view at: " + position);
 
         ViewHolder vh = null;
@@ -287,6 +303,10 @@ public class NewsContentAndImageAdapter extends BaseAdapter
     }
 
     public void startRecommendLoading(NewsContent content, int limit) {
+        if (!isAvailable) {
+            return;
+        }
+
         this.limit = limit;
         Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean("offline_mode", false);
@@ -328,6 +348,10 @@ public class NewsContentAndImageAdapter extends BaseAdapter
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        if (!isAvailable) {
+            return;
+        }
+
         ViewHolder vh = (ViewHolder) view.getTag();
         if (vh instanceof RecommendationViewHolder) {
             RecommendationViewHolder rvh = (RecommendationViewHolder) vh;

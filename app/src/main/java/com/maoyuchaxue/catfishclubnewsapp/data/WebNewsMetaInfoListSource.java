@@ -138,6 +138,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             con.connect();
 

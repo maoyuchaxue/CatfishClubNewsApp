@@ -180,6 +180,11 @@ public class NewsViewFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<NewsContent> loader, NewsContent data) {
 
+        if (data == null) {
+            mAdapter.setUnavailable();
+            return;
+        }
+
         TextView authorTextView = (TextView) homeView.findViewById(R.id.news_view_author);
         authorTextView.setText(data.getJournalist());
         String content = data.getContentStr();

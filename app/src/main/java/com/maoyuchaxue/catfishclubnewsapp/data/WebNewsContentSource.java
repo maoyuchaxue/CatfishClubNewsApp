@@ -140,6 +140,7 @@ public class WebNewsContentSource implements NewsContentSource {
         try{
             URL url = new URL(buildDetailString(id));
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             con.connect();
 
