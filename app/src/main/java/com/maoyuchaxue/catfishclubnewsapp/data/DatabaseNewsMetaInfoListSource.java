@@ -26,7 +26,13 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
 
         String selection = null;
         String[] selectionArgs = null;
-        // TODO: support no searching now
+
+        if (category == null) {
+            Log.i("offline", "null");
+        } else {
+            Log.i("offline", category.toString());
+        }
+
         if(category != null){
             selection = CacheDBOpenHelper.FIELD_CATEGORY_TAG + "=?";
             selectionArgs = new String[]{

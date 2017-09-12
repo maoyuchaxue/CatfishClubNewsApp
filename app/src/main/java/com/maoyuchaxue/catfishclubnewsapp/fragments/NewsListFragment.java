@@ -140,7 +140,6 @@ public class NewsListFragment extends Fragment
     }
 
     private void initDatabaseFragment() {
-//        TODO: database fragment
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         HistoryManager historyManager = HistoryManager.getInstance(CacheDBOpenHelper
                 .getInstance(getContext().getApplicationContext()));
