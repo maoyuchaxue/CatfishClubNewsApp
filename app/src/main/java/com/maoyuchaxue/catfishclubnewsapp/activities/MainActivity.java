@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity
 
         mViewPagerAdapter = new CategoryViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
-        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setOffscreenPageLimit(3);
         mTabLayout.setViewPager(mViewPager);
 
         refreshTabLayout();

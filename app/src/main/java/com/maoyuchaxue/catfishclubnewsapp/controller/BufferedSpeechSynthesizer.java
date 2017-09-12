@@ -45,16 +45,11 @@ public class BufferedSpeechSynthesizer
             }
         }
         processedSpeeches.add(cur);
-        Log.i("speaker", "speak processed: " + processedSpeeches.size());
-        for (int i = 0; i < processedSpeeches.size(); i++) {
-            Log.i("speaker", "speak processed length : "+ i + " " + processedSpeeches.get(i));
-        }
         index = -1;
         speakNextParagraph();
     }
 
     private void speakNextParagraph() {
-        Log.i("speaker", "speak started: " + index);
         index++;
         synthesizer.stopSpeaking();
         synthesizer.startSpeaking(processedSpeeches.get(index), this);
@@ -83,7 +78,6 @@ public class BufferedSpeechSynthesizer
 
     @Override
     public void onCompleted(SpeechError speechError) {
-        Log.i("speaker", "speak completed: " + index);
         if (index < processedSpeeches.size()) {
             speakNextParagraph();
         }

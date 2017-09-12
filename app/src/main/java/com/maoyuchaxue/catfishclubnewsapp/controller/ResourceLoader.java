@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.controller;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.ResourceSource;
 
@@ -37,6 +38,7 @@ public class ResourceLoader extends AsyncTaskLoader<Bitmap> {
                         resourceSource.getAsBitmap(url);
             }
         } catch (IOException e) {
+            e.printStackTrace();
         }
         return resource;
     }

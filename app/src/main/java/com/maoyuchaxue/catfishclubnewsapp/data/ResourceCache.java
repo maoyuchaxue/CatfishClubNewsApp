@@ -1,6 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.URL;
@@ -38,8 +39,10 @@ public abstract class ResourceCache extends ResourceSource{
     @Override
     public byte[] getAsThumbnailBlob(URL url) throws IOException{
         byte[] res = getAsThumbnailBlobFromCache(url);
-        if(res != null)
+
+        if(res != null) {
             return res;
+        }
 
         res = getFrontSource().getAsThumbnailBlob(url);
 
