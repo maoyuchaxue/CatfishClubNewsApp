@@ -47,7 +47,7 @@ public class NewsContent implements Serializable{
 //        this.crawTime = crawTime;
 //    }
 
-    private String contentStr, journalist, crawlSource, category;
+    private String contentStr = "", journalist = "", crawlSource = "", category = "";
 
     public String[] getKeywords() {
         return keywords;
@@ -57,7 +57,7 @@ public class NewsContent implements Serializable{
         this.keywords = keywords;
     }
 
-    private String[] keywords;
+    private String[] keywords = new String[0];
 //    private Date crawTime;
 
     // empty constructor

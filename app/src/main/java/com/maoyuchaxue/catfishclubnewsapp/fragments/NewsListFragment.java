@@ -30,6 +30,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsMetaInfoListCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
+import com.maoyuchaxue.catfishclubnewsapp.data.HybridNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
@@ -39,6 +40,8 @@ import com.maoyuchaxue.catfishclubnewsapp.data.SourceNewsList;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsMetaInfoListSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
+import com.maoyuchaxue.catfishclubnewsapp.data.rss.RSSManager;
+import com.maoyuchaxue.catfishclubnewsapp.data.rss.WebPageNewsContentSource;
 
 import org.w3c.dom.Text;
 
@@ -68,6 +71,7 @@ public class NewsListFragment extends Fragment
     public static final int WEB_FRAGMENT = 0;
     public static final int DATABASE_FRAGMENT = 1;
     public static final int BOOKMARK_FRAGMENT = 2;
+    public static final int RSS_FRAGMENT = 3;
 
     private String category;
     private String keyword;
@@ -83,6 +87,7 @@ public class NewsListFragment extends Fragment
     private Loader<List<NewsCursor>> mLoader;
     private NewsList newsList;
     private NewsCategoryTag tag;
+    private int type;
     private NewsCursor mCursor;
 
     private View mView = null;
@@ -131,6 +136,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void initWebFragment() {
+        type = 0;
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         if (keyword != null) {
             mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
@@ -140,16 +146,33 @@ public class NewsListFragment extends Fragment
     }
 
     private void initDatabaseFragment() {
+        if(category.equals("rss"))
+            type = 1;
+        else
+            type = -1;
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         HistoryManager historyManager = HistoryManager.getInstance(CacheDBOpenHelper
                 .getInstance(getContext().getApplicationContext()));
-        mMetaInfoListSource = historyManager.getNewsMetaInfoListSource();
+        mMetaInfoListSource = historyManager.getNewsMetaInfoListSource(type);
     }
 
     private void initBookmarkFragment() {
         mMetaInfoListSource = BookmarkManager.getInstance(CacheDBOpenHelper.
                 getInstance(getContext().getApplicationContext())).getNewsMetaInfoListSource();
         Log.i("bookmark", "bookmarkInited");
+    }
+
+    private void initRSSFragment(){
+        type = 0;
+        try {
+            mMetaInfoListSource = RSSManager.
+                    getInstance(CacheDBOpenHelper.getInstance(getContext().
+                            getApplicationContext()))
+                    .getNewsMetaInfoListSource();
+            Log.i("rss", "fragment initialised");
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -174,7 +197,8 @@ public class NewsListFragment extends Fragment
 
         mNewsContentSource = HistoryManager.getInstance(CacheDBOpenHelper.
                 getInstance(getContext().getApplicationContext())).getNewsContentSource(
-                new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"));
+                new HybridNewsContentSource(new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail"),
+                        new WebPageNewsContentSource()));
 
         switch (fragmentType) {
             case WEB_FRAGMENT:
@@ -185,6 +209,9 @@ public class NewsListFragment extends Fragment
                 break;
             case BOOKMARK_FRAGMENT:
                 initBookmarkFragment();
+                break;
+            case RSS_FRAGMENT:
+                initRSSFragment();
                 break;
         }
 
@@ -220,7 +247,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void resetNewsList() {
-        newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag);
+        newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag, type);
         mNewsListRecyclerViewListener.setFinished(false);
         mNewsListRecyclerViewListener.setFirstBatchLoaded(false);
         mAdapter.clear();

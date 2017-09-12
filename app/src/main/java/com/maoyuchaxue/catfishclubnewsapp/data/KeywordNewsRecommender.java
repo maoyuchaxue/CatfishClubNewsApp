@@ -30,6 +30,6 @@ public class KeywordNewsRecommender implements NewsRecommender {
         }
 
         Log.i("recommend", searchKey.toString());
-        return new SourceNewsList(source, contentSource, searchKey.toString(), null);
+        return new SourceNewsList(source, contentSource, searchKey.toString(), null, 0);
     }
 }

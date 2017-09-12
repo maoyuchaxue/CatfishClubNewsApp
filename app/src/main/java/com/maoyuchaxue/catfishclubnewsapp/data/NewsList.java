@@ -13,6 +13,7 @@ public interface NewsList {
     NewsCursor getHeadCursor();
     int getLength();
 
+    void refresh();
     void close();
 
 }

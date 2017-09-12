@@ -28,6 +28,11 @@ public class BookmarkManager {
     private class BookmarkNewsMetaInfoListSource extends DatabaseNewsMetaInfoListSource{
         private static final int PAGE_SIZE = 20;
 
+//        @Override
+//        protected int getType(){
+//            return -1;
+//        }
+
         @Override
         protected String getTableName(){
             return CacheDBOpenHelper.BOOKMARK_TABLE_NAME;
@@ -123,7 +128,10 @@ public class BookmarkManager {
         change.put(CacheDBOpenHelper.FIELD_INTRO, metaInfo.getIntro());
         change.put(CacheDBOpenHelper.FIELD_AUTHOR, metaInfo.getAuthor());
         change.put(CacheDBOpenHelper.FIELD_TITLE, metaInfo.getTitle());
-        change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
+        if(metaInfo.getCategoryTag() == null)
+            change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, 0);
+        else
+            change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
 
         StringBuilder pictureStr = new StringBuilder();
@@ -145,6 +153,7 @@ public class BookmarkManager {
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
 
         change.put(CacheDBOpenHelper.FIELD_ID, metaInfo.getId());
+        change.put(CacheDBOpenHelper.FIELD_TYPE, metaInfo.getType());
 
         long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
 
