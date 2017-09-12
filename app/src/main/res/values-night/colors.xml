@@ -8,5 +8,6 @@
     <color name="colorLine">#9E9E9E</color>
     <color name="colorBasicBackground">#212121</color>
     <color name="colorBasicText">#9E9E9E</color>
+    <color name="colorSecondaryText">#CCCCCC</color>
     <color name="colorIcon">#9E9E9E</color>
 </resources>

@@ -127,7 +127,19 @@ public class NewsMetainfoRecyclerViewAdapter
 
             titleView.setText(info.getTitle());
             introView.setText(info.getIntro());
-            sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
+
+            String src = info.getSrcSite();
+            String author = info.getAuthor();
+
+            if (src.isEmpty()) {
+                src = "匿名来源";
+            }
+
+            if (author.isEmpty()) {
+                author = "匿名作者";
+            }
+
+            sourceView.setText(src+ "  " + author);
 
             String id = info.getId();
             int color;
@@ -165,7 +177,19 @@ public class NewsMetainfoRecyclerViewAdapter
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_source);
             titleView.setText(info.getTitle());
             introView.setText(info.getIntro());
-            sourceView.setText(info.getSrcSite() + "  " + info.getAuthor());
+
+            String src = info.getSrcSite();
+            String author = info.getAuthor();
+
+            if (src.isEmpty()) {
+                src = "匿名来源";
+            }
+
+            if (author.isEmpty()) {
+                author = "匿名作者";
+            }
+
+            sourceView.setText(src+ "  " + author);
 
             String id = info.getId();
             int color;

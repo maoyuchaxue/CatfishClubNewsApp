@@ -75,7 +75,12 @@ public class RecommendListViewAdapter extends BaseAdapter
         NewsMetaInfo metaInfo = cursors.get(position).getNewsMetaInfo();
         titleView.setText(metaInfo.getTitle());
         introView.setText(metaInfo.getIntro());
-        authorView.setText(metaInfo.getAuthor());
+
+        String author = metaInfo.getAuthor();
+        if (author.isEmpty()) {
+            author = "匿名作者";
+        }
+        authorView.setText(author);
 
         Log.i("recommend", metaInfo.getTitle());
 

@@ -256,7 +256,11 @@ public class NewsContentAndImageAdapter extends BaseAdapter
             TextView authorView = (TextView) view.findViewById(R.id.recommend_author);
             titleView.setText(info.getNewsMetaInfo().getTitle());
             introView.setText(info.getNewsMetaInfo().getIntro());
-            authorView.setText(info.getNewsMetaInfo().getAuthor());
+            String author = info.getNewsMetaInfo().getAuthor();
+            if (author.isEmpty()) {
+                author = "匿名来源";
+            }
+            authorView.setText(author);
         }
     }
 
