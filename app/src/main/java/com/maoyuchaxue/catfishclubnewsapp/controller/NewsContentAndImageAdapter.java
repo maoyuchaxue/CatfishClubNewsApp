@@ -92,10 +92,9 @@ public class NewsContentAndImageAdapter extends BaseAdapter
         isImage = new ArrayList<Boolean>();
         for (String s : contents) {
             if (!s.isEmpty()) {
-                s = s + "</p>";
+                this.contents.add(s);
+                isImage.add(false);
             }
-            this.contents.add(s);
-            isImage.add(false);
         }
 
         for (URL url : urls) {

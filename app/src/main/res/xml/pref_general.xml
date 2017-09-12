@@ -29,4 +29,25 @@
         android:defaultValue="5"
         />
 
+    <ListPreference
+        android:key="speech_zh"
+        android:title="@string/pref_speech_zh"
+        android:summary="@string/pref_speech_zh_description"
+        android:dialogTitle="@string/pref_speech_zh"
+        android:entries="@array/pref_speech_zh_entries"
+        android:entryValues="@array/pref_speech_zh_values"
+        android:defaultValue="@string/pref_speech_zh_default"
+        />
+
+
+    <ListPreference
+        android:key="speech_en"
+        android:title="@string/pref_speech_en"
+        android:summary="@string/pref_speech_en_description"
+        android:dialogTitle="@string/pref_speech_en"
+        android:entries="@array/pref_speech_en_entries"
+        android:entryValues="@array/pref_speech_en_values"
+        android:defaultValue="@string/pref_speech_en_default"
+        />
+
 </PreferenceScreen>

@@ -2,6 +2,7 @@ package com.maoyuchaxue.catfishclubnewsapp.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -49,7 +50,16 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void initSynthesizer() {
-        mTts.setParameter(SpeechConstant.VOICE_NAME, isEnglish() ? "henry" : "xiaoyan");//设置发音人
+        String speaker = null;
+        if (isEnglish()) {
+            speaker = PreferenceManager.getDefaultSharedPreferences(NewsViewActivity.this)
+                    .getString("speech_en", "henry");
+        } else {
+            speaker = PreferenceManager.getDefaultSharedPreferences(NewsViewActivity.this)
+                    .getString("speech_zh", "xiaoyan");
+        }
+
+        mTts.setParameter(SpeechConstant.VOICE_NAME, speaker);//设置发音人
         mTts.setParameter(SpeechConstant.SPEED, "50");//设置语速
         mTts.setParameter(SpeechConstant.VOLUME, "80");//设置音量，范围0~100
         mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD); //设置云端
