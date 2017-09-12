@@ -19,10 +19,10 @@ public interface NewsContentCache extends NewsContentSource {
     /**
      * Caches the news content. If the old cache exists, it would be substituted by the newly fetched
      * record.
-     * @param id The ID of the news.
+     * @param metaInfo the meta information of the news
      * @return The updated content of the news.
      * */
-    NewsContent cacheNewsContent(String id) throws NewsSourceException;
+    NewsContent cacheNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException;
 
     /**
      * Flushes the possible buffer of the cache, which results in

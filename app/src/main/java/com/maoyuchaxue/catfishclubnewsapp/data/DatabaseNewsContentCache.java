@@ -29,10 +29,12 @@ public class DatabaseNewsContentCache implements NewsContentCache {
     }
 
     @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
+    public NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+        String id = metaInfo.getId();
+
         NewsContent newsContent = getNewsContentFromCache(id);
         if(newsContent == null)
-            newsContent = cacheNewsContent(id);
+            newsContent = cacheNewsContent(metaInfo);
         return newsContent;
     }
 @Override
@@ -72,8 +74,10 @@ public class DatabaseNewsContentCache implements NewsContentCache {
 
 
     @Override
-    public NewsContent cacheNewsContent(String id) throws NewsSourceException {
-        NewsContent updatedContent = frontSource.getNewsContent(id);
+    public NewsContent cacheNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+        String id = metaInfo.getId();
+
+        NewsContent updatedContent = frontSource.getNewsContent(metaInfo);
         writeNewsContentToDatabase(id, updatedContent);
 
         return updatedContent;

@@ -79,6 +79,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         metaInfo.setUrl(new URL(json.get("news_URL").getAsString()));
         metaInfo.setAuthor(json.get("news_Author").getAsString());
         metaInfo.setLang(json.get("lang_Type").getAsString());
+        metaInfo.setType(0);
 
         // parse the urls of the pictures
         String picStr = json.get("news_Pictures").getAsString().trim();

@@ -43,7 +43,8 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                         CacheDBOpenHelper.FIELD_TITLE,
                         CacheDBOpenHelper.FIELD_VIDEO,
                         CacheDBOpenHelper.FIELD_LANG,
-                        CacheDBOpenHelper.FIELD_AUTHOR
+                        CacheDBOpenHelper.FIELD_AUTHOR,
+                        CacheDBOpenHelper.FIELD_TYPE
                 },
                 selection,
                 selectionArgs,
@@ -86,6 +87,7 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                 metaInfo.setTitle(cursor.getString(6));
                 metaInfo.setLang(cursor.getString(8));
                 metaInfo.setAuthor(cursor.getString(9));
+                metaInfo.setType(cursor.getInt(10));
 
                 metaInfos.add(metaInfo);
             } while (cursor.moveToNext());

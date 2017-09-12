@@ -48,7 +48,7 @@ public class SourceNewsList implements NewsList {
             if(closed)
                 throw new NewsCursorClosedException();
             try {
-                return contentSource.getNewsContent(metaInfo.getId());
+                return contentSource.getNewsContent(metaInfo);
             } catch(Exception e){
                 e.printStackTrace();
             }

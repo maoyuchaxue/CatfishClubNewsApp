@@ -43,12 +43,14 @@ public class HistoryManager {
         }
 
         @Override
-        public NewsContent getNewsContent(String id) throws NewsSourceException {
+        public NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+//            String id = metaInfo.getId();
+
             SQLiteDatabase db = openHelper.getReadableDatabase();
             Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME, new String[]{CacheDBOpenHelper.FIELD_CONTENT_STR,
                             CacheDBOpenHelper.FIELD_JOURNALIST, CacheDBOpenHelper.FIELD_CATEGORY,
                             CacheDBOpenHelper.FIELD_CRAWL_SRC, CacheDBOpenHelper.FIELD_KEYWORDS}, CacheDBOpenHelper.FIELD_ID + "=?",
-                    new String[]{id}, null, null, null, null);
+                    new String[]{metaInfo.getId()}, null, null, null, null);
             NewsContent newsContent = null;
             if(cursor.moveToFirst()){ // found the record
                 String contentStr = cursor.getString(0);
@@ -72,7 +74,7 @@ public class HistoryManager {
             cursor.close();
 
             if(newsContent == null && frontSource != null){
-                newsContent = frontSource.getNewsContent(id);
+                newsContent = frontSource.getNewsContent(metaInfo);
             }
 
             return newsContent;
@@ -176,6 +178,7 @@ public class HistoryManager {
         change.put(CacheDBOpenHelper.FIELD_TITLE, metaInfo.getTitle());
         change.put(CacheDBOpenHelper.FIELD_CATEGORY_TAG, metaInfo.getCategoryTag().getIndex());
         change.put(CacheDBOpenHelper.FIELD_URL, metaInfo.getUrl().toString());
+        change.put(CacheDBOpenHelper.FIELD_TYPE, metaInfo.getType());
 
         StringBuilder pictureStr = new StringBuilder();
         first = true;

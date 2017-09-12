@@ -145,6 +145,7 @@ public class BookmarkManager {
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
 
         change.put(CacheDBOpenHelper.FIELD_ID, metaInfo.getId());
+        change.put(CacheDBOpenHelper.FIELD_TYPE, metaInfo.getType());
 
         long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
 

@@ -31,10 +31,10 @@ public class HybridNewsContentSource implements NewsContentSource {
     }
 
     @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
+    public NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
         // check the form of id
-        if(isUrl(id))
-            return sourceForUrl.getNewsContent(id);
-        return sourceForNonUrl.getNewsContent(id);
+        if(metaInfo.getType() == 0)
+            return sourceForUrl.getNewsContent(metaInfo);
+        return sourceForNonUrl.getNewsContent(metaInfo);
     }
 }

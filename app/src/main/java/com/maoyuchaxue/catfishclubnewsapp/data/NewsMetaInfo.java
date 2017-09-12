@@ -9,6 +9,7 @@ import java.net.URL;
 
 public class NewsMetaInfo implements Serializable{
     private NewsCategoryTag categoryTag;
+    private int type;
     private String id;
     private String srcSite;
     private String title;
@@ -137,5 +138,12 @@ public class NewsMetaInfo implements Serializable{
         this.intro = intro;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 }
 

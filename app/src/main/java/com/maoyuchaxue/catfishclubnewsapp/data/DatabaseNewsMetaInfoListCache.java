@@ -70,6 +70,7 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
         change.put(CacheDBOpenHelper.FIELD_VIDEO, metaInfo.getVideo() == null ? "" : metaInfo.getVideo().toString());
         change.put(CacheDBOpenHelper.FIELD_LANG, metaInfo.getLang());
         change.put(CacheDBOpenHelper.FIELD_SRC, metaInfo.getSrcSite());
+        change.put(CacheDBOpenHelper.FIELD_TYPE, metaInfo.getType());
 
 
         db.beginTransaction();

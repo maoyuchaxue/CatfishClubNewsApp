@@ -132,7 +132,9 @@ public class WebNewsContentSource implements NewsContentSource {
      *
      * */
     @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
+    public NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+        String id = metaInfo.getId();
+
         NewsContent content = null;
         try{
             URL url = new URL(buildDetailString(id));
