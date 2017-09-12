@@ -32,6 +32,7 @@ public class WebNewsContentSource implements NewsContentSource {
     private static final JsonParser JSON_PARSER = new JsonParser();
     private String apiUrl;
     private static final String ENTITY_LINK_PREFIX = "https://baike.baidu.com/item/";
+    private static final int KEYWORD_LIM = 3;
 
     private static final List<String> replaceStrings = Arrays.asList("。 ","？ ", "！ ", "… ", "\\. ", "\\? ", "\\! ", "” ", "— ", "\" ");
 
@@ -62,7 +63,11 @@ public class WebNewsContentSource implements NewsContentSource {
 
         content.setCrawlSource(json.get("crawl_Source").getAsString());
 //        content.setCrawTime(DATE_FORMAT.parse(json.get("crawl_Time").getAsString()));
-        content.setCategory(json.get("news_Category").getAsString());
+        try {
+            content.setCategory(json.get("news_Category").getAsString());
+        } catch(Exception e){
+            content.setCategory("");
+        }
         content.setJournalist(json.get("news_Journal").getAsString());
 
         String rawContent = json.get("news_Content").getAsString();
@@ -97,6 +102,19 @@ public class WebNewsContentSource implements NewsContentSource {
         }
         content.setContentStr(contentWithLinks.toString());
 
+        int i = 0;
+        JsonArray keywordArray = json.get("Keywords").getAsJsonArray();
+        ArrayList<String> keyList = new ArrayList<>();
+        for(JsonElement element : keywordArray){
+            if(i >= KEYWORD_LIM)
+                break;
+            JsonObject object = element.getAsJsonObject();
+            keyList.add(object.get("word").getAsString());
+
+            ++ i;
+        }
+        content.setKeywords(keyList.toArray(new String[0]));
+
         return content;
     }
 
@@ -122,6 +140,7 @@ public class WebNewsContentSource implements NewsContentSource {
         try{
             URL url = new URL(buildDetailString(id));
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             con.connect();
 

@@ -1,20 +1,28 @@
 package com.maoyuchaxue.catfishclubnewsapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
+import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,11 +37,15 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
+import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
+import com.maoyuchaxue.catfishclubnewsapp.fragments.SettingsFragment;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 public class MainActivity extends AppCompatActivity
@@ -49,7 +61,103 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private CategoryViewPagerAdapter mViewPagerAdapter;
     private SearchView mSearchView;
+    private DrawerLayout mDrawerLayout;
+    private MenuItem searchItem;
     private String globalKeyword = null;
+
+    public void testNetworkState() {
+        Context context = getApplicationContext();
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean networkAvailable = (networkInfo != null) && networkInfo.isAvailable();
+
+        boolean isOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getBoolean("offline_mode", false);
+        Log.i("offline", "is offline: " + String.valueOf(isOffline));
+
+        if (!networkAvailable && !isOffline) {
+            new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("没有网络")
+                    .setContentText("没有网络就不能访问新闻辣，要不要进入离线模式呢>_<")
+                    .setConfirmText("开启离线模式")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(final SweetAlertDialog sDialog) {
+                            PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                                    .edit().putBoolean("offline_mode", true).apply();
+
+                            sDialog
+                                    .setTitleText("没有网络")
+                                    .setContentText("已开启离线模式")
+                                    .setConfirmText("好的")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            refreshTabLayout();
+                                            sweetAlertDialog.dismissWithAnimation();
+                                        }
+                                    })
+                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    public boolean initNightMode() {
+
+        Boolean isNightMode = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("dark_style", false);
+
+        if (isNightMode) {
+            if (AppCompatDelegate.getDefaultNightMode() == -1 ||
+                    AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                MainActivity.this.recreate();
+                return false;
+            }
+        } else {
+            if (AppCompatDelegate.getDefaultNightMode() == -1 ||
+                    AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                MainActivity.this.recreate();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void initDrawerFragment() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        SettingsFragment fragment = new SettingsFragment();
+        getFragmentManager().beginTransaction().replace(R.id.setting_drawer, fragment).commit();
+
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            private boolean tempIsOffline;
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {}
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                tempIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean("offline_mode", false);
+                drawerView.setClickable(true);
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                boolean curIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean("offline_mode", false);
+                if (tempIsOffline != curIsOffline) {
+                    refreshTabLayout();
+                }
+            }
+            @Override
+            public void onDrawerStateChanged(int newState) {}
+        });
+        mDrawerLayout.closeDrawers();
+    }
 
     private void initActionBar() {
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_menu_toolbar);
@@ -62,11 +170,15 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = null;
                 switch (item.getItemId()) {
                     case R.id.main_menu_settings:
-                        intent = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivityForResult(intent, SETTINGS_ACTIVITY);
+//                        intent = new Intent(MainActivity.this, SettingsActivity.class);
+//                        startActivityForResult(intent, SETTINGS_ACTIVITY);
+                        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+                            mDrawerLayout.closeDrawers();
+                        } else {
+                            mDrawerLayout.openDrawer(Gravity.START);
+                        }
                         break;
                     case R.id.main_menu_search:
-
                         break;
                     case R.id.main_menu_bookmarks:
                         intent = new Intent(MainActivity.this, BookmarkListActivity.class);
@@ -91,7 +203,24 @@ public class MainActivity extends AppCompatActivity
         refreshTabLayout();
     }
 
+
     private void refreshTabLayout() {
+
+        Boolean isOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getBoolean("offline_mode", false);
+
+        Log.i("offline", String.valueOf(isOffline));
+
+        if (isOffline) {
+//            in offline mode, search view is meaningless
+            if (searchItem != null) {
+                if (searchItem.isActionViewExpanded()) {
+                    searchItem.collapseActionView();
+                }
+            }
+        }
+
+//        reset to the first tab, otherwise may crash when the focused category is removed
         mTabLayout.setCurrentTab(0);
 
         SharedPreferences sharedPreferences = getSharedPreferences("category", 0);
@@ -101,13 +230,15 @@ public class MainActivity extends AppCompatActivity
 
         if (globalKeyword != null)
             Log.i("catclub", globalKeyword);
-        fragments.add(NewsListFragment.newInstance("", globalKeyword, NewsListFragment.WEB_FRAGMENT));
+
+        int fragmentType = isOffline ? NewsListFragment.DATABASE_FRAGMENT : NewsListFragment.WEB_FRAGMENT;
+        fragments.add(NewsListFragment.newInstance("", globalKeyword, fragmentType));
         titles.add("综合");
 
         for (int i = 0; i < NewsCategoryTag.TITLES.length; i++) {
             boolean appears = sharedPreferences.getBoolean(NewsCategoryTag.TITLES_EN[i], true);
             if (appears) {
-                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, NewsListFragment.WEB_FRAGMENT));
+                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, fragmentType));
                 titles.add(NewsCategoryTag.TITLES[i]);
             }
         }
@@ -139,9 +270,17 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initActionBar();
-        initTabLayout();
-        initCategoryButton();
+        Log.i("offline", "created!");
+
+        if (initNightMode()) {
+//            if initNightMode returns false, then the activity is invalid.
+            initDrawerFragment();
+            initActionBar();
+            initTabLayout();
+            initCategoryButton();
+            testNetworkState();
+        }
+
     }
 
     @Override
@@ -154,11 +293,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.main_menu_search);
-
+        searchItem = menu.findItem(R.id.main_menu_search);
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean("offline_mode", false);
+                if (isOfflineMode) {
+                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("不能搜索>_<")
+                            .setContentText("离线模式下无法搜索的")
+                            .show();
+                    return false;
+                }
                 return true;
             }
 
@@ -205,6 +352,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     public void setKeywordForFragments(String keyword) {
         if (keyword == null) {
             globalKeyword = null;
@@ -216,5 +364,14 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         refreshTabLayout();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+            mDrawerLayout.closeDrawers();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

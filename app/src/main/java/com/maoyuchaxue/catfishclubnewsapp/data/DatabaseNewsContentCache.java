@@ -41,7 +41,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
         SQLiteDatabase db = openHelper.getReadableDatabase();
         Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME, new String[]{CacheDBOpenHelper.FIELD_CONTENT_STR,
                 CacheDBOpenHelper.FIELD_JOURNALIST, CacheDBOpenHelper.FIELD_CATEGORY,
-                CacheDBOpenHelper.FIELD_CRAWL_SRC}, CacheDBOpenHelper.FIELD_ID + "=?",
+                CacheDBOpenHelper.FIELD_CRAWL_SRC, CacheDBOpenHelper.FIELD_KEYWORDS}, CacheDBOpenHelper.FIELD_ID + "=?",
                 new String[]{id}, null, null, null, null);
         NewsContent newsContent = null;
         if(cursor.moveToFirst() && cursor.getString(0) != null){ // found the record
@@ -49,6 +49,9 @@ public class DatabaseNewsContentCache implements NewsContentCache {
             String journalist = cursor.getString(1);
             String category = cursor.getString(2);
             String crawSrc = cursor.getString(3);
+            String[] keys = cursor.getString(4).split(";");
+
+
             cursor.close();
 
 
@@ -58,6 +61,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
                 newsContent.setContentStr(contentStr);
                 newsContent.setCategory(category);
                 newsContent.setCrawlSource(crawSrc);
+                newsContent.setKeywords(keys);
             } catch(Exception e){
                 e.printStackTrace();
             }
@@ -97,6 +101,17 @@ public class DatabaseNewsContentCache implements NewsContentCache {
         change.put(CacheDBOpenHelper.FIELD_CRAWL_SRC, newsContent.getCrawlSource());
         change.put(CacheDBOpenHelper.FIELD_JOURNALIST, newsContent.getJournalist());
         change.put(CacheDBOpenHelper.FIELD_CONTENT_STR, newsContent.getContentStr());
+
+        // put the keys
+        boolean first = true;
+        StringBuilder keyList = new StringBuilder();
+        for(String key : newsContent.getKeywords()) {
+            if(!first)
+                keyList.append(';');
+            keyList.append(key);
+            first = false;
+        }
+        change.put(CacheDBOpenHelper.FIELD_KEYWORDS, keyList.toString());
 
         int affectedNo = db.update(CacheDBOpenHelper.NEWS_TABLE_NAME,
                 change,
