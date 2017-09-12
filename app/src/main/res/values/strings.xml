@@ -21,7 +21,7 @@
     <string name="pref_recommend_dia_title">推荐数量</string>
 
     <string name="cannot_load_content">似乎无法加载新闻……\n查看一下网络吧orz</string>
-
+    <string name="no_more_item">没有更多辣&#062;&#095;&#060; </string>
 
     <string-array name="pref_recommend_entries">
         <item>不推荐</item>

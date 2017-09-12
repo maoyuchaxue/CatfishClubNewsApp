@@ -54,6 +54,7 @@ public class NewsMetainfoRecyclerViewAdapter
 
     private static final int PICS_VIEW = 0;
     private static final int TEXT_ONLY_VIEW = 1;
+    private static final int FOOTER_VIEW = 2;
 
     public static interface OnRecyclerViewItemClickListener {
         void onItemClick(View view, NewsCursor cursor);
@@ -78,6 +79,10 @@ public class NewsMetainfoRecyclerViewAdapter
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.news_into_unit_layout, null);
                 viewHolder = new TextViewHolder(view);
                 break;
+            case FOOTER_VIEW:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.footer_unit_layout, null);
+                viewHolder = new FooterViewHolder(view);
+                break;
         }
         if (view != null) {
             view.setOnClickListener(this);
@@ -92,6 +97,10 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public int getItemViewType(int position) {
+        if (position >= cursors.size()) {
+            return FOOTER_VIEW;
+        }
+
         URL[] urls = cursors.get(position).getNewsMetaInfo().getPictures();
 
         Boolean isTextOnly = PreferenceManager.getDefaultSharedPreferences(context)
@@ -176,7 +185,7 @@ public class NewsMetainfoRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return cursors.size();
+        return cursors.size() + 1;
     }
 
     @Override
@@ -194,6 +203,9 @@ public class NewsMetainfoRecyclerViewAdapter
             if (titleView != null) {
                 introView = (TextView) v.findViewById(R.id.news_unit_pics_intro);
                 sourceView = (TextView) v.findViewById(R.id.news_unit_pics_source);
+            } else {
+//                is footer view
+                return;
             }
         }
 
@@ -287,7 +299,13 @@ public class NewsMetainfoRecyclerViewAdapter
         }
     }
 
-
+    private static class FooterViewHolder extends RecyclerView.ViewHolder {
+        public View view;
+        FooterViewHolder(View view) {
+            super(view);
+            this.view = view;
+        }
+    }
 
 }
 

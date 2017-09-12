@@ -207,7 +207,8 @@ public class NewsListFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        if (mAdapter.getItemCount() == 0) {
+        if (mAdapter.getItemCount() <= 1) {
+            // contains footer
             mSwipeRefreshLayout.setRefreshing(true);
             reloadFromBeginning();
         }
