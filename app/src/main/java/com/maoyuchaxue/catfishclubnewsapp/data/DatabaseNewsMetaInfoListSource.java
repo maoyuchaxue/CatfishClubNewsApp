@@ -85,7 +85,7 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                     metaInfo.setPictures(urls);
                 }
 
-                metaInfo.setCategoryTag(NewsCategoryTag.CATEGORIES[cursor.getInt(4)]);
+                metaInfo.setCategoryTag(NewsCategoryTag.CATEGORIES[cursor.getInt(4)-1]);
                 try {
                     metaInfo.setUrl(new URL(cursor.getString(5)));
                     metaInfo.setVideo(new URL(cursor.getString(7)));
