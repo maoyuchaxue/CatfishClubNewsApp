@@ -2,7 +2,6 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.constraint.solver.Cache;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -39,11 +38,11 @@ public class DatabaseNewsMetaInfoListCache implements NewsMetaInfoListCache {
 
     @Override
     public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword,
-                                                                     NewsCategoryTag category)
+                                                                     NewsCategoryTag category, int type)
             throws NewsSourceException {
         // does the simple job of delegating the task to the front source
         Pair<NewsMetaInfo[], Integer> res =
-                frontSrc.getNewsMetaInfoListByPageNo(pageNo, keyword, category);
+                frontSrc.getNewsMetaInfoListByPageNo(pageNo, keyword, category, -1);
         // and maintains the record in a cache
 
         for(NewsMetaInfo metaInfo : res.first)

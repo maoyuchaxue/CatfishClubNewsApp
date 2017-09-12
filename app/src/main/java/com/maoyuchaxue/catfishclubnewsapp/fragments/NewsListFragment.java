@@ -87,6 +87,7 @@ public class NewsListFragment extends Fragment
     private Loader<List<NewsCursor>> mLoader;
     private NewsList newsList;
     private NewsCategoryTag tag;
+    private int type;
     private NewsCursor mCursor;
 
     private View mView = null;
@@ -135,6 +136,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void initWebFragment() {
+        type = 0;
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         if (keyword != null) {
             mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
@@ -144,10 +146,14 @@ public class NewsListFragment extends Fragment
     }
 
     private void initDatabaseFragment() {
+        if(category.equals("rss"))
+            type = 1;
+        else
+            type = -1;
         tag = NewsCategoryTag.getCategoryByTitleEN(category);
         HistoryManager historyManager = HistoryManager.getInstance(CacheDBOpenHelper
                 .getInstance(getContext().getApplicationContext()));
-        mMetaInfoListSource = historyManager.getNewsMetaInfoListSource();
+        mMetaInfoListSource = historyManager.getNewsMetaInfoListSource(type);
     }
 
     private void initBookmarkFragment() {
@@ -157,6 +163,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void initRSSFragment(){
+        type = 0;
         try {
             mMetaInfoListSource = RSSManager.
                     getInstance(CacheDBOpenHelper.getInstance(getContext().
@@ -240,7 +247,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void resetNewsList() {
-        newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag);
+        newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag, type);
         mNewsListRecyclerViewListener.setFinished(false);
         mNewsListRecyclerViewListener.setFirstBatchLoaded(false);
         mAdapter.clear();

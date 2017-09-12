@@ -131,7 +131,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
     @Override
     public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword,
-                                                                     NewsCategoryTag category) throws NewsSourceException {
+                                                                     NewsCategoryTag category, int type) throws NewsSourceException {
         NewsMetaInfo[] list = null;
         int st = 0;
         try {

@@ -3,13 +3,8 @@ package com.maoyuchaxue.catfishclubnewsapp.data.rss;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.constraint.solver.Cache;
 
-import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
-import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsMetaInfoListSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
-import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
-import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfoListSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
@@ -68,7 +63,7 @@ public class RSSManager {
     private class RSSNewsMetaInfoListSource implements NewsMetaInfoListSource{
         private static final int PAGE_SIZE = 20;
         @Override
-        public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
+        public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category, int type) throws NewsSourceException {
             return getNewsMetaInfoListByIndex(newsMetaInfos.size() - PAGE_SIZE * (pageNo - 1) - 1,
                     keyword,
                     category);

@@ -120,19 +120,19 @@ public class NewsViewFragment extends Fragment
 //               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
 //        );
 
-        NewsContentSource frontSource = null;
+        NewsContentSource webSource = null, webPageSource = null;
         Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getBoolean("offline_mode", false);
 
 //        if offline, front src should be set to null to prevent network connection
         if (!isOfflineMode) {
-            frontSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+            webSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+            webPageSource = new WebPageNewsContentSource();
         }
 
         contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
                 getInstance(getContext().getApplicationContext())).getNewsContentSource(
-                new HybridNewsContentSource(new WebNewsContentSource(frontSource,
-                        new WebPageNewsContentSource())));
+                new HybridNewsContentSource(webSource, webPageSource));
 //        contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
 //                getInstance(getContext().getApplicationContext())).getNewsContentSource(
 //               new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
@@ -219,7 +219,8 @@ public class NewsViewFragment extends Fragment
 
         String recommendLimit = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("recommend_limit", "5");
-        int recommend = Integer.parseInt(recommendLimit);
+        int recommend = metaInfo.getType() == 1 ? 0 :
+                Integer.parseInt(recommendLimit);
         if (recommend > 0) {
             mAdapter.startRecommendLoading(data, recommend);
             mListView.setOnItemClickListener(mAdapter);

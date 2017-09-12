@@ -4,13 +4,8 @@ package com.maoyuchaxue.catfishclubnewsapp.data;
 import android.util.SparseArray;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Queue;
-import java.util.Random;
 
-import javax.xml.transform.Source;
+import java.util.Random;
 
 /**
  * Created by YU_Jason on 2017/9/5.
@@ -19,7 +14,7 @@ import javax.xml.transform.Source;
 public class SourceNewsList implements NewsList {
     private static final int LOOKUP_LIM = 3;
     private boolean sourceReversed;
-    private int nextD, previousD;
+    private int nextD, previousD, type;
 
 
     private class SourceNewsCursor implements NewsCursor{
@@ -161,15 +156,16 @@ public class SourceNewsList implements NewsList {
 
     public SourceNewsList(NewsMetaInfoListSource metaInfoSource,
                           NewsContentSource contentSource){
-        this(metaInfoSource, contentSource, null, null);
+        this(metaInfoSource, contentSource, null, null, -1);
 //        this.metaInfoSource = metaInfoSource;
 //        this.contentSource = contentSource;
     }
 
     public SourceNewsList(NewsMetaInfoListSource metaInfoSource,
                           NewsContentSource contentSource,
-                          String keyword, NewsCategoryTag newsCategoryTag){
+                          String keyword, NewsCategoryTag newsCategoryTag, int type){
 
+        this.type = type;
         this.metaInfoSource = metaInfoSource;
         this.contentSource = contentSource;
         this.keyword = keyword;
@@ -233,7 +229,7 @@ public class SourceNewsList implements NewsList {
     public NewsCursor getHeadCursor() {
         try {
             Pair<NewsMetaInfo[], Integer> res =
-                    metaInfoSource.getNewsMetaInfoListByPageNo(1, keyword, categoryTag);
+                    metaInfoSource.getNewsMetaInfoListByPageNo(1, keyword, categoryTag, type);
             for(int i = 0, cur = res.second; i < res.first.length; i ++, cur += nextD) {
                 SourceNewsCursor cursor = new SourceNewsCursor(cur, res.first[i], 1);
                 if(i == 0)
@@ -265,7 +261,7 @@ public class SourceNewsList implements NewsList {
             Pair<NewsMetaInfo[], Integer> res = null;
             for(int t = 0; t < LOOKUP_LIM; t ++) {
                 res =
-                        metaInfoSource.getNewsMetaInfoListByPageNo(nPage, keyword, categoryTag);
+                        metaInfoSource.getNewsMetaInfoListByPageNo(nPage, keyword, categoryTag, type);
                 // compute the index range of the page
                 int lo = res.second + nextD * res.first.length;
                 int hi = res.second;

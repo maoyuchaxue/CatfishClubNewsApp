@@ -8,6 +8,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
 
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,12 +21,16 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
     protected abstract CacheDBOpenHelper getOpenHelper();
     protected abstract String getTableName();
 
+//    protected abstract int getType();
+
     @Override
-    public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException {
+    public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category, int type) throws NewsSourceException {
         SQLiteDatabase db = getOpenHelper().getReadableDatabase();
 
-        String selection = null;
-        String[] selectionArgs = null;
+//        int type = getType();
+
+        String selection = "";
+        ArrayList<String> selectionArgs = new ArrayList<>();
 
         if (category == null) {
             Log.i("offline", "null");
@@ -33,11 +38,19 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
             Log.i("offline", category.toString());
         }
 
+        boolean first = true;
         if(category != null){
-            selection = CacheDBOpenHelper.FIELD_CATEGORY_TAG + "=?";
-            selectionArgs = new String[]{
+            selection += (first ? "" : " and " )+ CacheDBOpenHelper.FIELD_CATEGORY_TAG + "=?";
+            first = false;
+            selectionArgs.add(
                     Integer.toString(category.getIndex())
-            };
+            );
+        }
+
+        if(type != -1){
+            selection += (first ? "" : " and ") + CacheDBOpenHelper.FIELD_TYPE + "=?";
+            first = false;
+            selectionArgs.add(Integer.toString(type));
         }
 
         String order = "rowid desc";
@@ -57,7 +70,7 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                         CacheDBOpenHelper.FIELD_TYPE
                 },
                 selection,
-                selectionArgs,
+                selectionArgs.toArray(new String[0]),
                 null,
                 null,
                 order,
@@ -86,7 +99,9 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                     metaInfo.setPictures(urls);
                 }
 
-                metaInfo.setCategoryTag(NewsCategoryTag.CATEGORIES[cursor.getInt(4)-1]);
+                int catInt = cursor.getInt(4);
+                metaInfo.setCategoryTag(catInt == 0 ? null :
+                        NewsCategoryTag.CATEGORIES[catInt - 1]);
                 try {
                     metaInfo.setUrl(new URL(cursor.getString(5)));
                     metaInfo.setVideo(new URL(cursor.getString(7)));

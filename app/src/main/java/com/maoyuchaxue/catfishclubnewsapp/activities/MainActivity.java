@@ -245,7 +245,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        fragments.add(NewsListFragment.newInstance("", globalKeyword, NewsListFragment.RSS_FRAGMENT));
+        fragments.add(NewsListFragment.newInstance("rss", globalKeyword, isOffline ? NewsListFragment.DATABASE_FRAGMENT :
+                NewsListFragment.RSS_FRAGMENT));
         titles.add("订阅");
 
         String[] mtitles = new String[titles.size()];

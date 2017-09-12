@@ -28,6 +28,11 @@ public class BookmarkManager {
     private class BookmarkNewsMetaInfoListSource extends DatabaseNewsMetaInfoListSource{
         private static final int PAGE_SIZE = 20;
 
+//        @Override
+//        protected int getType(){
+//            return -1;
+//        }
+
         @Override
         protected String getTableName(){
             return CacheDBOpenHelper.BOOKMARK_TABLE_NAME;

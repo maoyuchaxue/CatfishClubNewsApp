@@ -83,6 +83,16 @@ public class HistoryManager {
 
     private class HistoryMetaInfoListSource extends DatabaseNewsMetaInfoListSource{
         private static final int PAGE_SIZE = 20;
+//        private int type;
+//
+//        HistoryMetaInfoListSource(int type){
+//            this.type = type;
+//        }
+//
+//        @Override
+//        protected int getType(){
+//            return type;
+//        }
 
         @Override
         protected String getTableName(){
@@ -146,7 +156,7 @@ public class HistoryManager {
         return new HistoryNewsContentSource(frontSource);
     }
 
-    public NewsMetaInfoListSource getNewsMetaInfoListSource(){
+    public NewsMetaInfoListSource getNewsMetaInfoListSource(int type){
         if(metaInfoListSource == null)
             metaInfoListSource = new HistoryMetaInfoListSource();
         return metaInfoListSource;
