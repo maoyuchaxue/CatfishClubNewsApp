@@ -54,6 +54,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
         if(category != null)
             queryStr.append("&category=" + category.getIndex());
 
+        Log.i("recommend", queryStr.toString());
 //        System.out.println(queryStr);
         return queryStr.toString();
     }
@@ -138,6 +139,7 @@ public class WebNewsMetaInfoListSource implements NewsMetaInfoListSource {
 
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             con.connect();
 

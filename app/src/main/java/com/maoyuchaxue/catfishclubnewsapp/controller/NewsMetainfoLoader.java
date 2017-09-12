@@ -55,7 +55,7 @@ public class NewsMetainfoLoader extends AsyncTaskLoader<List<NewsCursor>> {
             curCursor = curCursor.next();
         }
 
-        Log.i("mloader", String.valueOf(cursors.size()));
+        Log.i("recommend", String.valueOf(cursors.size()));
         return cursors;
     }
 

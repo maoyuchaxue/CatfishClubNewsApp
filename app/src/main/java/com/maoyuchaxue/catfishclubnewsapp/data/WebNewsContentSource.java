@@ -64,7 +64,11 @@ public class WebNewsContentSource implements NewsContentSource {
         // FIXME: 2017/9/11 check how to deal with the possible exceptions
         content.setCrawlSource(json.get("crawl_Source").getAsString());
 //        content.setCrawTime(DATE_FORMAT.parse(json.get("crawl_Time").getAsString()));
-        content.setCategory(json.get("news_Category").getAsString());
+        try {
+            content.setCategory(json.get("news_Category").getAsString());
+        } catch(Exception e){
+            content.setCategory("");
+        }
         content.setJournalist(json.get("news_Journal").getAsString());
 
         String rawContent = json.get("news_Content").getAsString();
@@ -139,6 +143,7 @@ public class WebNewsContentSource implements NewsContentSource {
         try{
             URL url = new URL(buildDetailString(id));
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             con.connect();
 

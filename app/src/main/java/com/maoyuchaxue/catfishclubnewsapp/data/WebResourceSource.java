@@ -27,6 +27,7 @@ public class WebResourceSource extends ResourceSource {
     @Override
     public byte[] getAsBlob(URL url) throws IOException{
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.setConnectTimeout(5000);
         con.setRequestMethod("GET");
 
         BufferedInputStream inputStream = new BufferedInputStream(con.getInputStream());

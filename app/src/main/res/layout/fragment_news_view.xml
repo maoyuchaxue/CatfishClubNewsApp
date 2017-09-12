@@ -32,6 +32,7 @@
         android:layout_marginBottom="10dp"/>
 
     <LinearLayout
+        android:id="@+id/news_view_content_layout"
         android:layout_width="fill_parent"
         android:layout_below="@+id/news_view_author"
         android:layout_height="fill_parent"
@@ -42,6 +43,20 @@
             android:layout_height="match_parent"
             android:footerDividersEnabled="false"
             android:divider="@null">
+        </ListView>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/recommend_layout"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/news_view_content_layout"
+        android:layout_height="fill_parent"
+        >
+        <ListView
+            android:id="@+id/recommend_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         </ListView>
     </LinearLayout>
 

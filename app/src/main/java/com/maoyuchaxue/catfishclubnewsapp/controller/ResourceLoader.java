@@ -25,6 +25,8 @@ public class ResourceLoader extends AsyncTaskLoader<Bitmap> {
         this.thumbnail = thumbnail;
     }
 
+    public URL getUrl() { return url; }
+
     @Override
     public Bitmap loadInBackground() {
         Bitmap resource = null;
