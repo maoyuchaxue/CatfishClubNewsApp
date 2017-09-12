@@ -1,9 +1,13 @@
 package com.maoyuchaxue.catfishclubnewsapp.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -61,7 +65,47 @@ public class MainActivity extends AppCompatActivity
     private MenuItem searchItem;
     private String globalKeyword = null;
 
-    public void initNightMode() {
+    public void testNetworkState() {
+        Context context = getApplicationContext();
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean networkAvailable = (networkInfo != null) && networkInfo.isAvailable();
+
+        boolean isOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getBoolean("offline_mode", false);
+        Log.i("offline", "is offline: " + String.valueOf(isOffline));
+
+        if (!networkAvailable && !isOffline) {
+            new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("没有网络")
+                    .setContentText("没有网络就不能访问新闻辣，要不要进入离线模式呢>_<")
+                    .setConfirmText("开启离线模式")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(final SweetAlertDialog sDialog) {
+                            PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                                    .edit().putBoolean("offline_mode", true).apply();
+
+                            sDialog
+                                    .setTitleText("没有网络")
+                                    .setContentText("已开启离线模式")
+                                    .setConfirmText("好的")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                            refreshTabLayout();
+                                            sweetAlertDialog.dismissWithAnimation();
+                                        }
+                                    })
+                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    public boolean initNightMode() {
 
         Boolean isNightMode = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("dark_style", false);
@@ -71,14 +115,17 @@ public class MainActivity extends AppCompatActivity
                     AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 MainActivity.this.recreate();
+                return false;
             }
         } else {
             if (AppCompatDelegate.getDefaultNightMode() == -1 ||
                     AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 MainActivity.this.recreate();
+                return false;
             }
         }
+        return true;
     }
 
     public void initDrawerFragment() {
@@ -223,11 +270,17 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initNightMode();
-        initDrawerFragment();
-        initActionBar();
-        initTabLayout();
-        initCategoryButton();
+        Log.i("offline", "created!");
+
+        if (initNightMode()) {
+//            if initNightMode returns false, then the activity is invalid.
+            initDrawerFragment();
+            initActionBar();
+            initTabLayout();
+            initCategoryButton();
+            testNetworkState();
+        }
+
     }
 
     @Override
