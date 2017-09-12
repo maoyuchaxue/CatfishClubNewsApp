@@ -33,12 +33,15 @@ import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
+import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.SettingsFragment;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 public class MainActivity extends AppCompatActivity
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private CategoryViewPagerAdapter mViewPagerAdapter;
     private SearchView mSearchView;
     private DrawerLayout mDrawerLayout;
+    private MenuItem searchItem;
     private String globalKeyword = null;
 
     public void initNightMode() {
@@ -84,14 +88,24 @@ public class MainActivity extends AppCompatActivity
         getFragmentManager().beginTransaction().replace(R.id.setting_drawer, fragment).commit();
 
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            private boolean tempIsOffline;
+
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {}
             @Override
             public void onDrawerOpened(View drawerView) {
+                tempIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean("offline_mode", false);
                 drawerView.setClickable(true);
             }
             @Override
-            public void onDrawerClosed(View drawerView) {}
+            public void onDrawerClosed(View drawerView) {
+                boolean curIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean("offline_mode", false);
+                if (tempIsOffline != curIsOffline) {
+                    refreshTabLayout();
+                }
+            }
             @Override
             public void onDrawerStateChanged(int newState) {}
         });
@@ -142,7 +156,24 @@ public class MainActivity extends AppCompatActivity
         refreshTabLayout();
     }
 
+
     private void refreshTabLayout() {
+
+        Boolean isOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                .getBoolean("offline_mode", false);
+
+        Log.i("offline", String.valueOf(isOffline));
+
+        if (isOffline) {
+//            in offline mode, search view is meaningless
+            if (searchItem != null) {
+                if (searchItem.isActionViewExpanded()) {
+                    searchItem.collapseActionView();
+                }
+            }
+        }
+
+//        reset to the first tab, otherwise may crash when the focused category is removed
         mTabLayout.setCurrentTab(0);
 
         SharedPreferences sharedPreferences = getSharedPreferences("category", 0);
@@ -152,13 +183,15 @@ public class MainActivity extends AppCompatActivity
 
         if (globalKeyword != null)
             Log.i("catclub", globalKeyword);
-        fragments.add(NewsListFragment.newInstance("", globalKeyword, NewsListFragment.WEB_FRAGMENT));
+
+        int fragmentType = isOffline ? NewsListFragment.DATABASE_FRAGMENT : NewsListFragment.WEB_FRAGMENT;
+        fragments.add(NewsListFragment.newInstance("", globalKeyword, fragmentType));
         titles.add("综合");
 
         for (int i = 0; i < NewsCategoryTag.TITLES.length; i++) {
             boolean appears = sharedPreferences.getBoolean(NewsCategoryTag.TITLES_EN[i], true);
             if (appears) {
-                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, NewsListFragment.WEB_FRAGMENT));
+                fragments.add(NewsListFragment.newInstance(NewsCategoryTag.TITLES_EN[i], globalKeyword, fragmentType));
                 titles.add(NewsCategoryTag.TITLES[i]);
             }
         }
@@ -207,11 +240,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.main_menu_search);
-
+        searchItem = menu.findItem(R.id.main_menu_search);
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean("offline_mode", false);
+                if (isOfflineMode) {
+                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("不能搜索>_<")
+                            .setContentText("离线模式下无法搜索的")
+                            .show();
+                    return false;
+                }
                 return true;
             }
 
@@ -257,6 +298,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
     }
+
 
     public void setKeywordForFragments(String keyword) {
         if (keyword == null) {

@@ -8,4 +8,5 @@
     <color name="colorLine">#000000</color>
     <color name="colorBasicBackground">#FFFFFF</color>
     <color name="colorBasicText">#000000</color>
+    <color name="colorIcon">#FFFFFF</color>
 </resources>

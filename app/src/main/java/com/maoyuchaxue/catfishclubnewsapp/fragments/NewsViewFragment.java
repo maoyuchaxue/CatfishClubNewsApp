@@ -117,10 +117,20 @@ public class NewsViewFragment extends Fragment
 //                CacheDBOpenHelper.getInstance(getContext().getApplicationContext())
 //               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
 //        );
+
+        NewsContentSource frontSource = null;
+        Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(getContext())
+                .getBoolean("offline_mode", false);
+
+//        if offline, front src should be set to null to prevent network connection
+        if (!isOfflineMode) {
+            frontSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+        }
+
         contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
-                getInstance(getContext().getApplicationContext())).getNewsContentSource(
-               new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
-        );
+                getInstance(getContext().getApplicationContext())).
+                getNewsContentSource(frontSource);
+
         if (getArguments() != null) {
             newsID = getArguments().getString(ARG_NEWS_ID);
             title = getArguments().getString(ARG_TITLE);
@@ -200,6 +210,7 @@ public class NewsViewFragment extends Fragment
         mAdapter.startRecommendLoading(data, 5);
         mListView.setOnItemClickListener(mAdapter);
         mAdapter.setOnClickNewsListener(this);
+
 
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).

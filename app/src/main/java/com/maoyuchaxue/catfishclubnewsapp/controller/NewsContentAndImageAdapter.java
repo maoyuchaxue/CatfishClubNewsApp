@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.controller;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -284,6 +285,14 @@ public class NewsContentAndImageAdapter extends BaseAdapter
     }
 
     public void startRecommendLoading(NewsContent content, int limit) {
+        Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("offline_mode", false);
+
+        if (isOfflineMode) {
+//            if offline, no recommendation is needed
+            return;
+        }
+
         Log.i("recommend", "start loading");
         NewsMetaInfoListSource listSource = new WebNewsMetaInfoListSource(
                 "http://166.111.68.66:2042/news/action/query/search");
