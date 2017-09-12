@@ -287,6 +287,7 @@ public class NewsViewFragment extends Fragment
         }
 
         speechSynthesizer.startSpeaking(speakContent, new SynthesizerListener() {
+
             @Override
             public void onSpeakBegin() {
 
@@ -334,6 +335,10 @@ public class NewsViewFragment extends Fragment
     @Override
     public void onClickNews(NewsCursor cursor) {
         activity.onClickNews(cursor);
+    }
+
+    public NewsMetaInfo getNewsMetaInfo(){
+        return metaInfo;
     }
 
 }

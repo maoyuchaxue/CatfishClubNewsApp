@@ -74,6 +74,8 @@ class RSSFeedHandler extends DefaultHandler {
                 channelMetaInfo.setLink(s);
             else if(currentElement.equalsIgnoreCase("description"))
                 channelMetaInfo.setDescription(s);
+            else if(currentElement.equalsIgnoreCase("language"))
+                channelMetaInfo.setLanguage(s);
         }
     }
 

@@ -137,11 +137,13 @@ public class RSSManager {
         con.disconnect();
 
 //        SQLiteDatabase db = openHelper.getWritableDatabase();
+        ChannelMetaInfo channelMetaInfo = handler.getChannelMetaInfo();
 
         for(NewsMetaInfo metaInfo : handler.getNewsMetaInfoList()){
             if(metaInfo.getId() == null)
                 metaInfo.setId(metaInfo.getUrl().toString());
             metaInfo.setType(1);
+            metaInfo.setLang(channelMetaInfo.getLanguage());
 
             String id = metaInfo.getId();
             if(idSet.contains(id))
@@ -185,7 +187,8 @@ public class RSSManager {
 //            long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
 //        }
 
-        return handler.getChannelMetaInfo();
+//        return handler.getChannelMetaInfo();
+        return channelMetaInfo;
     }
 
     /**

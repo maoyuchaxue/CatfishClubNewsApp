@@ -33,7 +33,6 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 public class NewsViewActivity extends AppCompatActivity implements View.OnClickListener {
-
     private static final int NEWS_VIEW_ACTIVITY = 0;
 
     private SpeechSynthesizer mTts;
@@ -45,11 +44,12 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
     private Intent resultIntent;
 
-    private void initSynthesizer() {
-        SpeechUtility.createUtility(NewsViewActivity.this, SpeechConstant.APPID +"=59b0c3fb");
+    private boolean isEnglish(){
+        return newsViewFragment.getNewsMetaInfo().getLang().toLowerCase().contains("en");
+    }
 
-        mTts = SpeechSynthesizer.createSynthesizer(NewsViewActivity.this, ini);
-        mTts.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");//设置发音人
+    private void initSynthesizer() {
+        mTts.setParameter(SpeechConstant.VOICE_NAME, isEnglish() ? "henry" : "xiaoyan");//设置发音人
         mTts.setParameter(SpeechConstant.SPEED, "50");//设置语速
         mTts.setParameter(SpeechConstant.VOLUME, "80");//设置音量，范围0~100
         mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD); //设置云端
@@ -59,10 +59,13 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SpeechUtility.createUtility(NewsViewActivity.this, SpeechConstant.APPID +"=59b0c3fb");
+        mTts = SpeechSynthesizer.createSynthesizer(NewsViewActivity.this, ini);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
         resultIntent = new Intent();
         resultIntent.putExtra("is_bookmark_modified", false);
 
-        initSynthesizer();
 
         setContentView(R.layout.activity_news_view);
 
@@ -70,7 +73,6 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
         NewsMetaInfo metaInfo = (NewsMetaInfo)intent.getSerializableExtra("meta_info");
 
         newsViewFragment = NewsViewFragment.newInstance(this, mTts, metaInfo);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         transaction.replace(R.id.news_view, newsViewFragment);
         transaction.commit();
@@ -132,6 +134,8 @@ public class NewsViewActivity extends AppCompatActivity implements View.OnClickL
 
             }
         });
+
+        initSynthesizer();
 
 
     }
