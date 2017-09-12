@@ -35,12 +35,14 @@ import com.maoyuchaxue.catfishclubnewsapp.controller.RecommendListViewAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
+import com.maoyuchaxue.catfishclubnewsapp.data.HybridNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.WebNewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
+import com.maoyuchaxue.catfishclubnewsapp.data.rss.WebPageNewsContentSource;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -57,7 +59,7 @@ public class NewsViewFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<NewsContent>,
         NewsContentAndImageAdapter.OnClickNewsListener {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_NEWS_ID = "news_id";
+    private static final String ARG_NEWS_META_INFO = "metaInfo";
     private static final String ARG_TITLE = "title";
 
     private NewsViewActivity activity;
@@ -87,21 +89,21 @@ public class NewsViewFragment extends Fragment
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param newsID ID of the news shown.
+     * @param newsMetaInfo meta info of the news shown.
      * @return A new instance of fragment NewsViewFragment.
      */
 
-    public static NewsViewFragment newInstance(String newsID, String title) {
+    public static NewsViewFragment newInstance(NewsMetaInfo newsMetaInfo, String title) {
         NewsViewFragment fragment = new NewsViewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_NEWS_ID, newsID);
+        args.putSerializable(ARG_NEWS_META_INFO, newsMetaInfo);
         args.putString(ARG_TITLE, title);
         fragment.setArguments(args);
         return fragment;
     }
 
     public static NewsViewFragment newInstance(NewsViewActivity activity, SpeechSynthesizer speechSynthesizer, NewsMetaInfo metaInfo){
-        NewsViewFragment instance = newInstance(metaInfo.getId(), metaInfo.getTitle());
+        NewsViewFragment instance = newInstance(metaInfo, metaInfo.getTitle());
         instance.activity = activity;
         instance.metaInfo = metaInfo;
         instance.speechSynthesizer = speechSynthesizer;
@@ -118,21 +120,25 @@ public class NewsViewFragment extends Fragment
 //               , new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
 //        );
 
-        NewsContentSource frontSource = null;
+        NewsContentSource webSource = null, webPageSource = null;
         Boolean isOfflineMode = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getBoolean("offline_mode", false);
 
 //        if offline, front src should be set to null to prevent network connection
         if (!isOfflineMode) {
-            frontSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+            webSource = new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail");
+            webPageSource = new WebPageNewsContentSource();
         }
 
         contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
-                getInstance(getContext().getApplicationContext())).
-                getNewsContentSource(frontSource);
-
+                getInstance(getContext().getApplicationContext())).getNewsContentSource(
+                new HybridNewsContentSource(webSource, webPageSource));
+//        contentSource = HistoryManager.getInstance(CacheDBOpenHelper.
+//                getInstance(getContext().getApplicationContext())).getNewsContentSource(
+//               new WebNewsContentSource("http://166.111.68.66:2042/news/action/query/detail")
+//        );
         if (getArguments() != null) {
-            newsID = getArguments().getString(ARG_NEWS_ID);
+            metaInfo = (NewsMetaInfo)getArguments().getSerializable(ARG_NEWS_META_INFO);
             title = getArguments().getString(ARG_TITLE);
         }
 
@@ -147,7 +153,6 @@ public class NewsViewFragment extends Fragment
 
         mListView = (ListView) homeView.findViewById(R.id.news_view_content);
         mListView.setAdapter(mAdapter);
-
 
         Bundle args = new Bundle();
         mLoader = getLoaderManager().initLoader(NEWS_CONTENT_LOADER_ID, args, this);
@@ -174,7 +179,7 @@ public class NewsViewFragment extends Fragment
 
     @Override
     public Loader<NewsContent> onCreateLoader(int id, Bundle args) {
-        return new NewsContentLoader(this.getContext(), newsID, contentSource);
+        return new NewsContentLoader(this.getContext(), metaInfo, contentSource);
     }
 
     @Override
@@ -214,7 +219,8 @@ public class NewsViewFragment extends Fragment
 
         String recommendLimit = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("recommend_limit", "5");
-        int recommend = Integer.parseInt(recommendLimit);
+        int recommend = metaInfo.getType() == 1 ? 0 :
+                Integer.parseInt(recommendLimit);
         if (recommend > 0) {
             mAdapter.startRecommendLoading(data, recommend);
             mListView.setOnItemClickListener(mAdapter);

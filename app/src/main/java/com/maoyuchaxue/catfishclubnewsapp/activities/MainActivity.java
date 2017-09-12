@@ -36,10 +36,12 @@ import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
+import com.maoyuchaxue.catfishclubnewsapp.data.rss.RSSManager;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.SettingsFragment;
 
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -243,6 +245,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        fragments.add(NewsListFragment.newInstance("rss", globalKeyword, isOffline ? NewsListFragment.DATABASE_FRAGMENT :
+                NewsListFragment.RSS_FRAGMENT));
+        titles.add("订阅");
+
         String[] mtitles = new String[titles.size()];
         Object[] mobjs = titles.toArray();
         for (int i = 0; i < titles.size(); i++) {
@@ -281,6 +287,13 @@ public class MainActivity extends AppCompatActivity
             testNetworkState();
         }
 
+        // for testing
+        try{
+            RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext())).addRSSFeed(
+                    new URL("http://feeds.bbci.co.uk/news/world/rss.xml"));
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

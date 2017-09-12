@@ -8,5 +8,5 @@ import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 public interface NewsContentSource {
     void close() throws NewsSourceException;
-    NewsContent getNewsContent(String id) throws NewsSourceException;
+    NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException;
 }

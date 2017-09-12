@@ -43,6 +43,7 @@ public class NewsMetainfoLoader extends AsyncTaskLoader<List<NewsCursor>> {
         List<NewsCursor> cursors = new ArrayList<NewsCursor>();
 
         if (curCursor == null && !finished) {
+            newsList.refresh();
             curCursor = newsList.getHeadCursor();
         }
         for (int i = 0; i < loadBatch; i++) {

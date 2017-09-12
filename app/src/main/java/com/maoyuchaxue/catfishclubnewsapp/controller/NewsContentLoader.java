@@ -6,6 +6,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import com.maoyuchaxue.catfishclubnewsapp.ApplicationState;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
 
 import java.util.List;
@@ -15,12 +16,12 @@ import java.util.List;
  */
 
 public class NewsContentLoader extends AsyncTaskLoader<NewsContent> {
-    private String newsID;
+    private NewsMetaInfo newsMetaInfo;
     private NewsContentSource contentSource;
 
-    public NewsContentLoader(Context context, String newsID, NewsContentSource contentSource) {
+    public NewsContentLoader(Context context, NewsMetaInfo newsMetaInfo, NewsContentSource contentSource) {
         super(context);
-        this.newsID = newsID;
+        this.newsMetaInfo = newsMetaInfo;
         this.contentSource = contentSource;
     }
 
@@ -28,7 +29,7 @@ public class NewsContentLoader extends AsyncTaskLoader<NewsContent> {
     public NewsContent loadInBackground() {
         NewsContent content = null;
         try {
-            content = contentSource.getNewsContent(newsID);
+            content = contentSource.getNewsContent(newsMetaInfo);
         } catch (NewsSourceException e) {
         }
         return content;

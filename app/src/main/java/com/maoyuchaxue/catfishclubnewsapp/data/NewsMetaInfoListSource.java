@@ -17,8 +17,8 @@ public interface NewsMetaInfoListSource {
      * @param keyword The keyword in news titles to be queried. If <code>null</code> is given,
      *                no restriction in news titles shall be assumed.
      * @param category The category tag to be queried. If <code>null</code> is given,
- *                 no restriction in the category tag of the news shall be assumed.  */
-    Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category) throws NewsSourceException;
+     * @param type  */
+    Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByPageNo(int pageNo, String keyword, NewsCategoryTag category, int type) throws NewsSourceException;
     Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException;
     boolean isReversed();
 

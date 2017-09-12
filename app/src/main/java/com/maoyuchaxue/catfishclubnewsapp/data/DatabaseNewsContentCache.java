@@ -29,14 +29,15 @@ public class DatabaseNewsContentCache implements NewsContentCache {
     }
 
     @Override
-    public NewsContent getNewsContent(String id) throws NewsSourceException {
+    public NewsContent getNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+        String id = metaInfo.getId();
+
         NewsContent newsContent = getNewsContentFromCache(id);
         if(newsContent == null)
-            newsContent = cacheNewsContent(id);
+            newsContent = cacheNewsContent(metaInfo);
         return newsContent;
     }
-
-    @Override
+@Override
     public NewsContent getNewsContentFromCache(String id) throws NewsSourceException {
         SQLiteDatabase db = openHelper.getReadableDatabase();
         Cursor cursor = db.query(false, CacheDBOpenHelper.NEWS_TABLE_NAME, new String[]{CacheDBOpenHelper.FIELD_CONTENT_STR,
@@ -44,7 +45,7 @@ public class DatabaseNewsContentCache implements NewsContentCache {
                 CacheDBOpenHelper.FIELD_CRAWL_SRC, CacheDBOpenHelper.FIELD_KEYWORDS}, CacheDBOpenHelper.FIELD_ID + "=?",
                 new String[]{id}, null, null, null, null);
         NewsContent newsContent = null;
-        if(cursor.moveToFirst() && cursor.getString(0) != null){ // found the record
+        if(cursor.moveToFirst() && !cursor.isNull(0)){ // found the record
             String contentStr = cursor.getString(0);
             String journalist = cursor.getString(1);
             String category = cursor.getString(2);
@@ -73,8 +74,10 @@ public class DatabaseNewsContentCache implements NewsContentCache {
 
 
     @Override
-    public NewsContent cacheNewsContent(String id) throws NewsSourceException {
-        NewsContent updatedContent = frontSource.getNewsContent(id);
+    public NewsContent cacheNewsContent(NewsMetaInfo metaInfo) throws NewsSourceException {
+        String id = metaInfo.getId();
+
+        NewsContent updatedContent = frontSource.getNewsContent(metaInfo);
         writeNewsContentToDatabase(id, updatedContent);
 
         return updatedContent;
