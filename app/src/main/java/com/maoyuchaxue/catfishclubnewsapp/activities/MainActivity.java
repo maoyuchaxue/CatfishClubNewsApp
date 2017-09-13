@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
                                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            refreshTabLayout();
+                                            MainActivity.this.recreate();
                                             sweetAlertDialog.dismissWithAnimation();
                                         }
                                     })
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity
                 boolean curIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                         .getBoolean("offline_mode", false);
                 if (tempIsOffline != curIsOffline) {
-                    refreshTabLayout();
+                    MainActivity.this.recreate();
                 }
             }
             @Override
@@ -190,10 +190,16 @@ public class MainActivity extends AppCompatActivity
 
         mViewPagerAdapter = new CategoryViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
-        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setOffscreenPageLimit(20);
         mTabLayout.setViewPager(mViewPager);
 
         refreshTabLayout();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        testNetworkState();
     }
 
 
@@ -330,7 +336,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String newText) {
-//                TODO: add history recommendation
                 return true;
             }
         });

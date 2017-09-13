@@ -157,12 +157,15 @@ public class NewsMetainfoRecyclerViewAdapter
 
             viewHolder.itemView.setTag(cursors.get(position));
 
+            Log.i("loaded_pic", "start url:" + info.getPictures()[0].toString());
             int loaderID = NewsListFragment.IMAGE_LOADER_ID + position;
             Loader loader = loaderManager.getLoader(loaderID);
             if (loader != null) {
                 loaderManager.destroyLoader(loaderID);
             }
+
             loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
+
 
             viewHolder.itemView.setTag(cursors.get(position));
 
@@ -282,15 +285,20 @@ public class NewsMetainfoRecyclerViewAdapter
         @Override
         public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
             imageView = (ImageView) view.findViewById(R.id.news_unit_pics_image);
-            return new ResourceLoader(context, summaryPicURL,
+            imageView.setImageResource(R.mipmap.ic_placeholder);
+            Loader<Bitmap> loader = new ResourceLoader(context, summaryPicURL,
                     new DatabaseResourceCache(CacheDBOpenHelper.getInstance(context.getApplicationContext()),
                             new WebResourceSource(200, 200, 1000, 1000)), true);
+
+            return loader;
         }
 
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
+            Log.i("loaded_pic", "on load finished");
             URL urls[] = ((NewsCursor) itemView.getTag()).getNewsMetaInfo().getPictures();
             if (urls == null || urls.length == 0) {
+                Log.i("loaded_pic", "tag got no urls " + ((NewsCursor) itemView.getTag()).getNewsMetaInfo().getTitle());
                 return;
             }
 
