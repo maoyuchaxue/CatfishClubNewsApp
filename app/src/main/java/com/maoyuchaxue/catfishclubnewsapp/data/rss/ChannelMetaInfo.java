@@ -7,7 +7,15 @@ import java.io.Serializable;
  */
 
 public class ChannelMetaInfo implements Serializable{
-    private String title, link, description;
+    private String title, link, description, language;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public String getTitle() {
         return title;

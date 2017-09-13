@@ -1,5 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data.rss;
 
+import android.util.Log;
+
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
 
 import org.xml.sax.Attributes;
@@ -19,6 +21,7 @@ class RSSFeedHandler extends DefaultHandler {
     private String currentElement;
     private NewsMetaInfo currentNewsMetaInfo;
     private ArrayList<NewsMetaInfo> newsMetaInfos;
+    private StringBuilder content;
 
     private ChannelMetaInfo channelMetaInfo;
 
@@ -27,6 +30,7 @@ class RSSFeedHandler extends DefaultHandler {
         channelMetaInfo = new ChannelMetaInfo();
         inItem = false;
         currentElement = "";
+        content = new StringBuilder();
     }
 
     @Override
@@ -35,22 +39,14 @@ class RSSFeedHandler extends DefaultHandler {
             currentNewsMetaInfo = new NewsMetaInfo();
             inItem = true;
         }
+        content = new StringBuilder();
         currentElement = localName;
 
     }
 
     @Override
     public void endElement(String uri, String localName, String qName){
-        if(localName.equalsIgnoreCase("item")) {
-            inItem = false;
-            newsMetaInfos.add(currentNewsMetaInfo);
-        }
-        currentElement = "";
-    }
-
-    @Override
-    public void characters(char[] ch, int start, int length) {
-        String s = new String(ch, start, length);
+        String s = content.toString();
         if(inItem){
 
             if(currentElement.equalsIgnoreCase("title"))
@@ -74,7 +70,21 @@ class RSSFeedHandler extends DefaultHandler {
                 channelMetaInfo.setLink(s);
             else if(currentElement.equalsIgnoreCase("description"))
                 channelMetaInfo.setDescription(s);
+            else if(currentElement.equalsIgnoreCase("language"))
+                channelMetaInfo.setLanguage(s);
         }
+        if(localName.equalsIgnoreCase("item")) {
+            inItem = false;
+            newsMetaInfos.add(currentNewsMetaInfo);
+        }
+        currentElement = "";
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length) {
+        String s = new String(ch, start, length);
+        content.append(s);
+
     }
 
     public NewsMetaInfo[] getNewsMetaInfoList(){

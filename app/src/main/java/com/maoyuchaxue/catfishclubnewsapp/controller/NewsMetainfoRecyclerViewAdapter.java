@@ -9,6 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,7 +128,15 @@ public class NewsMetainfoRecyclerViewAdapter
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_pics_source);
 
             titleView.setText(info.getTitle());
-            introView.setText(info.getIntro());
+
+            String intro = info.getIntro();
+            Spanned spannedContent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                spannedContent = Html.fromHtml(intro, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                spannedContent = Html.fromHtml(intro);
+            }
+            introView.setText(spannedContent);
 
             String src = info.getSrcSite();
             String author = info.getAuthor();
@@ -162,7 +172,9 @@ public class NewsMetainfoRecyclerViewAdapter
             if (loader != null) {
                 loaderManager.destroyLoader(loaderID);
             }
+
             loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
+
 
             viewHolder.itemView.setTag(cursors.get(position));
 
@@ -176,7 +188,10 @@ public class NewsMetainfoRecyclerViewAdapter
             TextView introView = (TextView) view.findViewById(R.id.news_unit_intro);
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_source);
             titleView.setText(info.getTitle());
-            introView.setText(info.getIntro());
+
+            String intro = info.getIntro();
+            String spannedContent = intro.replaceAll("<[^<>]*>", "");
+            introView.setText(spannedContent);
 
             String src = info.getSrcSite();
             String author = info.getAuthor();
@@ -282,15 +297,20 @@ public class NewsMetainfoRecyclerViewAdapter
         @Override
         public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
             imageView = (ImageView) view.findViewById(R.id.news_unit_pics_image);
-            return new ResourceLoader(context, summaryPicURL,
+            imageView.setImageResource(R.mipmap.ic_placeholder);
+            Loader<Bitmap> loader = new ResourceLoader(context, summaryPicURL,
                     new DatabaseResourceCache(CacheDBOpenHelper.getInstance(context.getApplicationContext()),
                             new WebResourceSource(200, 200, 1000, 1000)), true);
+
+            return loader;
         }
 
         @Override
         public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
+            Log.i("loaded_pic", "on load finished");
             URL urls[] = ((NewsCursor) itemView.getTag()).getNewsMetaInfo().getPictures();
             if (urls == null || urls.length == 0) {
+                Log.i("loaded_pic", "tag got no urls " + ((NewsCursor) itemView.getTag()).getNewsMetaInfo().getTitle());
                 return;
             }
 

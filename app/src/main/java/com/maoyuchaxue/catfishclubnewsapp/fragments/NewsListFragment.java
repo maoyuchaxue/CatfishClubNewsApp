@@ -83,6 +83,7 @@ public class NewsListFragment extends Fragment
     private NewsMetaInfoListSource mMetaInfoListSource;
     private NewsListRecyclerViewListener mNewsListRecyclerViewListener;
     private RecyclerView mRecyclerView;
+    private LinearLayout curView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Loader<List<NewsCursor>> mLoader;
     private NewsList newsList;
@@ -120,6 +121,7 @@ public class NewsListFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setRetainInstance(true);
         if (getArguments() != null) {
             category = getArguments().getString(ARG_CATEGORY);
             keyword = getArguments().getString(ARG_KEYWORD);
@@ -182,10 +184,11 @@ public class NewsListFragment extends Fragment
             return mView;
         }
 
-        LinearLayout curView = (LinearLayout) inflater.inflate(R.layout.fragment_news_list, container, false);
+        curView = (LinearLayout) inflater.inflate(R.layout.fragment_news_list, container, false);
 
         mRecyclerView = (RecyclerView) curView.findViewById(R.id.news_info_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
+
 
         mAdapter = new NewsMetainfoRecyclerViewAdapter(getContext(), getLoaderManager());
         mAdapter.setOnRecyclerViewItemClickListener(this);
@@ -217,6 +220,7 @@ public class NewsListFragment extends Fragment
 
         mCursor = null;
 
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) curView.findViewById(R.id.news_info_swipe_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -226,13 +230,15 @@ public class NewsListFragment extends Fragment
             }
         });
 
-        mView = curView;
         return curView;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        mView = curView;
+
         if (mAdapter.getItemCount() <= 1) {
             // contains footer
             mSwipeRefreshLayout.setRefreshing(true);

@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data.rss;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
@@ -17,7 +18,11 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -33,9 +38,10 @@ public class RSSManager {
             new WebPageNewsContentSource();
 
     private SAXParser xmlParser;
-    private ArrayList<Pair<URL, ChannelMetaInfo>> feeds;
+//    private ArrayList<Pair<URL, ChannelMetaInfo>> feeds;
     private ArrayList<NewsMetaInfo> newsMetaInfos;
     private HashSet<String> idSet;
+    private HashMap<String, URL> feeds;
 
     private static RSSManager instance;
 
@@ -71,10 +77,12 @@ public class RSSManager {
 
         @Override
         public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException {
+            Log.i("RSSManager P", Integer.toString(index));
+
             ArrayList<NewsMetaInfo> res = new ArrayList<>();
 
             for(int i = 0, p = index; i < PAGE_SIZE && p >= 0; i ++, p --)
-                res.add(newsMetaInfos.get(i));
+                res.add(newsMetaInfos.get(p));
             return new Pair<>(res.toArray(new NewsMetaInfo[0]),
                     index);
         }
@@ -116,19 +124,21 @@ public class RSSManager {
 
     private RSSManager(CacheDBOpenHelper openHelper) throws SAXException, ParserConfigurationException{
         this.openHelper = openHelper;
-        feeds = new ArrayList<>();
+        feeds = new HashMap<>();
         newsMetaInfos = new ArrayList<>();
+        try {
+//            loadRSSFeeds();
+        } catch (Exception e) {}
         idSet = new HashSet<>();
-
         xmlParser = SAXParserFactory.newInstance().newSAXParser();
     }
 
-    protected ChannelMetaInfo synchronise(URL rssUrl) throws IOException, SAXException{
+    protected ChannelMetaInfo synchronise(String rssId, URL rssUrl) throws IOException, SAXException{
         HttpURLConnection con = (HttpURLConnection)rssUrl.openConnection();
         con.setRequestMethod("GET");
         con.connect();
 
-
+        Log.i("RSSManager", rssUrl.toString());
         RSSFeedHandler handler = new RSSFeedHandler();
         xmlParser.parse(con.getInputStream(), handler);
 //        xmlParser.parse(con.getInputStream(), n);
@@ -137,11 +147,14 @@ public class RSSManager {
         con.disconnect();
 
 //        SQLiteDatabase db = openHelper.getWritableDatabase();
+        ChannelMetaInfo channelMetaInfo = handler.getChannelMetaInfo();
 
         for(NewsMetaInfo metaInfo : handler.getNewsMetaInfoList()){
             if(metaInfo.getId() == null)
                 metaInfo.setId(metaInfo.getUrl().toString());
             metaInfo.setType(1);
+            metaInfo.setLang(channelMetaInfo.getLanguage());
+            metaInfo.setSrcSite(rssId);
 
             String id = metaInfo.getId();
             if(idSet.contains(id))
@@ -185,7 +198,8 @@ public class RSSManager {
 //            long res = db.insert(CacheDBOpenHelper.BOOKMARK_TABLE_NAME, null, change);
 //        }
 
-        return handler.getChannelMetaInfo();
+//        return handler.getChannelMetaInfo();
+        return channelMetaInfo;
     }
 
     /**
@@ -193,46 +207,69 @@ public class RSSManager {
      *
      * */
     public void synchronise() throws IOException, SAXException{
-        for(Pair<URL, ChannelMetaInfo> feed : feeds)
-            feed.second = synchronise(feed.first);
+        idSet.clear();
+        newsMetaInfos.clear();
+
+        for(Map.Entry<String, URL> feed : feeds.entrySet())
+            synchronise(feed.getKey(), feed.getValue());
     }
 
     private void loadRSSFeeds() throws IOException{
         SQLiteDatabase db = openHelper.getReadableDatabase();
         Cursor cursor = db.query(false, CacheDBOpenHelper.RSS_TABLE_NAME, new String[]{
-                CacheDBOpenHelper.FIELD_URL,
-                CacheDBOpenHelper.FIELD_TITLE,
-                CacheDBOpenHelper.FIELD_LINK,
-                CacheDBOpenHelper.FIELD_DESC
+                CacheDBOpenHelper.FIELD_ID,
+                CacheDBOpenHelper.FIELD_URL
+//                CacheDBOpenHelper.FIELD_TITLE,
+//                CacheDBOpenHelper.FIELD_LINK,
+//                CacheDBOpenHelper.FIELD_DESC
                 },
                 null, null, null, null, "rowid asc", null);
         if(cursor.moveToFirst()){
             do{
-                URL url = new URL(cursor.getString(0));
-                ChannelMetaInfo metaInfo = new ChannelMetaInfo();
-                metaInfo.setTitle(cursor.getString(1));
-                metaInfo.setLink(cursor.getString(2));
-                metaInfo.setDescription(cursor.getString(3));
+                String id = cursor.getString(0);
+                URL url = new URL(cursor.getString(1));
 
-                feeds.add(new Pair<>(url, metaInfo));
+                feeds.put(id, url);
+
+//                ChannelMetaInfo metaInfo = new ChannelMetaInfo();
+//                metaInfo.setTitle(cursor.getString(1));
+//                metaInfo.setLink(cursor.getString(2));
+//                metaInfo.setDescription(cursor.getString(3));
+
+//                feeds.put(id, metaInfo);
             } while(cursor.moveToNext());
         }
         cursor.close();
     }
 
-    public void addRSSFeed(URL url){
+    public Set<Map.Entry<String, URL>> getRSSFeeds(){
+        return feeds.entrySet();
+    }
+
+    public void removeRSSFeed(String id){
+        feeds.remove(id);
+    }
+
+    public boolean addRSSFeed(String id, URL url){
 //        ChannelMetaInfo channelMetaInfo = synchronise(url);
 //        feeds.add(new Pair<>(url, channelMetaInfo));
-        feeds.add(new Pair<URL, ChannelMetaInfo>(url, null));
+        if(feeds.containsKey(id))
+            return false;
+
+//        feeds.put(url, new ChannelMetaInfo());
+        feeds.put(id, url);
 
         SQLiteDatabase db = openHelper.getWritableDatabase();
         ContentValues change = new ContentValues();
         change.put(CacheDBOpenHelper.FIELD_URL, url.toString());
+        change.put(CacheDBOpenHelper.FIELD_ID, id);
 //        change.put(CacheDBOpenHelper.FIELD_TITLE, channelMetaInfo.getTitle());
 //        change.put(CacheDBOpenHelper.FIELD_LINK, channelMetaInfo.getLink());
 //        change.put(CacheDBOpenHelper.FIELD_DESC, channelMetaInfo.getDescription());
 
         db.insert(CacheDBOpenHelper.RSS_TABLE_NAME, null, change);
+
+        return true;
     }
 
 
