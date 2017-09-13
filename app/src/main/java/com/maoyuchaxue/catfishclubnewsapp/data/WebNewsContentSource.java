@@ -152,11 +152,9 @@ public class WebNewsContentSource implements NewsContentSource {
             content = createContentFromJSON(json);
 
             con.disconnect();
-        } catch(IOException e){
-            //TODO: deal with the exception
-        } catch(JsonParseException e){
-            //TODO: deal with JsonParseExceptiong #2
-        } catch(ParseException e){
+        } catch(Exception e){
+            content = new NewsContent();
+            content.setContentStr(metaInfo.getIntro());
             //TODO: deal with ParseException #2
         }
         return content;
