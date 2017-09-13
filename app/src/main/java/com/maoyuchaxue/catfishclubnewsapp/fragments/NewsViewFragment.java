@@ -280,7 +280,8 @@ public class NewsViewFragment extends Fragment
             if (pictures.length > 0) {
                 oks.setImageUrl(pictures[0].toString());
             }
-            else {
+            else
+            {
                 oks.setImageUrl("http://wx2.sinaimg.cn/mw690/005VL8g3ly1fjidoye9iuj30710703yg.jpg");
             }
 
