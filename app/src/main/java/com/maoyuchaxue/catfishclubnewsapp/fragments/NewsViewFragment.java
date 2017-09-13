@@ -280,6 +280,9 @@ public class NewsViewFragment extends Fragment
             if (pictures.length > 0) {
                 oks.setImageUrl(pictures[0].toString());
             }
+            else {
+                oks.setImageUrl("http://wx2.sinaimg.cn/mw690/005VL8g3ly1fjidoye9iuj30710703yg.jpg");
+            }
 
             oks.setComment("输入评论：");
             // site是分享此内容的网站名称，仅在QQ空间使用
