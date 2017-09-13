@@ -211,7 +211,7 @@ public class CategoryEditActivity extends AppCompatActivity implements View.OnCl
                     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-
+                            repaintRssLabelsView();
                         }
                     });
 
