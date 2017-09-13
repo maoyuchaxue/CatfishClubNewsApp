@@ -24,7 +24,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:inputType="text"
-        android:maxLength="6"
+        android:maxLength="15"
         android:hint="源名称"
         android:drawableLeft="@drawable/ic_label_outline_black_24dp"
         android:drawableStart="@drawable/ic_label_outline_black_24dp"

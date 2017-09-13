@@ -9,6 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,7 +128,15 @@ public class NewsMetainfoRecyclerViewAdapter
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_pics_source);
 
             titleView.setText(info.getTitle());
-            introView.setText(info.getIntro());
+
+            String intro = info.getIntro();
+            Spanned spannedContent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                spannedContent = Html.fromHtml(intro, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                spannedContent = Html.fromHtml(intro);
+            }
+            introView.setText(spannedContent);
 
             String src = info.getSrcSite();
             String author = info.getAuthor();
@@ -157,7 +167,6 @@ public class NewsMetainfoRecyclerViewAdapter
 
             viewHolder.itemView.setTag(cursors.get(position));
 
-            Log.i("loaded_pic", "start url:" + info.getPictures()[0].toString());
             int loaderID = NewsListFragment.IMAGE_LOADER_ID + position;
             Loader loader = loaderManager.getLoader(loaderID);
             if (loader != null) {
@@ -179,7 +188,10 @@ public class NewsMetainfoRecyclerViewAdapter
             TextView introView = (TextView) view.findViewById(R.id.news_unit_intro);
             TextView sourceView = (TextView) view.findViewById(R.id.news_unit_source);
             titleView.setText(info.getTitle());
-            introView.setText(info.getIntro());
+
+            String intro = info.getIntro();
+            String spannedContent = intro.replaceAll("<[^<>]*>", "");
+            introView.setText(spannedContent);
 
             String src = info.getSrcSite();
             String author = info.getAuthor();

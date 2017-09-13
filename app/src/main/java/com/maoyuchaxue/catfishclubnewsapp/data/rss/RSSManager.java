@@ -3,6 +3,7 @@ package com.maoyuchaxue.catfishclubnewsapp.data.rss;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsMetaInfo;
@@ -76,10 +77,12 @@ public class RSSManager {
 
         @Override
         public Pair<NewsMetaInfo[], Integer> getNewsMetaInfoListByIndex(int index, String keyword, NewsCategoryTag category) throws NewsSourceException {
+            Log.i("RSSManager P", Integer.toString(index));
+
             ArrayList<NewsMetaInfo> res = new ArrayList<>();
 
             for(int i = 0, p = index; i < PAGE_SIZE && p >= 0; i ++, p --)
-                res.add(newsMetaInfos.get(i));
+                res.add(newsMetaInfos.get(p));
             return new Pair<>(res.toArray(new NewsMetaInfo[0]),
                     index);
         }
@@ -123,8 +126,10 @@ public class RSSManager {
         this.openHelper = openHelper;
         feeds = new HashMap<>();
         newsMetaInfos = new ArrayList<>();
+        try {
+//            loadRSSFeeds();
+        } catch (Exception e) {}
         idSet = new HashSet<>();
-
         xmlParser = SAXParserFactory.newInstance().newSAXParser();
     }
 
@@ -133,7 +138,7 @@ public class RSSManager {
         con.setRequestMethod("GET");
         con.connect();
 
-
+        Log.i("RSSManager", rssUrl.toString());
         RSSFeedHandler handler = new RSSFeedHandler();
         xmlParser.parse(con.getInputStream(), handler);
 //        xmlParser.parse(con.getInputStream(), n);
@@ -241,8 +246,8 @@ public class RSSManager {
         return feeds.entrySet();
     }
 
-    public void removeRSSFeed(URL url){
-        feeds.remove(url);
+    public void removeRSSFeed(String id){
+        feeds.remove(id);
     }
 
     public boolean addRSSFeed(String id, URL url){

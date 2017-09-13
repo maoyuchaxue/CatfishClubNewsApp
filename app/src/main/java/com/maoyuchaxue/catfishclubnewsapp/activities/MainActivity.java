@@ -37,6 +37,9 @@ import com.maoyuchaxue.catfishclubnewsapp.fragments.SettingsFragment;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -268,6 +271,50 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    private void initRSSFeed() {
+        String preferencedUrls = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).
+                getString("rss_urls", "http://feeds.bbci.co.uk/news/world/rss.xml");
+        String preferencedLabels = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).
+                getString("rss_labels", "BBC World");
+
+        HashSet<String> defaultLabels = new HashSet<>();
+        defaultLabels.add("BBC World");
+        Set<String> preferencedSelectedLabels = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).
+                getStringSet("rss_selected", defaultLabels);
+
+        Log.i("rss", preferencedUrls);
+        Log.i("rss", preferencedLabels);
+        Log.i("rss", preferencedSelectedLabels.toString());
+
+        List<String> tlabels = new ArrayList<>();
+        List<String> turls = new ArrayList<>();
+
+        String[] labelStrs = preferencedLabels.split("\\|");
+        for (String s : labelStrs) {
+            if (!s.isEmpty()) {
+                tlabels.add(s);
+            }
+        }
+
+        String[] urlStrs = preferencedUrls.split("\\|");
+        for (String s : urlStrs) {
+            if (!s.isEmpty()) {
+                turls.add(s);
+            }
+        }
+
+        try {
+            RSSManager manager = RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext()));
+            for (int i = 0; i < tlabels.size(); i++) {
+                if (preferencedSelectedLabels.contains(tlabels.get(i))) {
+                    manager.addRSSFeed(tlabels.get(i), new URL(turls.get(i)));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -278,6 +325,7 @@ public class MainActivity extends AppCompatActivity
         if (initNightMode()) {
 //            if initNightMode returns false, then the activity is invalid.
             initDrawerFragment();
+            initRSSFeed();
             initActionBar();
             initTabLayout();
             initCategoryButton();
