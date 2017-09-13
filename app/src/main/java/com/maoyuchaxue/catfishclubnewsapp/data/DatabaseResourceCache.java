@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 
@@ -43,6 +44,7 @@ public class DatabaseResourceCache extends ResourceCache {
 
     @Override
     protected byte[] getAsThumbnailBlobFromCache(URL url) throws IOException{
+        Log.i("loaded_pic", "get as tn from cache");
         SQLiteDatabase db = openHelper.getReadableDatabase();
 
         Cursor cursor = db.query(false, CacheDBOpenHelper.RESOURCES_TABLE_NAME,
@@ -55,6 +57,12 @@ public class DatabaseResourceCache extends ResourceCache {
         if(cursor.moveToFirst() && !cursor.isNull(0))
             res = cursor.getBlob(0);
         cursor.close();
+
+        if (res != null) {
+            Log.i("loaded_pic", "get as tn from cache succeeded");
+        } else {
+            Log.i("loaded_pic", "cannot get from cache");
+        }
         return res;
     }
 

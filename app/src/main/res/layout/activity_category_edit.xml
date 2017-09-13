@@ -77,5 +77,68 @@
         app:selectType="MULTI"
         app:maxSelect="0"/>
 
+    <View
+        android:layout_below="@+id/labels_view"
+        android:id="@+id/rss_separator"
+        android:layout_height="1px"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:background="@color/colorLine"
+        android:layout_marginTop="10dp"
+        />
+
+
+    <TextView
+        android:layout_below="@+id/rss_separator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:textSize="20sp"
+        android:id="@+id/rss_intro"
+        android:text="RSS源"
+        />
+
+    <View
+        android:layout_below="@+id/rss_intro"
+        android:id="@+id/rss_separator_2"
+        android:layout_height="1px"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:background="@color/colorLine"
+        android:layout_marginTop="10dp"
+        />
+
+    <com.donkingliang.labels.LabelsView
+        android:layout_below="@+id/rss_separator_2"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/rss_labels_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        app:labelBackground="@drawable/tag_background"
+        app:labelTextColor="@drawable/tag_text"
+        app:labelTextSize="16sp"
+        app:labelTextPaddingBottom="7dp"
+        app:labelTextPaddingLeft="13dp"
+        app:labelTextPaddingRight="13dp"
+        app:labelTextPaddingTop="7dp"
+        app:lineMargin="12dp"
+        app:wordMargin="12dp"
+        app:selectType="MULTI"
+        app:maxSelect="0"/>
 
 </RelativeLayout>

@@ -3,13 +3,10 @@ package com.maoyuchaxue.catfishclubnewsapp.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -17,8 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,19 +26,18 @@ import android.widget.Button;
 import com.flyco.tablayout.SlidingTabLayout;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.controller.CategoryViewPagerAdapter;
-import com.maoyuchaxue.catfishclubnewsapp.controller.NewsMetainfoRecyclerViewAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.rss.RSSManager;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsListFragment;
-import com.maoyuchaxue.catfishclubnewsapp.fragments.NewsViewFragment;
 import com.maoyuchaxue.catfishclubnewsapp.fragments.SettingsFragment;
 
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -96,7 +90,7 @@ public class MainActivity extends AppCompatActivity
                                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            refreshTabLayout();
+                                            MainActivity.this.recreate();
                                             sweetAlertDialog.dismissWithAnimation();
                                         }
                                     })
@@ -152,7 +146,7 @@ public class MainActivity extends AppCompatActivity
                 boolean curIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                         .getBoolean("offline_mode", false);
                 if (tempIsOffline != curIsOffline) {
-                    refreshTabLayout();
+                    MainActivity.this.recreate();
                 }
             }
             @Override
@@ -199,10 +193,16 @@ public class MainActivity extends AppCompatActivity
 
         mViewPagerAdapter = new CategoryViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
-        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setOffscreenPageLimit(20);
         mTabLayout.setViewPager(mViewPager);
 
         refreshTabLayout();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        testNetworkState();
     }
 
 
@@ -271,6 +271,50 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    private void initRSSFeed() {
+        String preferencedUrls = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).
+                getString("rss_urls", "http://feeds.bbci.co.uk/news/world/rss.xml");
+        String preferencedLabels = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).
+                getString("rss_labels", "BBC World");
+
+        HashSet<String> defaultLabels = new HashSet<>();
+        defaultLabels.add("BBC World");
+        Set<String> preferencedSelectedLabels = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).
+                getStringSet("rss_selected", defaultLabels);
+
+        Log.i("rss", preferencedUrls);
+        Log.i("rss", preferencedLabels);
+        Log.i("rss", preferencedSelectedLabels.toString());
+
+        List<String> tlabels = new ArrayList<>();
+        List<String> turls = new ArrayList<>();
+
+        String[] labelStrs = preferencedLabels.split("\\|");
+        for (String s : labelStrs) {
+            if (!s.isEmpty()) {
+                tlabels.add(s);
+            }
+        }
+
+        String[] urlStrs = preferencedUrls.split("\\|");
+        for (String s : urlStrs) {
+            if (!s.isEmpty()) {
+                turls.add(s);
+            }
+        }
+
+        try {
+            RSSManager manager = RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext()));
+            for (int i = 0; i < tlabels.size(); i++) {
+                if (preferencedSelectedLabels.contains(tlabels.get(i))) {
+                    manager.addRSSFeed(tlabels.get(i), new URL(turls.get(i)));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -281,6 +325,7 @@ public class MainActivity extends AppCompatActivity
         if (initNightMode()) {
 //            if initNightMode returns false, then the activity is invalid.
             initDrawerFragment();
+            initRSSFeed();
             initActionBar();
             initTabLayout();
             initCategoryButton();
@@ -289,7 +334,7 @@ public class MainActivity extends AppCompatActivity
 
         // for testing
         try{
-            RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext())).addRSSFeed(
+            RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext())).addRSSFeed("BBC World",
                     new URL("http://feeds.bbci.co.uk/news/world/rss.xml"));
         } catch(Exception e){
             e.printStackTrace();
@@ -339,7 +384,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String newText) {
-//                TODO: add history recommendation
                 return true;
             }
         });

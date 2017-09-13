@@ -29,6 +29,7 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.maoyuchaxue.catfishclubnewsapp.R;
 import com.maoyuchaxue.catfishclubnewsapp.activities.MainActivity;
 import com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity;
+import com.maoyuchaxue.catfishclubnewsapp.controller.BufferedSpeechSynthesizer;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentAndImageAdapter;
 import com.maoyuchaxue.catfishclubnewsapp.controller.NewsContentLoader;
 import com.maoyuchaxue.catfishclubnewsapp.controller.RecommendListViewAdapter;
@@ -69,8 +70,8 @@ public class NewsViewFragment extends Fragment
     private NewsMetaInfo metaInfo;
     private NewsContentSource contentSource;
     private ListView mListView;
-    private SpeechSynthesizer speechSynthesizer;
-    private String speakContent = null;
+    private BufferedSpeechSynthesizer speechSynthesizer;
+    private String[] speakContent = null;
     private NewsContentAndImageAdapter mAdapter;
     Loader<NewsContent> mLoader;
 
@@ -106,7 +107,7 @@ public class NewsViewFragment extends Fragment
         NewsViewFragment instance = newInstance(metaInfo, metaInfo.getTitle());
         instance.activity = activity;
         instance.metaInfo = metaInfo;
-        instance.speechSynthesizer = speechSynthesizer;
+        instance.speechSynthesizer = new BufferedSpeechSynthesizer(speechSynthesizer);
         return instance;
     }
 
@@ -205,17 +206,29 @@ public class NewsViewFragment extends Fragment
 
         String splitContents[] = content.split("</p>");
 
+        for (int i = 0; i < splitContents.length; i++) {
+            String s = splitContents[i];
+            if (!s.isEmpty()) {
+                splitContents[i] = s + "</p>";
+            }
+        }
+
         Log.i("madapter", "input data length: " + urls.length + " " + splitContents.length);
         mAdapter.resetData(splitContents, urls);
 
-        Spanned spannedContent;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            spannedContent = Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            spannedContent = Html.fromHtml(content);
-        }
 
-        speakContent = metaInfo.getTitle() + " " + spannedContent.toString();
+
+        speakContent = new String[splitContents.length + 1];
+        speakContent[0] = metaInfo.getTitle();
+        for (int i = 0; i < splitContents.length; i++) {
+            Spanned spannedContent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                spannedContent = Html.fromHtml(splitContents[i], Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                spannedContent = Html.fromHtml(splitContents[i]);
+            }
+            speakContent[i+1] = spannedContent.toString();
+        }
 
         String recommendLimit = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString("recommend_limit", "5");
@@ -267,6 +280,10 @@ public class NewsViewFragment extends Fragment
             if (pictures.length > 0) {
                 oks.setImageUrl(pictures[0].toString());
             }
+            else
+            {
+                oks.setImageUrl("http://wx2.sinaimg.cn/mw690/005VL8g3ly1fjidoye9iuj30710703yg.jpg");
+            }
 
             oks.setComment("输入评论：");
             // site是分享此内容的网站名称，仅在QQ空间使用
@@ -285,55 +302,21 @@ public class NewsViewFragment extends Fragment
         if (speakContent == null) {
             return;
         }
-
-        speechSynthesizer.startSpeaking(speakContent, new SynthesizerListener() {
-            @Override
-            public void onSpeakBegin() {
-
-            }
-
-            @Override
-            public void onBufferProgress(int i, int i1, int i2, String s) {
-
-            }
-
-            @Override
-            public void onSpeakPaused() {
-
-            }
-
-            @Override
-            public void onSpeakResumed() {
-
-            }
-
-            @Override
-            public void onSpeakProgress(int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onCompleted(SpeechError speechError) {
-
-            }
-
-            @Override
-            public void onEvent(int i, int i1, int i2, Bundle bundle) {
-
-            }
-        });
+        speechSynthesizer.startSpeaking(speakContent);
     }
 
 
     public void stopSpeaking() {
-        if (speechSynthesizer.isSpeaking()) {
-            speechSynthesizer.stopSpeaking();
-        }
+        speechSynthesizer.stopSpeaking();
     }
 
     @Override
     public void onClickNews(NewsCursor cursor) {
         activity.onClickNews(cursor);
+    }
+
+    public NewsMetaInfo getNewsMetaInfo(){
+        return metaInfo;
     }
 
 }

@@ -11,6 +11,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,10 +93,9 @@ public class NewsContentAndImageAdapter extends BaseAdapter
         isImage = new ArrayList<Boolean>();
         for (String s : contents) {
             if (!s.isEmpty()) {
-                s = s + "</p>";
+                this.contents.add(s);
+                isImage.add(false);
             }
-            this.contents.add(s);
-            isImage.add(false);
         }
 
         for (URL url : urls) {
@@ -232,6 +232,9 @@ public class NewsContentAndImageAdapter extends BaseAdapter
             TextView textView = (TextView) view.findViewById(R.id.news_view_text_unit_content);
             textView.setMovementMethod(LinkMovementMethod.getInstance());
             textView.setText(content);
+            String pref = PreferenceManager.getDefaultSharedPreferences(view.getContext()).
+                    getString("font_size", "20");
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, Integer.parseInt(pref));
         }
     }
 
