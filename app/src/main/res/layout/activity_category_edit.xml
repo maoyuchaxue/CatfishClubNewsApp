@@ -28,15 +28,18 @@
     <!---->
 
     <TextView
+        android:layout_below="@+id/category_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="31dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
         android:textSize="20sp"
         android:id="@+id/category_intro"
         android:text="分类标签"
-        android:layout_below="@+id/category_toolbar"
-        android:layout_alignLeft="@+id/category_separator"
-        android:layout_alignStart="@+id/category_separator" />
+        />
 
     <View
         android:layout_below="@+id/category_intro"
@@ -74,52 +77,68 @@
         app:selectType="MULTI"
         app:maxSelect="0"/>
 
+    <View
+        android:layout_below="@+id/labels_view"
+        android:id="@+id/rss_separator"
+        android:layout_height="1px"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:background="@color/colorLine"
+        android:layout_marginTop="10dp"
+        />
+
+
     <TextView
+        android:layout_below="@+id/rss_separator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="31dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
         android:textSize="20sp"
         android:id="@+id/rss_intro"
-        android:text="订阅源"
-        android:layout_below="@+id/labels_view"
-        android:layout_alignLeft="@+id/labels_view"
-        android:layout_alignStart="@+id/labels_view" />
+        android:text="RSS源"
+        />
 
-    <RelativeLayout
+    <View
+        android:layout_below="@+id/rss_intro"
+        android:id="@+id/rss_separator_2"
+        android:layout_height="1px"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="match_parent"
+        android:background="@color/colorLine"
+        android:layout_marginTop="10dp"
+        />
+
+    <com.donkingliang.labels.LabelsView
+        android:layout_below="@+id/rss_separator_2"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/rss_labels_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rss_intro"
-        android:layout_alignLeft="@+id/rss_intro"
-        android:layout_alignStart="@+id/rss_intro"
-        android:id="@+id/rss_input_layout"
-        >
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        app:labelBackground="@drawable/tag_background"
+        app:labelTextColor="@drawable/tag_text"
+        app:labelTextSize="16sp"
+        app:labelTextPaddingBottom="7dp"
+        app:labelTextPaddingLeft="13dp"
+        app:labelTextPaddingRight="13dp"
+        app:labelTextPaddingTop="7dp"
+        app:lineMargin="12dp"
+        app:wordMargin="12dp"
+        app:selectType="MULTI"
+        app:maxSelect="0"/>
 
-        <EditText
-            android:layout_toLeftOf="@+id/add_rss_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:id="@+id/rss_edit"
-            android:inputType="textUri"/>
-
-        <Button
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentRight="true"
-            android:id="@+id/add_rss_button"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@drawable/ic_add_black_24dp"
-            />
-    </RelativeLayout>
-
-    <ListView
-        android:layout_height="200dp"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/rss_input_layout"
-        android:layout_alignStart="@+id/rss_input_layout"
-        android:layout_alignLeft="@+id/rss_input_layout"
-        android:layout_alignRight="@+id/rss_input_layout"
-        android:layout_alignEnd="@+id/rss_input_layout"
-        />
 </RelativeLayout>
