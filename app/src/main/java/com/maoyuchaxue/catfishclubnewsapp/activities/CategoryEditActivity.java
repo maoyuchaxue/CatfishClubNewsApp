@@ -1,10 +1,16 @@
 package com.maoyuchaxue.catfishclubnewsapp.activities;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
 import com.donkingliang.labels.LabelsView;
 import com.maoyuchaxue.catfishclubnewsapp.R;
@@ -16,8 +22,8 @@ import java.util.List;
 public class CategoryEditActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences preferences;
-    private LabelsView labelsView;
-    ArrayList<String> labels;
+    private LabelsView labelsView, rssLabelsView;
+    ArrayList<String> labels, rssLabels;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,8 @@ public class CategoryEditActivity extends AppCompatActivity implements View.OnCl
         List<Boolean> categoryPreferences = getCategoryPreferences();
 
         labelsView = (LabelsView) findViewById(R.id.labels_view);
+        rssLabelsView = (LabelsView) findViewById(R.id.rss_labels_view);
+
         labels = new ArrayList<>();
         ArrayList<Integer> selectedLabels = new ArrayList<>();
         for (int i = 0; i < NewsCategoryTag.TITLES.length; i++) {
@@ -61,7 +69,42 @@ public class CategoryEditActivity extends AppCompatActivity implements View.OnCl
             }
         });
 
+        rssLabels = new ArrayList<>();
+        rssLabels.add("+");
+        rssLabelsView.setLabels(rssLabels);
+        rssLabelsView.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+            @Override
+            public void onLabelSelectChange(View label, String labelText, boolean isSelect, int position) {
+                if (labelText.equals("+") && isSelect) {
+                    View dialogView = LayoutInflater.from(CategoryEditActivity.this).
+                            inflate(R.layout.rss_source_dialog_layout, null);
+                    final EditText feedEditText = (EditText) dialogView.findViewById(R.id.rss_source_url);
+                    final EditText labelEditText = (EditText) dialogView.findViewById(R.id.rss_source_label);
 
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CategoryEditActivity.this);
+                    builder.setTitle("添加RSS源");
+                    builder.setView(dialogView);
+                    builder.setPositiveButton("添加", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Log.i("rss", feedEditText.getText().toString() + " " + labelEditText.getText().toString());
+                            rssLabels.add(0, labelEditText.getText().toString());
+                            rssLabelsView.setLabels(rssLabels);
+                        }
+                    });
+
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+
+                    builder.show();
+
+                }
+            }
+        });
 
     }
 
