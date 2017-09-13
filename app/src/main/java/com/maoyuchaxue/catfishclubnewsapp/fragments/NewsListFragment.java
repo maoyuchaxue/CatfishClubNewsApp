@@ -189,12 +189,7 @@ public class NewsListFragment extends Fragment
         mRecyclerView = (RecyclerView) curView.findViewById(R.id.news_info_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(container.getContext()));
 
-        return curView;
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
         mAdapter = new NewsMetainfoRecyclerViewAdapter(getContext(), getLoaderManager());
         mAdapter.setOnRecyclerViewItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
@@ -225,6 +220,7 @@ public class NewsListFragment extends Fragment
 
         mCursor = null;
 
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) curView.findViewById(R.id.news_info_swipe_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -233,6 +229,13 @@ public class NewsListFragment extends Fragment
                 reloadFromBeginning();
             }
         });
+
+        return curView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         mView = curView;
 

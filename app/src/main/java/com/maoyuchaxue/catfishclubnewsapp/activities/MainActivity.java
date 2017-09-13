@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity
                 boolean curIsOffline = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                         .getBoolean("offline_mode", false);
                 if (tempIsOffline != curIsOffline) {
-                    refreshTabLayout();
+                    MainActivity.this.recreate();
                 }
             }
             @Override
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity
 
         mViewPagerAdapter = new CategoryViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
-        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setOffscreenPageLimit(20);
         mTabLayout.setViewPager(mViewPager);
 
         refreshTabLayout();
@@ -339,7 +339,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String newText) {
-//                TODO: add history recommendation
                 return true;
             }
         });
