@@ -26,6 +26,7 @@ public class WebPageNewsContentSource implements NewsContentSource{
         String url = metaInfo.getUrl().toString();
 
         NewsContent content;
+        content = new NewsContent();
         try {
             Document doc = Jsoup.connect(url).get();
             Elements params = doc.select("p");
@@ -35,16 +36,15 @@ public class WebPageNewsContentSource implements NewsContentSource{
                 contentStr.append("<p>" + element.html() + "</p>");
             }
 
-            content = new NewsContent();
-
             content.setJournalist("");
             content.setCrawlSource("");
             content.setCategory("");
             content.setContentStr(contentStr.toString());
             content.setKeywords(new String[0]);
         } catch(Exception e){
-            e.printStackTrace();
-            throw new NewsSourceException();
+//            e.printStackTrace();
+            content.setContentStr(metaInfo.getIntro());
+//            throw new NewsSourceException();
         }
         return content;
     }

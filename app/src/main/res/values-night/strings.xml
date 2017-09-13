@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">News App</string>
+    <string name="app_name">猫鱼新闻</string>
 
     <string name="main_page_title">新闻列表</string>
 
@@ -40,4 +40,53 @@
         <item>10</item>
     </string-array>
 
+    <string name="pref_speech_zh">中文语音</string>
+    <string name="pref_speech_zh_description">设置中文语音的播报员</string>
+    <string-array name="pref_font_size">
+        <item>大</item>
+        <item>中</item>
+        <item>小</item>
+    </string-array>
+
+    <string-array name="pref_speech_zh_entries">
+        <item>小峰（男声）</item>
+        <item>小燕（女声）</item>
+        <item>小新（卡通音）</item>
+        <item>小丸子（卡通音）</item>
+    </string-array>
+
+    <string-array name="pref_speech_zh_values">
+        <item>xiaofeng</item>
+        <item>xiaoyan</item>
+        <item>xiaoxin</item>
+        <item>xiaowanzi</item>
+    </string-array>
+
+    <string name="pref_speech_zh_default">xiaoyan</string>
+
+
+    <string name="pref_speech_en">英文语音</string>
+    <string name="pref_speech_en_description">设置英文语音的播报员</string>
+
+    <string-array name="pref_speech_en_entries">
+        <item>亨利（男声）</item>
+        <item>凯瑟琳（女声）</item>
+    </string-array>
+
+    <string-array name="pref_speech_en_values">
+        <item>henry</item>
+        <item>catherine</item>
+    </string-array>
+
+    <string name="pref_speech_en_default">henry</string>
+
+    <string name="pref_font_size_title">字体大小</string>
+
+    <string-array name="pref_font_size_values">
+        <item>25</item>
+        <item>20</item>
+        <item>14</item>
+    </string-array>
+
+    <string name="pref_font_size_default">20</string>
 </resources>

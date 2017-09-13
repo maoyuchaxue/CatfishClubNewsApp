@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/rss_source_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="15dp"
+        android:inputType="textUri"
+        android:hint="RSS源URL"
+        android:drawableLeft="@drawable/ic_rss_feed_black_24dp"
+        android:drawableStart="@drawable/ic_rss_feed_black_24dp"
+        />
+
+    <EditText
+        android:id="@+id/rss_source_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:inputType="text"
+        android:maxLength="15"
+        android:hint="源名称"
+        android:drawableLeft="@drawable/ic_label_outline_black_24dp"
+        android:drawableStart="@drawable/ic_label_outline_black_24dp"
+        />
+
+
+</LinearLayout>

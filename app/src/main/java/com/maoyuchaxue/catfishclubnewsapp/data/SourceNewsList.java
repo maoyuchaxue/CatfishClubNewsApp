@@ -1,6 +1,7 @@
 package com.maoyuchaxue.catfishclubnewsapp.data;
 
 
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.util.Pair;
@@ -241,6 +242,8 @@ public class SourceNewsList implements NewsList {
         } catch(Exception e){
             e.printStackTrace();
         }
+
+        Log.i("rssmanager", "returned null!");
         return null;
     }
 
@@ -285,10 +288,14 @@ public class SourceNewsList implements NewsList {
                 else
                     bufferCursor(cursor);
             }
+
+            Log.i("rssmanager", "index: " + String.valueOf(index));
             return allocated.get(index);
         } catch(Exception e){
             e.printStackTrace();
         }
+
+        Log.i("rssmanager", "returned null!");
         return null;
     }
 
