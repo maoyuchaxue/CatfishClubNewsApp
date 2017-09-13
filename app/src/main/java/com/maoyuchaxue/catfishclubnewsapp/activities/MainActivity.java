@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
                                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                         @Override
                                         public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                            refreshTabLayout();
+                                            MainActivity.this.recreate();
                                             sweetAlertDialog.dismissWithAnimation();
                                         }
                                     })
@@ -203,6 +203,12 @@ public class MainActivity extends AppCompatActivity
         mTabLayout.setViewPager(mViewPager);
 
         refreshTabLayout();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        testNetworkState();
     }
 
 
