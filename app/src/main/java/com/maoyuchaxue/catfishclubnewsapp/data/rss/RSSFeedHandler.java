@@ -83,7 +83,6 @@ class RSSFeedHandler extends DefaultHandler {
     @Override
     public void characters(char[] ch, int start, int length) {
         String s = new String(ch, start, length);
-        Log.i("Handler", s);
         content.append(s);
 
     }

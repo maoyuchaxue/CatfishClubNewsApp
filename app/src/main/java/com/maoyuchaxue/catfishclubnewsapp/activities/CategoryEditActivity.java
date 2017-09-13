@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.ExecutionException;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class CategoryEditActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences preferences;
@@ -170,32 +172,36 @@ public class CategoryEditActivity extends AppCompatActivity implements View.OnCl
 
                             try {
                                 if (label.contains("|") || label.isEmpty() || url.isEmpty()) {
-                                    return;
+                                    new SweetAlertDialog(CategoryEditActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                            .setTitleText("添加错误")
+                                            .setContentText("标签和URL不应为空>_<").show();
+                                } else {
+                                    boolean rssAdded = RSSManager.getInstance(CacheDBOpenHelper.
+                                            getInstance(getApplicationContext())).addRSSFeed(label, new URL(url));
+                                    if (!rssAdded) {
+                                        new SweetAlertDialog(CategoryEditActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                                .setTitleText("添加错误")
+                                                .setContentText("源已被使用，或者格式不对吧orz").show();
+                                    } else {
+
+                                        preferencedLabels += "|" + label;
+                                        preferencedUrls += "|" + url;
+                                        preferencedSelectedLabels.add(label);
+
+                                        PreferenceManager.getDefaultSharedPreferences(CategoryEditActivity.this).
+                                                edit().putString("rss_urls", preferencedUrls).commit();
+
+                                        PreferenceManager.getDefaultSharedPreferences(CategoryEditActivity.this).
+                                                edit().putString("rss_labels", preferencedLabels).commit();
+
+                                        PreferenceManager.getDefaultSharedPreferences(CategoryEditActivity.this).
+                                                edit().putStringSet("rss_selected", preferencedSelectedLabels).commit();
+
+                                    }
+
                                 }
-
-                                boolean rssAdded = RSSManager.getInstance(CacheDBOpenHelper.
-                                        getInstance(getApplicationContext())).addRSSFeed(label, new URL(url));
-
-                                if (!rssAdded) {
-                                    return;
-                                }
-
-                                rssLabelsView.setLabels(rssLabels);
-                                preferencedLabels += "|" + label;
-                                preferencedUrls += "|" + url;
-                                preferencedSelectedLabels.add(label);
-
-                                PreferenceManager.getDefaultSharedPreferences(CategoryEditActivity.this).
-                                        edit().putString("rss_urls", preferencedUrls).commit();
-
-                                PreferenceManager.getDefaultSharedPreferences(CategoryEditActivity.this).
-                                        edit().putString("rss_labels", preferencedLabels).commit();
-
-                                PreferenceManager.getDefaultSharedPreferences(CategoryEditActivity.this).
-                                        edit().putStringSet("rss_selected", preferencedSelectedLabels).commit();
 
                                 repaintRssLabelsView();
-
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
