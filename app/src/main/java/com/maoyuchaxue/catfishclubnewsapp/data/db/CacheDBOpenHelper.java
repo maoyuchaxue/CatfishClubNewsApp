@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class CacheDBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "cache";
-    private static final int DB_VERSION = 9;
+    private static final int DB_VERSION = 10;
 
     public static final String NEWS_TABLE_NAME = "news_cache";
     public static final String FIELD_ID = "id";
@@ -101,6 +101,14 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             FIELD_PICTURES + " text, " +
             FIELD_VIDEO + " text);";
 
+    public static final String KEYWORD_TABLE_NAME = "keywords";
+    public static final String FIELD_KEYWORD = "keyword";
+    public static final String FIELD_SCORE = "score";
+    private static final String KEYWORD_TABLE_CREATE = "create table if not exists " +
+            KEYWORD_TABLE_NAME + " (" +
+            FIELD_KEYWORD + " text primary key, " +
+            FIELD_SCORE + " real not null);";
+
 
     private CacheDBOpenHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
@@ -119,6 +127,7 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(RESOURCES_TABLE_CREATE);
         db.execSQL(BOOKMARK_TABLE_CREATE);
         db.execSQL(RSS_TABLE_CREATE);
+        db.execSQL(KEYWORD_TABLE_CREATE);
     }
 
     @Override
@@ -161,6 +170,9 @@ public class CacheDBOpenHelper extends SQLiteOpenHelper {
             db.execSQL("drop table if exists " + RSS_TABLE_NAME + ";");
             db.execSQL(RSS_TABLE_CREATE);
         }
+
+        if(newVersion == 10)
+            db.execSQL(KEYWORD_TABLE_CREATE);
     }
 
     @Override
