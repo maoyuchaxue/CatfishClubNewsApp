@@ -30,6 +30,10 @@ public class NewsListRecyclerViewListener extends RecyclerView.OnScrollListener 
         this.firstBatchLoaded = firstBatchLoaded;
     }
 
+    public void resetLastLoad() {
+        mLastLoad = 0;
+    }
+
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
@@ -40,8 +44,10 @@ public class NewsListRecyclerViewListener extends RecyclerView.OnScrollListener 
             return;
         }
 
+        Log.i("loading", String.valueOf(firstBatchLoaded) + String.valueOf(finished));
         if (mLastLoad != mItemCount && mItemCount <= mLastCompletely + 3 && !finished && firstBatchLoaded) {
             mLastLoad = mItemCount;
+            Log.i("loading","onloadmore");
             onLoadMoreListener.onLoadMore();
         }
     }

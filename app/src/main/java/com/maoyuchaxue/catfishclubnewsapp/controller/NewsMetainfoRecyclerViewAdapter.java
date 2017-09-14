@@ -322,6 +322,8 @@ public class NewsMetainfoRecyclerViewAdapter
                 return;
             }
 
+            if(imageView == null)
+                return;
             if (data == null || data.getByteCount() == 0 || data.getHeight() == 0) {
                 imageView.setImageResource(R.mipmap.ic_placeholder);
             } else {

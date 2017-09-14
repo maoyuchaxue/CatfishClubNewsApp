@@ -136,13 +136,17 @@ public class RSSManager {
     protected ChannelMetaInfo synchronise(String rssId, URL rssUrl) throws IOException, SAXException{
         HttpURLConnection con = (HttpURLConnection)rssUrl.openConnection();
         con.setRequestMethod("GET");
-        con.connect();
+        con.setConnectTimeout(5000);
+        try {
+            con.connect();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
 
         Log.i("RSSManager", rssUrl.toString());
         RSSFeedHandler handler = new RSSFeedHandler();
         xmlParser.parse(con.getInputStream(), handler);
 //        xmlParser.parse(con.getInputStream(), n);
-        // TODO: 2017/9/12 Merging the new list and the old list
 
         con.disconnect();
 

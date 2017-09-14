@@ -37,6 +37,8 @@ import com.maoyuchaxue.catfishclubnewsapp.data.BookmarkManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.HybridNewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.KeywordHistoryManager;
+import com.maoyuchaxue.catfishclubnewsapp.data.KeywordNewsRecommender;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContent;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
@@ -243,6 +245,9 @@ public class NewsViewFragment extends Fragment
         // add to history
         HistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
             add(metaInfo, data);
+        KeywordHistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().getApplicationContext())).
+                addKeys(data.getKeywords());
+
     }
 
     @Override

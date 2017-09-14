@@ -233,6 +233,17 @@ public class MainActivity extends AppCompatActivity
         if (globalKeyword != null)
             Log.i("catclub", globalKeyword);
 
+
+        if(!isOffline){
+            fragments.add(NewsListFragment.newInstance("", globalKeyword, NewsListFragment.RECOMMEND_FRAGMENT));
+            titles.add("推荐");
+        }
+
+        fragments.add(NewsListFragment.newInstance("rss", globalKeyword, isOffline ? NewsListFragment.DATABASE_FRAGMENT :
+                NewsListFragment.RSS_FRAGMENT));
+        titles.add("订阅");
+
+
         int fragmentType = isOffline ? NewsListFragment.DATABASE_FRAGMENT : NewsListFragment.WEB_FRAGMENT;
         fragments.add(NewsListFragment.newInstance("", globalKeyword, fragmentType));
         titles.add("综合");
@@ -244,10 +255,6 @@ public class MainActivity extends AppCompatActivity
                 titles.add(NewsCategoryTag.TITLES[i]);
             }
         }
-
-        fragments.add(NewsListFragment.newInstance("rss", globalKeyword, isOffline ? NewsListFragment.DATABASE_FRAGMENT :
-                NewsListFragment.RSS_FRAGMENT));
-        titles.add("订阅");
 
         String[] mtitles = new String[titles.size()];
         Object[] mobjs = titles.toArray();
@@ -333,12 +340,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         // for testing
-        try{
-            RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext())).addRSSFeed("BBC World",
-                    new URL("http://feeds.bbci.co.uk/news/world/rss.xml"));
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+//        try{
+//            RSSManager.getInstance(CacheDBOpenHelper.getInstance(getApplicationContext())).addRSSFeed("BBC World",
+//                    new URL("http://feeds.bbci.co.uk/news/world/rss.xml"));
+//        } catch(Exception e){
+//            e.printStackTrace();
+//        }
     }
 
     @Override

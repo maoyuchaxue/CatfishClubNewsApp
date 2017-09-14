@@ -31,6 +31,7 @@ import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsContentCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.DatabaseNewsMetaInfoListCache;
 import com.maoyuchaxue.catfishclubnewsapp.data.HistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.HybridNewsContentSource;
+import com.maoyuchaxue.catfishclubnewsapp.data.KeywordHistoryManager;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCategoryTag;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsContentSource;
 import com.maoyuchaxue.catfishclubnewsapp.data.NewsCursor;
@@ -72,6 +73,7 @@ public class NewsListFragment extends Fragment
     public static final int DATABASE_FRAGMENT = 1;
     public static final int BOOKMARK_FRAGMENT = 2;
     public static final int RSS_FRAGMENT = 3;
+    public static final int RECOMMEND_FRAGMENT = 4;
 
     private String category;
     private String keyword;
@@ -90,6 +92,7 @@ public class NewsListFragment extends Fragment
     private NewsCategoryTag tag;
     private int type;
     private NewsCursor mCursor;
+    private boolean isRecommended = false;
 
     private View mView = null;
 
@@ -177,6 +180,12 @@ public class NewsListFragment extends Fragment
         }
     }
 
+    private void initRecommendFragment() {
+        type = 0;
+        mMetaInfoListSource = new WebNewsMetaInfoListSource("http://166.111.68.66:2042/news/action/query/search");
+        isRecommended = true;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -216,6 +225,9 @@ public class NewsListFragment extends Fragment
             case RSS_FRAGMENT:
                 initRSSFragment();
                 break;
+            case RECOMMEND_FRAGMENT:
+                initRecommendFragment();
+                break;
         }
 
         mCursor = null;
@@ -253,10 +265,15 @@ public class NewsListFragment extends Fragment
     }
 
     private void resetNewsList() {
-        newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag, type);
+        if(isRecommended)
+            newsList = KeywordHistoryManager.getInstance(CacheDBOpenHelper.getInstance(getContext().
+                    getApplicationContext())).getRecommendedNewsList(mMetaInfoListSource, mNewsContentSource);
+        else
+            newsList = new SourceNewsList(mMetaInfoListSource, mNewsContentSource, keyword, tag, type);
         mNewsListRecyclerViewListener.setFinished(false);
         mNewsListRecyclerViewListener.setFirstBatchLoaded(false);
-        mAdapter.clear();
+        mNewsListRecyclerViewListener.resetLastLoad();
+        //mAdapter.clear();
     }
 
     public void reloadFromBeginning() {
@@ -341,9 +358,9 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onDestroy() {
-        if (mAdapter != null) {
-            mAdapter.clear();
-        }
+//        if (mAdapter != null) {
+//            mAdapter.clear();
+//        }
         super.onDestroy();
     }
 }

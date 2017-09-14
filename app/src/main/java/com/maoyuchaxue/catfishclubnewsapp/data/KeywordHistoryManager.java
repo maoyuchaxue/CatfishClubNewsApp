@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.constraint.solver.Cache;
+import android.util.Log;
 
 import com.maoyuchaxue.catfishclubnewsapp.data.db.CacheDBOpenHelper;
 import com.maoyuchaxue.catfishclubnewsapp.data.exceptions.NewsSourceException;
@@ -49,7 +50,8 @@ public class KeywordHistoryManager {
         }
         cursor.close();
 
-        return new SourceNewsList(metaInfoListSource, contentSource, searchKey, null, 0);
+        Log.i("KeywordHistoryManager", searchKey);
+        return new SourceNewsList(metaInfoListSource, contentSource, searchKey.isEmpty() ? null : searchKey, null, 0);
     }
 
     public void addKeys(String[] keys){
@@ -117,12 +119,12 @@ public class KeywordHistoryManager {
                     null, null, null, null, CacheDBOpenHelper.FIELD_SCORE + " asc", Integer.toString(removeCnt));
             cursor.moveToNext();
             do{
-                db.delete(CacheDBOpenHelper.KEYWORD_TABLE_NAME, CacheDBOpenHelper.FIELD_KEYWORD,
+                db.delete(CacheDBOpenHelper.KEYWORD_TABLE_NAME, CacheDBOpenHelper.FIELD_KEYWORD + "=?",
                         new String[]{cursor.getString(0)});
             } while(cursor.moveToNext());
             cursor.close();
         }
-
+        db.setTransactionSuccessful();
         db.endTransaction();
     }
 

@@ -48,6 +48,7 @@ public class NewsMetainfoLoader extends AsyncTaskLoader<List<NewsCursor>> {
         }
         for (int i = 0; i < loadBatch; i++) {
             if (curCursor == null) {
+                Log.i("recommend", "finished2");
                 finished = true;
                 break;
             }
@@ -56,6 +57,7 @@ public class NewsMetainfoLoader extends AsyncTaskLoader<List<NewsCursor>> {
         }
 
         if (curCursor == null) {
+            Log.i("recommend", "finished");
             finished = true;
         }
 
