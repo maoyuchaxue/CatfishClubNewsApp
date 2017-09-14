@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.maoyuchaxue.catfishclubnewsapp.activities.NewsViewActivity">
+    tools:context="com.java.team17.activities.NewsViewActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/news_view_menu_toolbar"

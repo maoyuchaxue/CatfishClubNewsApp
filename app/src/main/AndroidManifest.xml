@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.maoyuchaxue.catfishclubnewsapp">
+    package="com.java.team17">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -41,15 +41,15 @@
         android:roundIcon="@mipmap/ic_launcher_cat"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="com.java.team17.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.NewsViewActivity" />
-        <activity android:name=".activities.CategoryEditActivity" />
+        <activity android:name="com.java.team17.activities.NewsViewActivity" />
+        <activity android:name="com.java.team17.activities.CategoryEditActivity" />
         <activity
             android:name="com.mob.tools.MobUIShell"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -84,7 +84,7 @@
 
         <!-- 微信分享回调 -->
         <activity
-            android:name=".wxapi.WXEntryActivity"
+            android:name="com.java.team17.wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -98,7 +98,7 @@
             android:name="Mob-AppSecret"
             android:value="e3da27d7c73b3a0c48df2234afb0c0f4" />
 
-        <activity android:name=".activities.BookmarkListActivity"></activity>
+        <activity android:name="com.java.team17.activities.BookmarkListActivity"></activity>
     </application>
 
 </manifest>

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.maoyuchaxue.catfishclubnewsapp"
+        applicationId "com.java.team17"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1

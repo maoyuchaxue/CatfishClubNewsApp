@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.maoyuchaxue.catfishclubnewsapp.activities.BookmarkListActivity">
+    tools:context="com.java.team17.activities.BookmarkListActivity">
 
     <!--<include layout="@layout/widget_main_menu_bar"></include>-->
 
