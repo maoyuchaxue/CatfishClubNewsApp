@@ -169,11 +169,10 @@ public class NewsMetainfoRecyclerViewAdapter
 
             int loaderID = NewsListFragment.IMAGE_LOADER_ID + position;
             Loader loader = loaderManager.getLoader(loaderID);
-            if (loader != null) {
-                loaderManager.destroyLoader(loaderID);
-            }
-
-            loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
+            if (loader != null && loader.isReset()) {
+                loaderManager.restartLoader(loaderID, null, picsViewHolder).forceLoad();
+            } else
+                loaderManager.initLoader(loaderID, null, picsViewHolder).forceLoad();
 
 
             viewHolder.itemView.setTag(cursors.get(position));

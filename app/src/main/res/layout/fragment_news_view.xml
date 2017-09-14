@@ -39,11 +39,9 @@
         >
         <ListView
             android:id="@+id/news_view_content"
-            android:overScrollMode="ifContentScrolls"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:footerDividersEnabled="false"
-            android:stackFromBottom="true"
             android:divider="@null">
         </ListView>
     </LinearLayout>

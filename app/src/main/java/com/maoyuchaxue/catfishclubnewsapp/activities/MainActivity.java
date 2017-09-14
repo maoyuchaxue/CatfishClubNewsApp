@@ -420,7 +420,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             return;
         }
-        refreshTabLayout();
+        initTabLayout();
+//        refreshTabLayout();
     }
 
     @Override

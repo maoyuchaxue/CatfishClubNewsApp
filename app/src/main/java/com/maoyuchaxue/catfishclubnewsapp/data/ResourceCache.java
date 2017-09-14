@@ -27,7 +27,12 @@ public abstract class ResourceCache extends ResourceSource{
 
     @Override
     public Bitmap getAsThumbnail(URL url) throws IOException{
-        return getBitmapFromBlob(getAsThumbnailBlob(url));
+        Bitmap bm = getBitmapFromBlob(getAsThumbnailBlob(url));
+        if(bm == null)
+            Log.i("ResourceCache", "NULL");
+        else
+            Log.i("ResourceCache", url.toString());
+        return bm;
     }
 
     @Override
