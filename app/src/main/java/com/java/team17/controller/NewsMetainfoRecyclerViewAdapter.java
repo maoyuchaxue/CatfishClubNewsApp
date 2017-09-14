@@ -265,9 +265,9 @@ public class NewsMetainfoRecyclerViewAdapter
     public void clear() {
         for (int i = 0; i < cursors.size(); i++) {
             NewsCursor cursor = cursors.get(i);
-            if (cursor != null) {
-                cursor.close();
-            }
+//            if (cursor != null) {
+//                cursor.close();
+//            }
         }
         cursors = new ArrayList<NewsCursor>();
         IDToPosition = new HashMap<String, Integer>();

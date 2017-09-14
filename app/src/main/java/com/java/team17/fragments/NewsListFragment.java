@@ -151,6 +151,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void initBookmarkFragment() {
+        type = -1;
         mMetaInfoListSource = BookmarkManager.getInstance(CacheDBOpenHelper.
                 getInstance(getContext().getApplicationContext())).getNewsMetaInfoListSource();
         Log.i("bookmark", "bookmarkInited");
@@ -262,7 +263,7 @@ public class NewsListFragment extends Fragment
         mNewsListRecyclerViewListener.setFinished(false);
         mNewsListRecyclerViewListener.setFirstBatchLoaded(false);
         mNewsListRecyclerViewListener.resetLastLoad();
-        //mAdapter.clear();
+        mAdapter.clear();
     }
 
     public void reloadFromBeginning() {

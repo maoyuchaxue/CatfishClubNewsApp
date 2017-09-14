@@ -103,6 +103,10 @@ public abstract class DatabaseNewsMetaInfoListSource implements NewsMetaInfoList
                         NewsCategoryTag.CATEGORIES[catInt - 1]);
                 try {
                     metaInfo.setUrl(new URL(cursor.getString(5)));
+                } catch(MalformedURLException e){
+                    e.printStackTrace();
+                }
+                try {
                     metaInfo.setVideo(new URL(cursor.getString(7)));
                 } catch(MalformedURLException e){
                     e.printStackTrace();

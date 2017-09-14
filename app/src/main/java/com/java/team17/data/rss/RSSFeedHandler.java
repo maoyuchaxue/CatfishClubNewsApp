@@ -61,6 +61,8 @@ class RSSFeedHandler extends DefaultHandler {
                 currentNewsMetaInfo.setIntro(s);
             else if(currentElement.equalsIgnoreCase("source"))
                 currentNewsMetaInfo.setSrcSite(s);
+            else if(currentElement.equalsIgnoreCase("guid"))
+                currentNewsMetaInfo.setId(s);
         } else{
             if(currentElement.equalsIgnoreCase("title"))
                 channelMetaInfo.setTitle(s);
